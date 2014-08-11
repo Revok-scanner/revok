@@ -38,7 +38,7 @@ start() {
     # Check to see if the /proc dir for this process exists
     if [ -a /proc/${PID} ]; then
       # check to make sure this is likely the running service
-      ps aux | grep ${PID} | grep $ACTIVEMQD_PROCESS_TYPE >> /dev/null
+      ps aux | grep ${PID} | grep $ACTIVEMQD_PROCESS_TYPE | grep -v stop >> /dev/null
       # If it is a process of the right type assume that it is mydaemon and just exit
       # otherwise remove the subsys lock file and start mydaemon
       if [ "$?" = "0" ]; then
@@ -67,7 +67,7 @@ stop() {
     cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_STOP >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
     for i in {1..30}
     do
-      if [ -n "`ps aux | grep $ACTIVEMQD_PROCESS_TYPE | grep activemq `" ]; then
+      if [ -n "`ps aux | grep $ACTIVEMQD_PROCESS_TYPE | grep activemq |grep -v stop`" ]; then
         sleep 1 # Still running, wait a second.
         echo -n .
       else
@@ -89,7 +89,7 @@ stop() {
 }
 
 status() {
-  ps aux | grep activemq | grep $ACTIVEMQD_PROCESS_TYPE | grep -v status >> /dev/null
+  ps aux | grep activemq | grep $ACTIVEMQD_PROCESS_TYPE | grep -v status | grep -v stop >> /dev/null
   if [ "$?" == "1" ]; then
     echo "$NAME is not running"
   else
