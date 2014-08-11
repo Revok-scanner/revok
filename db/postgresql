@@ -10,7 +10,7 @@ SVC_LOG_FILE="$ROOT_PATH/.backend/log/$NAME.log"
 # Start Command
 restart() {
   echo "Starting $NAME: "
-  pg_ctl restart -D $DB_DATA_DIR -s -o "-p ${DB_PORT}" -w -t 300 -m fast -l $SVC_LOG_FILE
+  pg_ctl restart -D $DB_DATA_DIR -s -o "-p ${DB_PORT}" -w -t 300 -m fast -l $SVC_LOG_FILE >> $SVC_LOG_FILE 2>&1
 
   return $?
 }

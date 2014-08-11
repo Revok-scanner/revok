@@ -67,7 +67,7 @@ stop() {
     cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_STOP >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
     for i in {1..30}
     do
-      if [ -n "`ps aux | grep $ACTIVEMQD_PROCESS_TYPE | grep activemq |grep -v stop`" ]; then
+      if [ -n "`ps aux | grep $ACTIVEMQD_PROCESS_TYPE | grep activemq | grep -v stop`" ]; then
         sleep 1 # Still running, wait a second.
         echo -n .
       else
