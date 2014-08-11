@@ -1,0 +1,104 @@
+[class*="icon2-"] {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	background-image: url(../imgs/sprites_disable.svg);
+	background-repeat: no-repeat;
+}
+.icon2-directions {
+	background-position: 0 0;
+	width: 24px;
+}
+.icon2-user {
+	background-position: -40px 0;
+	width: 24px;
+}
+.icon2-location {
+	background-position: -80px 0;
+	width: 24px;
+}
+.icon2-paperplane {
+	background-position: -120px 0;
+	width: 24px;
+}
+.icon2-target {
+	background-position: -160px 0;
+	width: 24px;
+}
+.icon2-megaphone {
+	background-position: -200px 0;
+	width: 24px;
+}
+.icon2-tools {
+	background-position: -240px 0;
+	width: 24px;
+}
+.icon2-cog {
+	background-position: -280px 0;
+	width: 24px;
+}
+.icon2-link {
+	background-position: -320px 0;
+	width: 24px;
+}
+.icon2-bell {
+	background-position: -360px 0;
+	width: 24px;
+}
+.icon2-flashlight {
+	background-position: -400px 0;
+	width: 24px;
+}
+.icon2-search {
+	background-position: -440px 0;
+	width: 24px;
+}
+.icon2-feather {
+	background-position: -480px 0;
+	width: 24px;
+}
+.icon2-new {
+	background-position: -520px 0;
+	width: 24px;
+}
+.icon2-eye {
+	background-position: -560px 0;
+	width: 24px;
+}
+.icon2-key {
+	background-position: -600px 0;
+	width: 24px;
+}
+.icon2-light-bulb {
+	background-position: 0 -40px;
+}
+.icon2-info {
+	background-position: -40px -40px;
+}
+.icon2-help {
+	background-position: -80px -40px;
+}
+.icon2-upload {
+	background-position: -120px -40px;
+}
+.icon2-cloud {
+	background-position: -160px -40px;
+}
+.icon2-warning {
+	background-position: -200px -40px;
+}
+.icon2-arrow-left {
+	background-position: -240px -40px;
+}
+.icon2-arrow-right {
+	background-position: -280px -40px;
+}
+.icon2-network {
+	background-position: -320px -40px;
+}
+.icon2-house {
+	background-position: -360px -40px;
+}
+.icon2-mouse {
+	background-position: -400px -40px;
+}

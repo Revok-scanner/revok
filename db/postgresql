@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Name for the service, used in logging
+NAME=postgresql
+
+# Where to write the log file?
+SVC_LOG_FILE="$ROOT_PATH/.backend/log/$NAME.log"
+
+# SERVICE ENTRY POINTS (START/STOP)
+# Start Command
+restart() {
+  echo "Starting $NAME: "
+  pg_ctl restart -D $DB_DATA_DIR -s -o "-p ${DB_PORT}" -w -t 300 -m fast -l $SVC_LOG_FILE
+
+  return $?
+}
+
+stop() {
+  echo "Stopping $NAME: "
+  pg_ctl stop -D $DB_DATA_DIR -s -m fast -l $SVC_LOG_FILE
+
+  return $?
+}
+
+status() {
+  pg_ctl status -D $DB_DATA_DIR
+}
+
+case "$1" in
+  start)
+    restart
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  status)
+    status
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac

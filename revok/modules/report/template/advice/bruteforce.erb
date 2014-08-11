@@ -1,0 +1,18 @@
+
+<% name "Brute-force [1 url]" %>
+<% priority 10 %>
+
+
+
+<b>Description:</b> It appears that your site does not have any mitigation method to prevent from brute-force attacks on login pages.</br>
+<b>Affected URLs:</b><br/>
+
+
+<%= "#{details['method']} request for #{details['login']}<br/>" %>
+
+<b>Advice: </b> Implement mitigations such as locking out accounts after unsuccessful login trials or introducing time delays between successive attempts to login.<br/>
+<b>References:</b> </br>
+OWASP - https://www.owasp.org/index.php/Authentication_Cheat_Sheet#Prevent_Brute-Force_Attacks</br>
+
+
+

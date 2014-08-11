@@ -1,0 +1,33 @@
+<% priority 10 %>
+<% if details['ssl_report'].length >1 %>
+<% name "SSL/TLS Mis-configuration [#{details['ssl_report'].length} issues]" %>
+<% else %>
+<% name "SSL/TLS Mis-configuration [1 issue]" %>
+<% end %>
+<b>Description:</b> SSL/TLS mis-configuration exists on the target's web server. The configuration can not secure the communication between browser and server well.<br/>
+<b>Issues:</b><br/>
+
+<% num=1 %>
+<% details['ssl_report'].each do |key,value| %>
+	<%= "#{num}" %>.&nbsp;&nbsp;<%= "#{value[0]}" %><br/>
+
+	<% if value[2]!=nil %>
+		<% value[2].each do |i| %>
+			<%= "&nbsp;&nbsp;&nbsp;&nbsp;#{i}<br/>" %>
+		<% end %>
+	<% end %>
+	
+	<% num+=1 %>
+<% end %>
+
+<b>Advice:</b><br/>
+<% num=1 %>
+<% details['ssl_report'].each do |key,value| %>
+	<%= "#{num}" %>.&nbsp;&nbsp;<%= "#{value[1]}" %><br/>
+	<% num+=1 %>
+<% end %>
+
+<b>Reference:</b><br/>
+OWASP - https://www.owasp.org/index.php/Testing_for_SSL-TLS_(OWASP-CM-001)<br/>
+<br/>
+

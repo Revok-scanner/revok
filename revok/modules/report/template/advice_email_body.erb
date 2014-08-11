@@ -1,0 +1,18 @@
+Your scan report of <%= "#{report.config['target']}" %> is ready. For detailed report, please download the attachment.
+
+========================================
+       Revok Executive Report
+========================================
+
+Revok version: 0.7
+Target: <%= "#{report.config['target']}\n" %>
+Started on: <%= "#{report.datastore['start']}\n" %>
+Finished on: <%= "#{`date`.slice(0..-2)}\n" %>
+
+
+Scan results:
+
+     Vulnerability: <%= "%*d\n" % [3,report.warnings.size] %>
+Security Hardening: <%= "%*d\n" % [3,report.advice.size] %>
+               Sum: <%= "%*d\n" % [3,report.advice.size+report.warnings.size] %>
+========================================

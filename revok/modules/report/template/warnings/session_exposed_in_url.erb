@@ -1,0 +1,22 @@
+
+<% priority 10 %>
+
+<% if details['list'].size >1 %>
+<% name "Session Exposure In URL [#{details['list'].size} urls]" %>
+<% else %>
+<% name "Session Exposure In URL [1 url]" %>
+<% end %>
+
+<b>Description:</b> Session IDs are exposed in requested urls.<br/>
+
+
+<%= "Affected URLs:<br/>" %>
+
+<% details['list'].each do |endpoint| %>
+	<%= "#{endpoint['url']}<br/>" %>
+<% end %>
+
+
+<b>Remediation:</b> Avoid transmitting session IDs through urls.<br/>
+<b>References:</b></br> 
+CWE-200 - http://cwe.mitre.org/data/definitions/200.html<br/>

@@ -1,0 +1,16 @@
+
+
+<% name "Lack of SSL on login page [1 url]" %>
+
+<% priority 10 %>
+
+
+
+<b>Description:</b> The login page does not require or redirect to SSL, it may leads to the sensitive data exposure.<br/>
+<b>Affected URLs:</b><br/>
+
+<%= "#{details['reason']}" %> for <%= "#{details['login_page']}<br/>" %>
+
+<b>Advice: </b> Enable the SSL forcing with a trusted certificate for login page.<br/>
+<b>References:</b><br/>
+OWASP - https://www.owasp.org/index.php/HTTP_Strict_Transport_Security<br/>

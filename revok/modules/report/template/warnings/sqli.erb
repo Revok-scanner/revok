@@ -1,0 +1,21 @@
+
+<% priority 10 %>
+
+<% if details['vul_urls'].size >1 %>
+<% name "SQL Injection [#{details['vul_urls'].size} urls]" %>
+<% else %>
+<% name "SQL Injection [1 url]" %>
+<% end %>
+<b>Description:</b> Client-side sql code can be injected into the web application. This law can be exploited to read, modify sensitive data, execute administration operations on the database, recover the content of a given file present on the DBMS file system and issue commands to the operating system.<br/>
+
+
+
+<%= "<b>Affected URLs:</b> <br/>" %>
+
+<% details['vul_urls'].each do |url, method| %>
+	<%= "#{method}" %> request for <%= "#{url}<br/>" %>
+<% end %>
+
+<b>Remediation:</b> User inputs must be validated, filtered or or encoded before being included in database queries.<br/>
+<b>References:</b></br> 
+OWASP - https://www.owasp.org/index.php/SQL_Injection<br/>

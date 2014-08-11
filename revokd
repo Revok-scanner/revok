@@ -1,0 +1,89 @@
+#!/bin/bash
+
+export ROOT_PATH=$(dirname $(readlink -f $0))
+NULL="> /dev/null 2>&1"
+
+. $ROOT_PATH/bin/setenv.sh
+
+init() {
+  # Pre-init check
+  # JRE check
+  echo -en "Check JRE installation..."
+  which java > /dev/null || exit 1
+  echo "done"
+
+  # Make dirs
+  echo -en "Make directories..."
+  eval mkdir -p .frontend/lock $NULL
+  eval mkdir -p .frontend/pid $NULL
+  eval mkdir -p .frontend/log $NULL
+  eval mkdir -p .backend/lock $NULL
+  eval mkdir -p .backend/pid $NULL
+  eval mkdir -p .backend/log $NULL
+  echo "done"
+
+  # Softlink bin files
+  echo -en "Make softlinks..."
+  eval ln -s $PHANTOM_JS_DIR/bin/phantomjs $ROOT_PATH/bin/phantomjs $NULL
+  eval ln -s $MITMPROXY_DIR/mitmproxy $ROOT_PATH/bin/mitmproxy $NULL
+  eval ln -s $MITMPROXY_DIR/mitmdump $ROOT_PATH/bin/mitmdump $NULL
+  eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so $NULL
+  eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so.5 $NULL
+  eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml.so $NULL
+  eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml-0.so.2 $NULL
+  echo "done"
+
+  # Config iptables
+  echo "Config iptables, may need the password for root..."
+  su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
+  iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
+  iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
+  iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT"
+  echo "done"
+}
+
+start() {
+  $ROOT_PATH/activemq/activemqd start
+  $ROOT_PATH/db/postgresql start
+  $ROOT_PATH/caroline/carolined start
+  $ROOT_PATH/rest/rest-served start
+  $ROOT_PATH/webconsole/frontd start
+}
+
+stop() {
+  $ROOT_PATH/webconsole/frontd stop
+  $ROOT_PATH/rest/rest-served stop
+  $ROOT_PATH/caroline/carolined stop
+  $ROOT_PATH/db/postgresql stop
+  $ROOT_PATH/activemq/activemqd stop
+}
+
+status() {
+  $ROOT_PATH/activemq/activemqd status
+  $ROOT_PATH/rest/rest-served status
+  $ROOT_PATH/caroline/carolined status
+  $ROOT_PATH/webconsole/frontd status
+  $ROOT_PATH/db/postgresql status
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
+  restart|reload)
+    stop
+    start
+  ;;
+  init)
+    init
+  ;;
+  *)
+    echo $"Usage: $0 {init|start|stop|status|restart}"
+    exit 1
+esac

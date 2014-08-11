@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Revok</title>
+  <link rel="stylesheet" href="css/foundation.custom.css"/>
+  <link rel="stylesheet" href="css/revok.css"/>
+  <link rel="stylesheet" href="css/sprites.css"/>
+  <link rel="stylesheet" href="css/sprites_disable.css"/>
+  <link rel="stylesheet" href="css/loda-button.css"/>
+</head>
+<body ng-controller="stateController">
+
+
+
+  <div class="row" style="margin-top:10px;">
+    <a href="/">
+    <div class="large-6 columns " style="margin-left: 0px;">
+      <img id="logo" src="imgs/revok.png" width="90" height="90"/>
+      
+    </div>
+    </a>
+    
+
+    <div class="smal large-6 columns" style="text-align:right;line-height:30px;">
+      <div style="margin-right:0px">
+          <a class="toplink" href="https://docs.engineering.redhat.com/x/5QtmAQ" target="_blank">About</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <a class="toplink" href="https://docs.engineering.redhat.com/x/RgU_AQ" target="_blank">Features</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <a class="toplink" href="https://docs.engineering.redhat.com/x/4QhmAQ" target="_blank">FAQ</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <div ng-view></div>
+</div><!--end wrapper-->
+
+<div class="footer">
+  <div class="row">
+    <div class="small-6 large-6 columns">
+        <p style="font-size:12px">&nbsp;Copyright &copy; 2014 Red Hat, Inc.</p>
+        <p style="font-size:12px">&nbsp;HSS Pen-test Team</p>
+    </div>
+    <div class="smal large-6 columns">
+      <div class="row" style="float:right; padding-top:1.2em;">  
+          <a class="footerlink" href="https://docs.engineering.redhat.com/x/qQA_AQ" target="_blank">Roadmap&nbsp;&nbsp;&nbsp;</a>
+          <a class="footerlink" href="https://docs.engineering.redhat.com/x/2ghmAQ" target="_blank">Changelog&nbsp;&nbsp;&nbsp;</a>
+          <a class="footerlink" href="https://post-office.corp.redhat.com/mailman/listinfo/revok" target="_blank">Subscribe&nbsp;&nbsp;&nbsp;</a>
+          <a class="footerlink" href="mailto:revok@redhat.com">Email&nbsp;&nbsp;&nbsp;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="js/vendor/jquery.js"></script>
+  <script src="js/loda-button.js"></script>
+  <script src="js/angular.min.js"></script>
+  <script src="js/revok.js"></script>
+  <script src="js/controllers/state.js"></script>
+  <script src="js/controllers/detect.js"></script>
+  <script src="js/controllers/scan.js"></script>
+  <script src="js/controllers/graphic.js"></script>
+  <script src="js/controllers/loginfo.js"></script>
+  <script src="js/controllers/manuallogin.js"></script>
+  <script src="js/controllers/confirm.js"></script>
+</body>
+</html>

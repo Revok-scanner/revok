@@ -1,0 +1,24 @@
+
+<% priority 10 %>
+
+<% if details['vul_paths'].size >1 %>
+<% name "Method Check [#{details['vul_paths'].size} urls]" %>
+<% else %>
+<% name "Method Check [1 url]" %>
+<% end %>
+<b>Description:</b> Some HTTP methods are designed to aid developers in deploying and testing HTTP applications. These HTTP methods can be used for nefarious purposes if the web server is misconfigured.<br/>
+
+<% if details.has_key?('vul_paths') then %>
+			<b>Affected URLs:</b><br/>
+
+			<% details['vul_paths'].each_pair {|path, method| %>
+				<%= "#{method}" %> enabled on <%= "#{path}<br/>" %>
+			<% } %>
+<% end %>
+
+
+<b>Advice: </b> Disable the HTTP methods that are listed.<br/>
+<b>References:</b><br/>
+OWASP - https://www.owasp.org/index.php/Testing_for_HTTP_Methods_and_XST_(OWASP-CM-008)<br/>
+Apache - http://httpd.apache.org/docs/2.2/mod/core.html#limitexcept<br/>
+Nginx - http://nginx.org/en/docs/http/ngx_http_core_module.html#limit_except<br/>

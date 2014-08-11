@@ -1,0 +1,24 @@
+
+<% if details['cookies'].split("<br/>").size >1 %>
+<% name "#{details['name']} [#{details['cookies'].split("<br/>").size} cookies]" %>
+<% elsif details['cookies']=="All of the cookies.<br/>" %>
+<% name "#{details['name']} [all cookies]" %>
+<% else %>
+<% name "#{details['name']} [1 cookie]" %>
+<% end %>
+<% priority 10 %>
+
+
+
+<% if details.has_key?('description') then %>
+<b>Description:</b> <%= "#{details['description']}<br/>" %>
+<% end %>
+<% if details.has_key?('cookies') then %>
+<b>Affected cookies:</b><br/> <%= "#{details['cookies']}" %>
+<% end %>
+<% if details.has_key?('advice') then %>
+<b>Advice: </b> <%= "#{details['advice']}<br/>" %>
+<% end %>
+<% if details.has_key?('reference') then %>
+<b>References:</b><br/><%= "#{details['reference']}<br/>" %>
+<% end %>

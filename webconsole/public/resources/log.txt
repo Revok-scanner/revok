@@ -1,0 +1,270 @@
+
+** send introduction email **
+ [*] RESULT: PASS
+
+** autologin **
+ [*] mitmdump running...
+ [*] phantomjs running...
+ [*] asking mitmdump to stop
+ [*] 10770
+ [*] RESULT: PASS
+
+** crawler **
+ [*] mitmdump
+ [*] phantomjs
+ [*] asking mitmdump to stop
+ [*] 10869
+ [*] pipes closed
+ [*] 412497
+ [*] 4399
+ [*] RESULT: PASS
+
+** null session **
+
+** merge and snk **
+ [*] RESULT: PASS
+
+** setup **
+
+** sitemap **
+ [*] Generating the directory structure of this site
+ [*] Directory structure:
+ [*] http://10.66.81.133/
+ [*] http://10.66.81.133/login.php
+ [*] http://10.66.81.133/dvwa/
+ [*] http://10.66.81.133/dvwa/css/
+ [*] http://10.66.81.133/dvwa/css/login.css
+ [*] http://10.66.81.133/dvwa/css/main.css
+ [*] http://10.66.81.133/dvwa/images/
+ [*] http://10.66.81.133/dvwa/images/login_logo.png
+ [*] http://10.66.81.133/dvwa/images/logo.png
+ [*] http://10.66.81.133/dvwa/images/spanner.png
+ [*] http://10.66.81.133/dvwa/images/lock.png
+ [*] http://10.66.81.133/dvwa/js/
+ [*] http://10.66.81.133/dvwa/js/dvwaPage.js
+ [*] http://10.66.81.133/index.php
+ [*] http://10.66.81.133/instructions.php
+ [*] http://10.66.81.133/setup.php
+ [*] http://10.66.81.133/vulnerabilities/
+ [*] http://10.66.81.133/vulnerabilities/brute/
+ [*] http://10.66.81.133/vulnerabilities/exec/
+ [*] http://10.66.81.133/vulnerabilities/csrf/
+ [*] http://10.66.81.133/vulnerabilities/captcha/
+ [*] http://10.66.81.133/vulnerabilities/fi/
+ [*] http://10.66.81.133/vulnerabilities/sqli/
+ [*] http://10.66.81.133/vulnerabilities/sqli_blind/
+ [*] http://10.66.81.133/vulnerabilities/upload/
+ [*] http://10.66.81.133/vulnerabilities/xss_r/
+ [*] http://10.66.81.133/vulnerabilities/xss_s/
+ [*] http://10.66.81.133/security.php
+ [*] http://10.66.81.133/phpinfo.php
+ [*] http://10.66.81.133/about.php
+ [*] http://10.66.81.133/ids_log.php
+ [*] RESULT: PASS
+
+** corss **
+ [*] RESULT: PASS
+
+** access_admin **
+ [*] Start sending requests to possible admin URIs...
+ [*] RESULT: PASS
+
+** path_traversal **
+ [*] Now checking path traversal against URL: http://10.66.81.133/vulnerabilities/fi\?page=include.php...
+ [*] Now checking path traversal against URL: http://10.66.81.133/instructions.php\?doc=PHPIDS-license...
+ [*] RESULT: FAIL
+
+** session_exposed_in_url **
+ [*] detecting session_id
+ [*] PHPSESSID
+ [*] The key of Session ID is detected: PHPSESSID
+ [*] RESULT: PASS
+ [*] checking session_id exposure in url
+ [*] No session ID found in urls
+ [*] RESULT: PASS
+
+** session_fixation **
+ [*] Start session fixation test...
+ [*] Start pre_login before the first login...
+ [*] Step1: Check session ID is set before login or not
+ [*] Step2: Session ID is set before login. Login and check if it changes...
+ [*] No set cookie in response header
+ [*] pre_session is: {"PHPSESSID"=>"s9n1s8p0qa0akmq02gevjlek97", "security"=>"low"}
+ [*] aft_session is: {"PHPSESSID"=>"s9n1s8p0qa0akmq02gevjlek97", "security"=>"low"}
+ [*] The cookie is not changed after login
+ [*] Login with an old session ID, and it was not reset
+ [*] RESULT: FAIL
+
+** cookie_attr_check **
+ [*] checking cookie attr
+ [*] 'expires' not set on cookies:{"GET http://10.66.81.133/login.php "=>"PHPSESSID=qp4sdo4epo3gqdj535lbvaikj2; path=/"}
+ [*] RESULT: FAIL
+
+** reverse_cookie **
+ [*] reversing cookie
+ [*] Scan for critical information in plain, base64 and hex decoded cookies...
+ [*] No critical info was found
+ [*] RESULT: PASS
+
+** mime_type **
+ [*] Actual content type mismatchs with html: POST http://10.66.81.133/security.php?test=param
+ [*] RESULT: FAIL
+
+** frame_busting **
+ [*] The following 26 URLs miss the field "X-Frame-Options" in HTTP headers:
+ [*] 	URL: http://10.66.81.133/login.php
+ [*] 	URL: http://10.66.81.133/index.php
+ [*] 	URL: http://10.66.81.133/
+ [*] 	URL: http://10.66.81.133/instructions.php
+ [*] 	URL: http://10.66.81.133/setup.php
+ [*] 	URL: http://10.66.81.133/security.php
+ [*] 	URL: http://10.66.81.133/phpinfo.php
+ [*] 	URL: http://10.66.81.133/about.php
+ [*] 	URL: http://10.66.81.133/vulnerabilities/exec/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/brute/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/csrf/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/captcha/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/fi/?page=6f8aa728-16ea-4470-a885-2f54609deda1
+ [*] 	URL: http://10.66.81.133/vulnerabilities/sqli/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/sqli_blind/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/upload/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/xss_r/
+ [*] 	URL: http://10.66.81.133/vulnerabilities/xss_s/
+ [*] 	URL: http://10.66.81.133/instructions.php?doc=da72b3c4-4ec1-48db-85cb-5901aa7d5791
+ [*] 	URL: http://10.66.81.133/security.php?test=9ce34771-393d-4668-812e-50c27c3dbadc
+ [*] 	URL: http://10.66.81.133/ids_log.php
+ [*] 	URL: http://10.66.81.133/vulnerabilities/sqli/?id=&Submit=Submit
+ [*] 	URL: http://10.66.81.133/vulnerabilities/csrf/?password_new=&password_conf=&Change=Change
+ [*] 	URL: http://10.66.81.133/vulnerabilities/brute/?username=&password=&Login=Login
+ [*] 	URL: http://10.66.81.133/vulnerabilities/sqli_blind/?id=&Submit=Submit
+ [*] 	URL: http://10.66.81.133/vulnerabilities/xss_r/?name=
+ [*] RESULT: FAIL
+
+** method_check **
+ [*] Checking each directory
+ [*] The URL "http://10.66.81.133/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/dvwa/" should disable following methods:
+ [*] OPTIONS, TRACE
+ [*] The URL "http://10.66.81.133/dvwa/css/" should disable following methods:
+ [*] OPTIONS, TRACE
+ [*] The URL "http://10.66.81.133/dvwa/images/" should disable following methods:
+ [*] OPTIONS, TRACE
+ [*] The URL "http://10.66.81.133/dvwa/js/" should disable following methods:
+ [*] OPTIONS, TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/" should disable following methods:
+ [*] OPTIONS, TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/brute/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/exec/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/csrf/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/captcha/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/fi/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/sqli/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/sqli_blind/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/upload/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/xss_r/" should disable following methods:
+ [*] TRACE
+ [*] The URL "http://10.66.81.133/vulnerabilities/xss_s/" should disable following methods:
+ [*] TRACE
+ [*] RESULT: FAIL
+
+** passwd_auto_complete **
+ [*] Check auto-complete enabled on pass parameters
+ [*] Access login page http://10.66.81.133/login.php
+ [*] RESULT: PASS
+
+** bruteforce **
+ [*] Begin Bruteforcing
+ [*] *Bruteforcing is working*
+ [*] RESULT: FAIL
+
+** anti_reflection **
+ [*] RESULT: FAIL
+
+** redir check **
+ [*] Fetching requests to test from session data...
+ [*] Testing http://10.66.81.133/vulnerabilities/xss_r/?name=param
+ [*] Testing http://10.66.81.133/vulnerabilities/xss_s/
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Testing http://10.66.81.133/vulnerabilities/xss_s/
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] Problem execution expired
+ [*] RESULT: PASS
+
+** ssl_check **
+ [*] {:ssl_available_check=>["Target URL does not appear to support SSL.", "Enable SSL for your site, or at least make sure the urls which transmit sensitive data are only accessible through secure HTTPS connections."]}
+ [*] RESULT: FAIL
+
+** sqli **
+ [*] Error based test.
+ [*] Keyword found: column
+ [*] Keyword found: column
+ [*] Keyword found: unknown
+ [*] Keyword found: column
+ [*] Keyword found: usuario
+ [*] Keyword found: unknown
+ [*] Keyword found: column
+ [*] Keyword found: usuario
+ [*] Keyword found: line
+ [*] Keyword found: line
+ [*] Keyword found: unknown
+ [*] Keyword found: unknown
+ [*] Keyword found: invalid
+ [*] Keyword found: function
+ [*] Keyword found: invalid
+ [*] Keyword found: function
+ [*] Time based test.
+ [*] RESULT: FAIL
+
+** xssi **
+ [*] Checking: GET http://10.66.81.133/vulnerabilities/xss_r/?name=4125e520-c632-445c-8602-417781549d50
+ [*] 	checking param 24:
+ [*] 		["'", "\"", "<", ">"]
+ [*] Checking: POST http://10.66.81.133/vulnerabilities/xss_s/
+ [*] 	checking param 27:
+ [*] 		["'", "\"", "<", ">"]
+ [*] 	checking param 28:
+ [*] 		["'", "\"", "<", ">"]
+ [*] RESULT: FAIL
+
+** render report **
+ [*] Rendering executive report...
+ [*] Rendering warnings/...
+ [*] path_traversal
+ [*] session_fixation
+ [*] sqli
+ [*] xssi
+ [*] Rendering lists/...
+ [*] sitemap
+ [*] Rendering advice/...
+ [*] cookie_attr_check
+ [*] cookie_attr_check
+ [*] cookie_attr_check
+ [*] mime_type_check
+ [*] frame_busting
+ [*] method_check
+ [*] bruteforce
+ [*] anti_reflection
+ [*] ssl_check
+ [*] Rendering final report...
+ [*] Report rendered...
+ [*] RESULT: PASS
+
+** send report email **
+ [*] RESULT: PASS
+

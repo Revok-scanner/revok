@@ -1,0 +1,25 @@
+
+<% if details['vul_urls'].size >1 %>
+<% name "Frame busting [#{details['vul_urls'].size} urls]" %>
+<% else %>
+<% name "Frame busting [1 url]" %>
+<% end %>
+<% priority 10 %>
+
+
+<b>Description:</b> Use multiple transparent or opaque layers to trick users into clicking on another page when they were intending to click on the the top level page.<br/>
+
+
+
+
+
+<% if details.has_key?('vul_urls') then %>
+		<b>Affected URLs:</b><br/>
+		<% details['vul_urls'].each {|vul_url| %>
+		<%= "#{vul_url}<br/>" %>
+		<% } %>
+
+<% end %>
+<b>Advice: </b> Send the x-frame-options: deny/sameorigin response header to prevent framing from other domains.<br/>
+<b>Reference:</b><br/>
+OWASP - https://www.owasp.org/index.php/List_of_useful_HTTP_headers<br/>
