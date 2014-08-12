@@ -157,7 +157,8 @@ All dependent packages of REST API Server are required. Other dependency is as b
 - ImageMagick
 - openssl
 - sslscan
-- expecta
+- expect
+- zip
 
 [Demo for Fedora 20]
 $ yum install -y python ImageMagick openssl sslscan expect
@@ -243,7 +244,7 @@ $ systemctl start httpd.service
 Access the web console via url http://$FRONT_HOST:$FRONT_PORT.
 
 
- 
+
 3 Monitor and troubleshoot
 
 3.1 Service status

@@ -5,7 +5,7 @@ Revok is an online self-service web app security scanner, finding common web sec
 
 Download
 -------------
-The binary version which has self-contained operating environment can be downloaded from https://revok.app.qa.eng.nay.redhat.com/scan/resources/revok-0.7.6.tar.gz
+The binary version which has self-contained operating environment can be downloaded from https://revok.app.qa.eng.nay.redhat.com/scan/resources/revok-0.7.6_x86_64.tar.xz or https://revok.app.qa.eng.nay.redhat.com/scan/resources/revok-0.7.6_i686.tar.xz
 The source code can be cloned from git+ssh://code.engineering.redhat.com/revok.git
 
 
@@ -17,9 +17,8 @@ Find more documents at https://docs.engineering.redhat.com/x/EAdmAQ
 Start Revok in a single node
 ------------------------------------
 Step 1: Download and decompress the binary version
-Step 2: Modify the report config (smtp config) in the file conf/revok.conf
-Step 3: Initialize with command ./revokd init
-Step 4: Run with command ./revokd start
+Step 2: Initialize with command ./revokd init
+Step 3: Run with command ./revokd start
 
 
 Deploy Revok in distributed environment
@@ -30,7 +29,7 @@ Five components of Revok: web console, REST API server, messaging server, Caroli
 Use Revok to scan a target
 -----------------------------------
 Step 1: Open the web console in browser
-step 2: Input a target URL
+Step 2: Input a target URL
 Step 3: Provide authentication information
 Step 4: Confirm and submit
 
