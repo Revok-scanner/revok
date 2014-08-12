@@ -10,7 +10,7 @@ set_smtp(){
   server_reg="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
   port_reg="[0-9]{1,5}"
   while true; do
-    echo "To send you scan report, we need your email:"
+    echo "We need an email account to send the scan report:"
     read email
     email="${email,,}"
 
