@@ -11,15 +11,25 @@ SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
 restart() {
   echo "Starting $NAME: "
   pg_ctl restart -D $DB_DATA_DIR -s -o "-p ${DB_PORT}" -w -t 300 -m fast -l $SVC_LOG_FILE >> $SVC_LOG_FILE 2>&1
-
-  return $?
+  
+  if [ $? -eq 0 ]; then
+    echo Done
+    return 0
+  else
+    return 1
+  fi
 }
 
 stop() {
   echo "Stopping $NAME: "
   pg_ctl stop -D $DB_DATA_DIR -s -m fast -l $SVC_LOG_FILE
 
-  return $?
+  if [ $? -eq 0 ]; then
+    echo Done
+    return 0
+  else
+    return 1
+  fi
 }
 
 status() {
