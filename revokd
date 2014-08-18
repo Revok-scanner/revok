@@ -114,6 +114,10 @@ init() {
   eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml-0.so.2 $NULL
   echo "done"
 
+  # Softlink docs
+  eval ln -s $ROOT_PATH/docs $ROOT_PATH/webconsole/public/docs $NULL
+  eval ln -s $ROOT_PATH/README $ROOT_PATH/webconsole/public/docs/About $NULL
+
   # Config iptables
   echo "Configure iptables, may need the password for root..."
   su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
@@ -129,7 +133,7 @@ start() {
   $ROOT_PATH/caroline/carolined start
   $ROOT_PATH/rest/rest-served start
   $ROOT_PATH/webconsole/rackd start
-  echo "Now, you can access http://127.0.0.1:3030 in your browser to try Revok, have a nice day"
+  echo "Web console is started at http://127.0.0.1:3030. Have a nice journey with Revok!"
 }
 
 stop() {

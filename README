@@ -1,17 +1,12 @@
 Introduction
 ---------------
-Revok is an online self-service web app security scanner, finding common web security issues with minimal cost. If you are unsure of the security of your application, enter its URL into the Revok scanner and a diagnosis of the sites security will follow. Revok can be deployed in both integrated (single node) and distributed (multiple nodes) environment.
+Revok is an online self-service web app security scanner, finding common web security issues with minimal cost. If you are unsure of the security of your application, enter its URL into the Revok scanner and a diagnosis of the sites security will follow. Revok can be deployed in both centralized (single node) and distributed (multiple nodes) environment.
 
 
 Download
 -------------
-The binary version which has self-contained operating environment can be downloaded from https://revok.app.qa.eng.nay.redhat.com/scan/resources/revok-0.7.6_x86_64.tar.xz or https://revok.app.qa.eng.nay.redhat.com/scan/resources/revok-0.7.6_i686.tar.xz
-The source code can be cloned from git+ssh://code.engineering.redhat.com/revok.git
-
-
-Documents
----------------
-Find more documents at https://docs.engineering.redhat.com/x/EAdmAQ
+The binary version which has self-contained operating environment can be downloaded from http://revok.github.io/revok/revok-0.7.6_x86_64.tar.xz
+The source code can be cloned from https://github.com/Revok/revok.git
 
 
 Start Revok in a single node
@@ -19,6 +14,7 @@ Start Revok in a single node
 Step 1: Download and decompress the binary version
 Step 2: Initialize with command ./revokd init
 Step 3: Run with command ./revokd start
+Step 4: Access the web console at http://localhost:3030
 
 
 Deploy Revok in distributed environment
@@ -28,17 +24,21 @@ Five components of Revok: web console, REST API server, messaging server, Caroli
 
 Use Revok to scan a target
 -----------------------------------
-Step 1: Open the web console in browser
-Step 2: Input a target URL
-Step 3: Provide authentication information
-Step 4: Confirm and submit
+Step 1: Input a target URL to be scanned
+Step 2: Provide authentication information
+Step 3: Confirm and submit
+
+
+Documents
+---------------
+Find more documents in docs directory.
 
 
 Issues tracker
 ------------------
-Issues for Revok is listed at https://projects.engineering.redhat.com/issues/?filter=13510
+Issues for Revok is listed at https://github.com/Revok/revok/issues.
 
 
 Contact us
 --------------
-Email revok@redhat.com or join IRC #revok channel.
+Plese email to revok2014@gmail.com.

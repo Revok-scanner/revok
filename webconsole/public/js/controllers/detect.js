@@ -61,15 +61,6 @@ revok.controller('loginDetectController', function($scope,$timeout,$http) {
                 return;
             }
             clear_userinfo();
-            try{
-               $scope.state.target.indexOf('redhat.com') ;
-            }       
-            catch(e){
-                $scope.input_style = "form-group has-error";
-                $scope.user_input_error = "URL is empty.";
-                $scope.need_error_log = true;
-
-            }
             if ($scope.state.target == ''){
                 $scope.input_style = "form-group has-error";
                 $scope.user_input_error = "URL is empty.";
