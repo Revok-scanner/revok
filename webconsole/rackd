@@ -63,7 +63,7 @@ stop() {
   checkpid
   if [ "${PID}" != "" ]; then
     echo $"Stopping $NAME: "
-    kill $PID
+    kill -INT $PID
     for i in {1..30}
     do
       if [ -n "`ps aux | grep $PROCESS_TYPE | grep rackup `" ]; then
