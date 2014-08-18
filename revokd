@@ -129,6 +129,7 @@ start() {
   $ROOT_PATH/caroline/carolined start
   $ROOT_PATH/rest/rest-served start
   $ROOT_PATH/webconsole/rackd start
+  echo "Now, you can access http://127.0.0.1:3030 in your browser to try Revok, have a nice day"
 }
 
 stop() {
