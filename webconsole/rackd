@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Name for the service, used in logging
-NAME=frontd
+NAME=rackd
 
 # In which directory is the shell script that this service will execute
 SCRIPTS_DIR="$ROOT_PATH/webconsole"
@@ -11,14 +11,14 @@ SCRIPTS_DIR="$ROOT_PATH/webconsole"
 PROCESS_TYPE=ruby
 
 # Where to write the log file?
-SVC_LOG_FILE="$ROOT_PATH/.frontend/log/$NAME.log"
+SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
 
 # Lock file
-LOCK_FILE="$ROOT_PATH/.frontend/lock/$NAME"
+LOCK_FILE="$ROOT_PATH/var/lock/$NAME"
 
 # Where to write the process identifier - this is used to track if the service is already running
 # Note: the script noted in the COMMAND must actually write this file
-PID_FILE="$ROOT_PATH/.frontend/pid/$NAME.pid"
+PID_FILE="$ROOT_PATH/var/run/$NAME.pid"
 
 # Is the service already running? If so, capture the process id
 checkpid(){

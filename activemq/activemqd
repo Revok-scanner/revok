@@ -12,14 +12,14 @@ ACTIVEMQD_COMMAND_STOP="bin/activemq stop"
 ACTIVEMQD_PROCESS_TYPE=java
 
 # Where to write the log file?
-ACTIVEMQD_SVC_LOG_FILE="$ROOT_PATH/.backend/log/$NAME.log"
+ACTIVEMQD_SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
 
 # Lock file
-ACTIVEMQD_LOCK_FILE="$ROOT_PATH/.backend/lock/$NAME"
+ACTIVEMQD_LOCK_FILE="$ROOT_PATH/var/lock/$NAME"
 
 # Where to write the process identifier - this is used to track if the service is already running
 # Note: the script noted in the COMMAND must actually write this file
-PID_FILE="$ACTIVEMQD_SCRIPTS_DIR/data/activemq-*.pid"
+PID_FILE=$ACTIVEMQ_PIDFILE
 
 # Is the service already running? If so, capture the process id
 checkpid(){

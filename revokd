@@ -98,12 +98,9 @@ init() {
 
   # Make dirs
   echo -en "Make directories..."
-  eval mkdir -p .frontend/lock $NULL
-  eval mkdir -p .frontend/pid $NULL
-  eval mkdir -p .frontend/log $NULL
-  eval mkdir -p .backend/lock $NULL
-  eval mkdir -p .backend/pid $NULL
-  eval mkdir -p .backend/log $NULL
+  eval mkdir -p var/lock $NULL
+  eval mkdir -p var/run $NULL
+  eval mkdir -p var/log $NULL
   echo "done"
 
   # Softlink bin files
@@ -131,11 +128,11 @@ start() {
   $ROOT_PATH/db/postgresql start
   $ROOT_PATH/caroline/carolined start
   $ROOT_PATH/rest/rest-served start
-  $ROOT_PATH/webconsole/frontd start
+  $ROOT_PATH/webconsole/rackd start
 }
 
 stop() {
-  $ROOT_PATH/webconsole/frontd stop
+  $ROOT_PATH/webconsole/rackd stop
   $ROOT_PATH/rest/rest-served stop
   $ROOT_PATH/caroline/carolined stop
   $ROOT_PATH/db/postgresql stop
@@ -146,7 +143,7 @@ status() {
   $ROOT_PATH/activemq/activemqd status
   $ROOT_PATH/rest/rest-served status
   $ROOT_PATH/caroline/carolined status
-  $ROOT_PATH/webconsole/frontd status
+  $ROOT_PATH/webconsole/rackd status
   $ROOT_PATH/db/postgresql status
 }
 

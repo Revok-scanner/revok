@@ -4,7 +4,7 @@
 NAME=postgresql
 
 # Where to write the log file?
-SVC_LOG_FILE="$ROOT_PATH/.backend/log/$NAME.log"
+SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
 
 # SERVICE ENTRY POINTS (START/STOP)
 # Start Command
