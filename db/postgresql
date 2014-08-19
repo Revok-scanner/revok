@@ -33,7 +33,12 @@ stop() {
 }
 
 status() {
-  pg_ctl status -D $DB_DATA_DIR
+  pg_ctl status -D $DB_DATA_DIR >> $SVC_LOG_FILE 2>&1
+  if [ $? -eq 0 ]; then
+    echo "$NAME is running"
+  else
+    echo "$NAME is not running"
+  fi
 }
 
 case "$1" in
