@@ -22,4 +22,4 @@ Revok 0.9, estimated Feb. 2015
 
 Revok 1.0, estimated Apr. 2015
 - Use lightweight components (db, messaging server) as default selection
-- Provide unified interface which is compatible to different component options
+- Support different options for components

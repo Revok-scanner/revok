@@ -19,7 +19,7 @@ class Postman2
     subject = ""
     msg = ""
     email_body=""
-    system("zip -qjm #{File.dirname(__FILE__)}/report/report.html.zip #{File.dirname(__FILE__)}/report/report.html")
+    system("zip -qj #{File.dirname(__FILE__)}/report/report.html.zip #{File.dirname(__FILE__)}/report/report_#{$datastore['timestamp']}.html")
     if (report.nil?) or  not File.exists?("#{File.dirname(__FILE__)}/report/report.html.zip")
       subject = "There was a problem with your scan of #{target}."
       msg = <<-problem_msg

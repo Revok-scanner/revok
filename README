@@ -5,8 +5,8 @@ Revok is an online self-service web app security scanner, finding common web sec
 
 Download
 -------------
-The binary version which has self-contained operating environment can be downloaded from http://revok.github.io/revok/revok-0.7.6_x86_64.tar.xz
-The source code can be cloned from https://github.com/Revok/revok.git
+The binary version which has self-contained operating environment can be downloaded from {placeholder}
+The source code can be cloned from {placeholder}
 
 
 Start Revok in a single node
@@ -14,7 +14,8 @@ Start Revok in a single node
 Step 1: Download and decompress the binary version
 Step 2: Initialize with command ./revokd init
 Step 3: Run with command ./revokd start
-Step 4: Access the web console at http://localhost:3030
+Step 4: Access the web console to submit a scan at http://localhost:3030
+Step 5: Monitor scan process from log file (var/log/carolined.log) and check report (report/report_$time.html) when finished
 
 
 Deploy Revok in distributed environment
@@ -36,7 +37,7 @@ Find more documents in docs directory.
 
 Issues tracker
 ------------------
-Issues for Revok is listed at https://github.com/Revok/revok/issues.
+Issues for Revok is listed at {placeholder}.
 
 
 Contact us

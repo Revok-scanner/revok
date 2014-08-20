@@ -115,8 +115,9 @@ def initialize(config=$datastore['config'],advice_report=$datastore['advice_repo
     $datastore['advice_email_body'] = rendered
 
     log "Report rendered..."
-    File.open("#{File.dirname(__FILE__)}/report.html",'w') {|f| f.write $datastore['advice_report']  }
-    system("if test -f  #{File.dirname(__FILE__)}/report.html ;then echo -e \" [*] Create report Successfully.\"; else echo -e \" [*] Create  report failed.\"; fi")
+    $datastore['timestamp'] = Time.now.strftime('%Y%m%d%H%M%S')
+    File.open("#{File.dirname(__FILE__)}/report_#{$datastore['timestamp']}.html",'w') {|f| f.write $datastore['advice_report']  }
+    system("if test -f  #{File.dirname(__FILE__)}/report_#{$datastore['timestamp']}.html ;then echo -e \" [*] Create report Successfully.\"; else echo -e \" [*] Create  report failed.\"; fi")
     log "RESULT: PASS"
   end
 

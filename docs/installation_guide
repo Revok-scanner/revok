@@ -172,10 +172,20 @@ $ wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86
 $ tar xjvf phantomjs-1.9.7-linux-x86_64.tar.bz2
 $ cp phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/bin/
 
-Step 2: setting environment variables
+Step 2: setting SMTP server
+A SMTP server is needed to send scan reports to users. Set it in the global configuration file (conf/revok.conf).
+# Report config
+USE_SMTP=on
+SMTP_ADDRESS=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=username
+SMTP_PASSWORD=password
+EMAIL_ADDRESS=revok@example.com
+
+Step 3: setting environment variables
 The same as step 2 for REST API Server.
 
-Step 3: starting carolined
+Step 4: starting carolined
 
 [Demo for Fedora 20]
 $ revok/caroline/carolined start
