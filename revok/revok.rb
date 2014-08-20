@@ -3,6 +3,7 @@ $: << "#{File.dirname(__FILE__)}/modules/"
 $: << "#{File.dirname(__FILE__)}/modules/crawler/"
 $: << "#{File.dirname(__FILE__)}/modules/report/"
 
+require 'fileutils'
 require 'sqli'
 require 'render'
 require 'email_intro'
@@ -262,7 +263,7 @@ module Revok
 
     if use_smtp == "off"
       pretreated(runCase.scanConfigObj.sendnotify, 'send a pop-up notification') {
-        system("ln -s #{File.dirname(__FILE__)}/modules/report/report.html #{File.dirname(__FILE__)}/../report/report.html")
+        FileUtils.mv("#{File.dirname(__FILE__)}/modules/report/report_#{$datastore['timestamp']}.html", "#{File.dirname(__FILE__)}/../report/report_#{$datastore['timestamp']}.html")
         notify = NotifySender.new
         notify.send_msg("Revok", "Your scan has finished, access {revok_directory}/report to review it")
       }
