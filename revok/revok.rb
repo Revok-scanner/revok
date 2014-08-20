@@ -31,6 +31,7 @@ require 'access_admin'
 require 'session_exposed_in_url'
 require 'session_fixation'
 require 'screenshot'
+require 'send_notify'
 
 module Revok
   include Utils
@@ -44,6 +45,7 @@ module Revok
     $datastore['log']=runCase.log
     $datastore['start'] = runCase.startTime
     $datastore['end'] = runCase.endTime
+    use_smtp = ENV['USE_SMTP'].downcase
 
     #prepared
     begin
@@ -63,11 +65,18 @@ module Revok
       photographer=Photographer.new
       photographer.shot
     }
-    
-    pretreated(runCase.scanConfigObj.sendemail,'send introduction email'){
-      p1=Postman1.new
-      p1.send
-    }
+
+    if use_smtp == "off"
+      pretreated(runCase.scanConfigObj.sendnotify, 'send a pop-up notification') {
+        notify = NotifySender.new
+        notify.send_msg("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan finish.")
+      }
+    else
+      pretreated(runCase.scanConfigObj.sendemail,'send introduction email'){
+        p1=Postman1.new
+        p1.send
+      }
+    end
 
     #this module will set global datastore['config']
     pretreated(runCase.scanConfigObj.autologin,'autologin'){
@@ -87,7 +96,7 @@ module Revok
       depth = 8
       time = 180
       $datastore['config']=config
-  
+
       #crawler will set global $datastore['injections'] and $datastore['walk']
       crawler=Crawler.new(config,width,height,attempts,delay,depth,time)
       crawler.run
@@ -96,7 +105,7 @@ module Revok
     #null sesion module in case of nil result
     pretreated(runCase.scanConfigObj.crawler,'null session'){
       if $datastore['injections'] == "" || $datastore['walk'] == ""
-        log "The crawler may doesn't run correctly, the null session module launched." 
+        log "The crawler may doesn't run correctly, the null session module launched."
         array=Utils.fake_session
         $datastore['injections']=array[0]
         $datastore['walk']=array[1]
@@ -125,7 +134,7 @@ module Revok
         $datastore['ssl'] = true
       end
       domain = config['target'].match(/(http(s)*:\/\/)*([^\/]+)(\/.*)*/)[3]
-      if domain.scan(/:\d+/) != [] 
+      if domain.scan(/:\d+/) != []
         $datastore['port'] = domain.split(':')[1]
         domain = domain.split(':')[0]
       end
@@ -251,10 +260,18 @@ module Revok
       renderer.run
     }
 
-    pretreated(runCase.scanConfigObj.sendemail,'send report email'){
-      p2=Postman2.new
-      p2.send
-    }
+    if use_smtp == "off"
+      pretreated(runCase.scanConfigObj.sendnotify, 'send a pop-up notification') {
+        system("ln -s #{File.dirname(__FILE__)}/modules/report/report.html #{File.dirname(__FILE__)}/../report/report.html")
+        notify = NotifySender.new
+        notify.send_msg("Revok", "Your scan has finished, access {revok_directory}/report to review it")
+      }
+    else
+      pretreated(runCase.scanConfigObj.sendemail,'send report email'){
+        p2=Postman2.new
+        p2.send
+      }
+    end
 
     #update runcase
     runCase.setProcess("==========")

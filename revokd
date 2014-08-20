@@ -5,74 +5,6 @@ NULL="> /dev/null 2>&1"
 
 . $ROOT_PATH/bin/setenv.sh
 
-set_smtp(){
-  mail_reg="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-  server_reg="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
-  port_reg="[0-9]{1,5}"
-  while true; do
-    echo "We need an email account to send the scan report:"
-    read email
-    email="${email,,}"
-
-    if [[ $email =~ $mail_reg ]]; then
-      break
-    else
-      echo "Invalid email address, please try again"
-    fi
-  done
-
-  domain=$(echo $email | grep -Eo '[^@]+$')
-
-  server_name=$(awk "/$domain/{print \$2}" $ROOT_PATH/conf/smtp_list.txt)
-  port=$(awk "/$domain/{print \$3}" $ROOT_PATH/conf/smtp_list.txt)
-  if [ -z $server_name ]; then
-    echo "It seems not a common domain, we need the smtp server name of this domain:"
-    while true; do
-      read server_name
-      server_name="${server_name,,}"
-      if [[ $server_name =~ $server_reg ]]; then
-        break
-      else
-        echo "Invalid server name, try again please"
-      fi
-    done
-    while true; do
-      echo "The smtp port of the server:"
-      read port
-      if [[ $port =~ $port_reg ]]; then
-        break
-      else
-        echo "Invalid port number, try again please"
-      fi
-    done
-  fi
-  while true; do
-    echo "The password to login your email:"
-    read -s password
-    if [ ! -z $password ]; then
-      break
-    else
-      echo "Invalid port number, try again please"
-    fi
-  done
-  username=${email/"@"$domain/""}
-
-  key="SMTP_ADDRESS"
-  sed -i "s/\($key *= *\).*/\1$server_name/" $ROOT_PATH/conf/revok.conf
-
-  key="SMTP_PORT"
-  sed -i "s/\($key *= *\).*/\1$port/" $ROOT_PATH/conf/revok.conf
-
-  key="SMTP_USER"
-  sed -i "s/\($key *= *\).*/\1$username/" $ROOT_PATH/conf/revok.conf
-
-  key="SMTP_PASSWORD"
-  sed -i "s/\($key *= *\).*/\1$password/" $ROOT_PATH/conf/revok.conf
-
-  key="EMAIL_ADDRESS"
-  sed -i "s/\($key *= *\).*/\1$email/" $ROOT_PATH/conf/revok.conf
-}
-
 init() {
   # Pre-init check
   # JRE check
@@ -93,14 +25,12 @@ init() {
   fi
   echo "done"
 
-  # Init SMTP config
-  set_smtp
-
   # Make dirs
   echo -en "Make directories..."
   eval mkdir -p var/lock $NULL
   eval mkdir -p var/run $NULL
   eval mkdir -p var/log $NULL
+  eval mkdir -p report $NULL
   echo "done"
 
   # Softlink bin files
