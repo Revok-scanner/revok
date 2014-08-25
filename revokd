@@ -49,7 +49,12 @@ init() {
   eval ln -s $ROOT_PATH/README $ROOT_PATH/webconsole/public/docs/About $NULL
 
   # Config iptables
-  echo "Configure iptables, may need the password for root..."
+  echo "To make revok work, we need to execute the below commands to add rules in iptables:"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT (required by ActiveMQ)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT (required by PostgreSQL)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT (required by Rest-server)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT (required by Rack web server)"
+  echo "We need the password of root, it'll never be saved"
   su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
   iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
   iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
