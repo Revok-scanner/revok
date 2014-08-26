@@ -26,13 +26,11 @@ Changelog
 0.7.3 (2014-06-13)
 - A re-engineered crawler with stable results and improved efficiency 
 - Bug fix: lengthen waiting time to avoid blank screenshot
-- Bug fix: false positive report of corss, path_traversal,
-passwd_auto_complete, ssl_check
+- Bug fix: false positive report of corss, path_traversal, passwd_auto_complete, ssl_check
 
 
 0.7.2 (2014-04-22)
-- Add SSL/TLS mis-configuration checking module (SSL testing criteria:
-original + new )
+- Add SSL/TLS mis-configuration checking module (SSL testing criteria: original + new )
 - Add error handling for modules: anti_reflection, bruteforce and redirs
 
 
@@ -59,12 +57,10 @@ original + new )
 
 
 0.6.1 (2014-01-20)
-- Bug fix: Modify session_exposed_in_url module for null cookie and filter the
-URLs not belongs to the app
+- Bug fix: Modify session_exposed_in_url module for null cookie and filter the URLs not belongs to the app
 - Bug fix: sqli still met error when scanning against errata tool
 - Bug fix: Reduce loading time of the Revok landing page
-- Discard credentials of target app (base64 encoded) on Revok to mitigate
-privacy concerns
+- Discard credentials of target app (base64 encoded) on Revok to mitigate privacy concerns
 
 
 0.6 (2014-01-09)

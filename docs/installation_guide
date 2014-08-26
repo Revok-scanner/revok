@@ -16,7 +16,7 @@ Revok REST APIs are defined to receive and handle requests from the web console.
 Messaging server stores scan requests and distributes them to Caroline nodes. When requests were received, new messages would be produced and kept in a queue until Caroline nodes consume messages from the queue.
 
 (4) Caroline nodes
-Revok Caroline nodes implement scans with a group of testing modules and generate final scan reports.
+Revok Caroline nodes (working nodes) implement scans with a group of testing modules and generate final scan reports.
 
 (5) Database
 Details for all scan tasks are recorded in the database. It can be used for data query or statistic.
@@ -39,22 +39,47 @@ Communication for Revok components is as below. The messaging flow is from left 
 
 2 Deployment
 
-2.1 Preparation
+2.1 Start Revok in a single node
 
-(1) Initial settings
+Step 1: downloading and decompressing the binary version
+$ wget {placeholder}
+$ tar xJvf revok-0.7.6_x86_64.tar.xz
+
+Step 2: initializing Revok
+$ cd revok-0.7.6_x86_64
+$ ./revokd init
+
+Step 3: running Revok
+$ ./revokd start
+
+Step 4: accessing the web console to submit a scan at http://localhost:3030
+
+Step 5: monitoring scan process from log file (var/log/carolined.log) and checking report (report/report_$time.html) when finished
+
+
+2.2 Deploy Revok in distributed environment
+
+The five components of Revok can be deployed on separated hosts. In addition, you can add more than one working nodes to support parallel scans.
+
+2.2.1 Preparation
+
+(1) Get source code 
+The source code can be cloned from {placeholder}.
+
+(2) Initial settings
 The global configuration file (conf/revok.conf) defines the settings for starting Revok service. Please reset or keep the default values according to your requirements.
 
-(2) Iptables rules
+(3) Iptables rules
 Define iptables rules correctly to make sure remote connections among Revok components are available.
 
-(3) SELinux rules
+(4) SELinux rules
 Configure SELinux rules if needed to make Revok service run smoothly.
 
-(4) DNS settings
-Add maps of hostnames and IP addresses to the hosts file in distributed environment.
+(5) DNS settings (Optional)
+Add maps of hostnames and IP addresses to the hosts file in distributed environment when hostnames are used to communicate.
 
 
-2.2 Database server
+2.2.2 Database server
 PostgreSQL is the storage for Revok history data. Other database options will be added in the future.
 
 Step 1: installing and initializing PostgreSQL
@@ -75,8 +100,8 @@ Start PostgreSQL service. Create database for Revok and the user for its mainten
 $ systemctl start postgresql.service
 $ su - postgres
 $ psql
-postgres=# create database revok;
-postgres=# create user revok with password 'revok_passwd';
+postgres=# create database $DB_NAME;
+postgres=# create user $DB_USER with password '$DB_PASSWORD';
 
 Step 3: configuring client authentication
 Edit the configuration file ($PGSQL_DATA_DIR/pg_hba.conf) for client authentication. Apply MD5 authentication to revok user and restart the service.
@@ -88,7 +113,7 @@ host revok revok 0.0.0.0/0 md5
 $ systemctl restart postgresql.service
 
 
-2.3 Message queue server
+2.2.3 Message queue server
 ActiveMQ works as the messaging server in Revok.
 
 Step 1: installing ActiveMQ
@@ -107,49 +132,50 @@ $ vi apache-activemq-5.10.0/conf/activemq.xml
 <plugins>
     <simpleAuthenticationPlugin>
         <users>
-            <authenticationUser username="caroline" password="caroline_passwd" groups="users"/>
+            <authenticationUser username="$AMPQ_USER" password="$AMPQ_PASSWORD" groups="users"/>
         </users>
     </simpleAuthenticationPlugin>
 </plugins>
 $ apache-activemq-5.10.0/bin/activemq start
 
 
-2.4 REST API server
+2.2.4 REST API server
 
 Step 1: preparing dependent packages
 The list of basic packages required by REST API server.
-- ruby (>=1.9.2)
+- ruby (>=1.9.3)
+- ruby-devel
 - rubygems
 The list of required gems.
-- nokogiri
-- mechanize
-- pg
-- stomp
-- mail
+- bundle
+- see 'Gemfile' for others
 
 [Demo for Fedora 20]
 $ yum install -y ruby rubygems
-$ gem install $REQUIRED_GEMS
+$ gem install bundle
+$ cd revok
+$ bundle install
 
 Step 2: setting environment variables
 Set options defined in the global configuration file as environment variables.
 
 [Demo for Fedora 20]
-$ sh revok/bin/setenv.sh
+$ cd revok
+$ sh bin/setenv.sh
 
 Step 3: importing data schema to database
 Create tables in the revok database.
 
 [Demo for Fedora 20]
-$ ruby revok/db/initdb.rb
+$ ruby db/initdb.rb
 
 Step 4: starting rest-served
 
 [Demo for Fedora 20]
-$ revok/rest/rest-served start
+$ rest/rest-served start
 
 
-2.5 Caroline nodes
+2.2.5 Caroline nodes
 
 Step 1: preparing dependent packages
 All dependent packages of REST API Server are required. Other dependency is as below.
@@ -188,28 +214,23 @@ The same as step 2 for REST API Server.
 Step 4: starting carolined
 
 [Demo for Fedora 20]
-$ revok/caroline/carolined start
+$ caroline/carolined start
 
 
-2.6 Web console
+2.2.6 Web console
 
-2.6.1 Start by WEBrick
+(1) Start by WEBrick
 
 Step 1: preparing dependent packages
-All dependent packages of REST API Server are required. Other dependency is as below.
-The list of required gems.
-- rack
-- rake
+All dependent packages of REST API Server are required.
+
+Step 2: starting rackd
 
 [Demo for Fedora 20]
-$ gem install $REQUIRED_GEMS
+$ cd revok
+$ webconsole/rackd start
 
-Step 2: starting frontd
-
-[Demo for Fedora 20]
-$ revok/webconsole/frontd start
-
-2.6.2 Start by Apache
+(2) Start by Apache
 
 Step 1: preparing dependent packages
 All dependent packages of REST API Server are required. Other dependency is as below.
@@ -254,7 +275,7 @@ LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.4
     </Directory>
 </VirtualHost>
 $ systemctl start httpd.service
-Access the web console via url http://$FRONT_HOST:$FRONT_PORT.
+Access the web console via url http://$WEB_HOST:$WEB_PORT.
 
 
 
@@ -264,29 +285,29 @@ Access the web console via url http://$FRONT_HOST:$FRONT_PORT.
 After startup, check service status to confirm all of the services are running.
 
 (1) Status for ActiveMQ
-$ revok/activemq/activemqd status
+$ activemq/activemqd status
 
 (2) Status for Caroline
-$ revok/caroline/carolined status
+$ caroline/carolined status
 
 (3) Status for REST service
-$ revok/rest/rest-served status
+$ rest/rest-served status
 
 (4) Status for web console started by WEBrick
-$ revok/webconsole/frontd status
+$ webconsole/rackd status
 
 
 3.2 Log files
 Turn to log files for detailed running information or for troubleshooting when error occured.
 
 (1) Log file for ActiveMQ
-revok/.backend/logs/activemqd.log
+var/log/activemqd.log
 
 (2) Log file for Caroline
-revok/.backend/logs/carolined.log
+var/log/carolined.log
 
 (3) Log file for REST service
-revok/.backend/logs/rest_served.log
+var/log/rest_served.log
 
 (4) Log file for web console
-revok/.frontend/logs/frontd.log
+var/log/rackd.log
