@@ -20,6 +20,7 @@ revok.controller('confirmController', function($scope,$http) {
    } 
  
    $scope.next= function(){
+     $scope.state.email = "test@example.com";
      if (valid_email($scope.state.email)==false){
        $scope.state.valid_email = true;
        $scope.email_input = "form-group has-error";
