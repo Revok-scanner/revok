@@ -51,8 +51,8 @@ msg
       subject "Message from Revok: Your scan of #{target} has begun."
       body    msg
     end
-
-    log "RESULT: PASS"
+    log "Introduction email is sent" 
+   
   end
 
 end

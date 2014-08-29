@@ -90,7 +90,7 @@ class Snks
       }
 
     end
-    log "RESULT: PASS" 
+    log "Datas got from the crawler are merged"
     return JSON.dump({'snks'=>snks}).to_s
   end
 end

@@ -18,6 +18,7 @@ class PasswordAutoCompleteChecker
 
   def find_auto_complete(node)
     if node.to_s.include?("autocomplete=\"off\"")
+      log "auto-complete is enabled"
       return true
     elsif node.name == "form" || node.name == "html"
       return false
@@ -27,7 +28,7 @@ class PasswordAutoCompleteChecker
   end
 
   def run
-    log "Check auto-complete enabled on pass parameters" 
+    log "Checking auto-complete attribute of password parameters..." 
     result = false
     issues = []
     target = ""
@@ -43,7 +44,6 @@ class PasswordAutoCompleteChecker
           result = find_auto_complete(passwd_element[0])
         else
           log "Invalid login page." 
-          issues.push("Invalid login page.")
           result = true
         end
       else
@@ -51,25 +51,21 @@ class PasswordAutoCompleteChecker
         result = true
       end
     rescue => exp 
-      log exp.to_s 
       issues.push(exp)
-      result = false
     end
 
     if result
       abstain
-      log "RESULT: PASS" 
     else
       if issues.size != 0
         issues.each do |issue|
-          log "\tIssue: #{issue}\n" 
+          log "ERROR: #{issue}\n" 
         end
         error
-        log "RESULT: ERROR" 
         return
       end
       advise({'login_page'=>target})
-      log "RESULT: FAIL" 
+      log "auto-complete is not enabled"
     end
 
   end

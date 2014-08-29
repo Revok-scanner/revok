@@ -24,14 +24,14 @@ module Sess
     else
       dir = @target
     end
-    log "Start pre_login before the first login..." 
+    log "Running pre_login before the first login..." 
     pre_resp=Typhoeus::Request.new(dir,ssl_verifypeer: false,ssl_verifyhost: 1,connecttimeout:5,).run
     #log "***pre_resp***#{pre_resp.code}#{pre_resp.headers}" 
 
     if pre_resp.nil?
-      log "No response received..." 
+      log "No response received" 
     elsif pre_resp.code == 404
-      log "404 received, page wasn't found..." 
+      log "404 received, page wasn't found" 
     end
     grab_set_cookie(pre_resp)
 
@@ -125,7 +125,7 @@ module Sess
     temp = Array.new()
     setcookie=resp.headers['Set-Cookie']
     if setcookie == nil
-      log "No set cookie in response header" 
+      #log "No set cookie in response header" 
       return @cookies
     end
     if setcookie.class==Array
@@ -192,10 +192,10 @@ module Sess
   def compare_cookie(pre_cookie, aft_cookie)
     k = @session_id
     if (pre_cookie.has_key? k) and (aft_cookie.has_key? k) and (pre_cookie[k] != aft_cookie[k])
-      log "The cookie is changed after login" 
+      #log "The cookie is changed after login" 
       return false
     else
-      log "The cookie is not changed after login" 
+      #log "The cookie is not changed after login" 
       return true
     end
   end
@@ -208,13 +208,12 @@ module Sess
     @cookies = Hash.new()
     env_prepare
     if @config['logtype'] != "none"
-      log "Start session fixation test..." 
       pre_resp = pre_login
       pre_cookie = @cookies.clone
 
-      log "Step1: Check session ID is set before login or not" 
+      log "Checking session ID is set or not before login..." 
       if(pre_cookie.has_key? @session_id)
-        log "Step2: Session ID is set before login. Login and check if it changes..." 
+        log "Session ID is set before login. Login and check if it changes..." 
 
         login(pre_resp)
         aft_cookie = @cookies.clone
@@ -231,6 +230,8 @@ module Sess
       else
         log "Session ID isn't set before login" 
       end
+    else
+      log "No authentication in this application"
     end
     return true
   end #sess_fix

@@ -91,11 +91,9 @@ class CookieReverser
 
     if result == true 
       abstain
-      log "No critical info was found" 
-      log "RESULT: PASS" 
+      log "No critical info is found" 
     else
       advise({"cookies" => @report})
-      log "RESULT: FAIL" 
     end
 
   end

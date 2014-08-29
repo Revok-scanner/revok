@@ -24,7 +24,7 @@ class BruteForceCheckor
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -153,12 +153,11 @@ class BruteForceCheckor
       @session_data = JSON.parse(@session_data, {create_additions:false})
       @config = JSON.parse(@config, {create_additions:false})
       
-      log "Begin Bruteforcing" 
+      log "Start bruteforcing..." 
 
       @login_req = _get_login_req
       if not @login_req
         log "No login request found" 
-        log "RESULT: FAIL" 
         return
       end
 
@@ -202,7 +201,7 @@ class BruteForceCheckor
         # - compare new response with it
         if _are_same_resp(resp, success_resp)
           # this means the login with invalid password has been successful. AUTH issue
-          log "authentication failed" 
+          log "Authentication failed" 
           break
         end
  
@@ -212,7 +211,6 @@ class BruteForceCheckor
           # if new response becomes different with the first invalid response
           if not _are_same_resp(resp, first_invalid_resp)
             log "Bruteforcing mitigation is being applied" 
-            log "RESULT: PASS" 
             break
           end
         end
@@ -220,13 +218,11 @@ class BruteForceCheckor
 
       if i == max_run
         advise({'method'=>_get_method_from_req(@login_req), 'login'=>@config['target']})
-        log "*Bruteforcing is working*" 
-        log "RESULT: FAIL" 
+        log "Bruteforcing is working" 
       end
     rescue => exp
       error
-      log "#{exp}" 
-      log "RESULT: ERROR" 
+      log "ERROR: #{exp}" 
     end
   end #run
 end

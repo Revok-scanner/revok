@@ -26,7 +26,7 @@ class RedirChecker
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -57,7 +57,7 @@ class RedirChecker
     def _30x_redir(resp)
       if resp.headers['location']!=nil
         if resp.headers['location'].downcase.start_with? @expected
-          log "redir detected via location header" 
+          log "Redir detected via location header" 
           EV "Location: #{resp.headers['location']}"
           return true
         end
@@ -71,7 +71,7 @@ class RedirChecker
       if resp.headers['refresh']!=nil
         url = resp.headers['refresh'].split('=')[1]
         if url.start_with? @expected
-          log "redir detected via refresh header" 
+          log "Redir detected via refresh header" 
           EV resp.headers['refresh']
           return true
         end
@@ -86,7 +86,7 @@ class RedirChecker
       resp.body.scan(/<meta.*url=([^"]*)/) do |matched|
         url = matched[0]
         if url.start_with? @expected
-          log "redir detected via meta tag" 
+          log "Redir detected via meta tag" 
           #p resp.body[/<meta.*url.*>/]
           EV $~
           return true
@@ -106,7 +106,7 @@ class RedirChecker
           url = matched_loc[0]
 
           if url.start_with? @expected
-            log "redir detected via javascript" 
+            log "Redir detected via javascript" 
             EV $~
             return true
           end
@@ -187,13 +187,11 @@ class RedirChecker
 
     ### in revok 
     #@data = JSON.parse(datastore['SESSION'], {create_additions:false})
-    result="PASS"
     begin
       @data = JSON.parse(@session_data, {create_additions:false})
       @config = JSON.parse(@config, {create_additions:false})
       if @data.nil?
         log "datastore['SESSION'] is nil"
-        log "RESULT: FAIL" 
         return
       end
       uri=URI(@config['target'])
@@ -231,7 +229,7 @@ class RedirChecker
             resp = conn.send_recv(req,30)
             # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
           rescue
-            log "Problem #{$!}" 
+            log "ERROR: #{$!}" 
           end
 
           if not resp
@@ -240,8 +238,6 @@ class RedirChecker
           end
 
           if _30x_redir(resp) or _refresh_redir(resp) or  _meta_redir(resp) or _js_redir(resp)
-            result="FAIL"
-
             if not id_report_done
               id_report_done = true
 
@@ -260,9 +256,7 @@ class RedirChecker
       end
     rescue =>exp
       error
-      log "#{exp}" 
-      result="ERROR" 
+      log "ERROR: #{exp}" 
     end
-    log "RESULT:"+" #{result}"	
   end
 end

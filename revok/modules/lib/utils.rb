@@ -95,7 +95,7 @@ a_resp
       rescue =>exp 
         log exp.to_s
       	if module_name.class == String
-           log "RESULT: ERORR"
+           log "ERROR: An issue occurred when running this module"
       	end
       end
      end

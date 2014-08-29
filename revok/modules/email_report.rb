@@ -58,8 +58,8 @@ body
     end
     system("rm -f #{File.dirname(__FILE__)}/report/report.html.zip")
     system("if test -f  #{File.dirname(__FILE__)}/report/report.html.zip ;then echo -e \" [*] Delete zip file faild.\"; else echo -e \" [*] Delete zip file successfully.\"; fi")
-
-    log "RESULT: PASS"
+    log "Report email is sent\n"
+   
   end
 
 end

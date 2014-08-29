@@ -46,7 +46,6 @@ class SessionFixationCheckor
 
     if result == true
       abstain
-      log "RESULT: PASS" 
     else
       if @config['logtype'] == 'normal'
         url = "POST request for #{@config['login']}"
@@ -54,7 +53,6 @@ class SessionFixationCheckor
         url = "GET request for #{@config['target']}"
       end
       warn({"url" => url,"name"=>"session_fixation"})
-      log "RESULT: FAIL"
     end
   end
    

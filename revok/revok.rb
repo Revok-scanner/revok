@@ -68,9 +68,10 @@ module Revok
     }
 
     if use_smtp == "off"
-      pretreated(runCase.scanConfigObj.sendnotify, 'send a pop-up notification') {
+      pretreated(runCase.scanConfigObj.sendnotify, 'send notification') {
         notify = NotifySender.new
         notify.send_msg("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan finish.")
+        log "Notification of scan start is sent"
       }
     else
       pretreated(runCase.scanConfigObj.sendemail,'send introduction email'){
@@ -105,11 +106,14 @@ module Revok
 
     #null sesion module in case of nil result
     pretreated(runCase.scanConfigObj.crawler,'null session'){
+      log "Checking the result of crawler..."
       if $datastore['injections'] == "" || $datastore['walk'] == ""
-        log "The crawler may doesn't run correctly, the null session module launched."
+        log "Crawler may not run correctly, so launch null session module"
         array=Utils.fake_session
         $datastore['injections']=array[0]
         $datastore['walk']=array[1]
+      else
+        log "The crwaling result is ready"
       end
     }
 
@@ -122,6 +126,7 @@ module Revok
       #merge stage 2(get $datastore['session'])
       $datastore['session']=Utils.merge(comp,snk)
     }
+
     pretreated(runCase.scanConfigObj.crawler,'setup'){
       #setup other options from $datastore['config'] and $datastore['session']
       config = JSON.parse($datastore['config'], {create_additions:false})
@@ -141,6 +146,7 @@ module Revok
       end
       $datastore['host'] = domain
       $datastore['cookie'] = session['cookie']
+      log "Environment for running test modules are prepared"
     }
 
     #sitemap, return the list of map
@@ -170,9 +176,9 @@ module Revok
     #session_exposed_in_url module
     pretreated(runCase.scanConfigObj.session_check,'session_exposed_in_url'){
       sc=SessionExposureCheckor.new
-      log "detecting session_id"
+      log "Detecting session id..."
       sc.session_id_detect
-      log "checking session_id exposure in url"
+      log "Checking session id exposure in urls..."
       sc.exposure_check
     }
 
@@ -185,13 +191,12 @@ module Revok
     #cookie_attr_check module
     pretreated(runCase.scanConfigObj.cookie_check,'cookie_attr_check'){
       cc=CookieAttrChecker.new
-      log "checking cookie attr"
+      log "Checking cookie attributes..."
       cc.run
     }
 
     #reverse_cookie module
     pretreated(runCase.scanConfigObj.cookie_check,'reverse_cookie'){
-      log "reversing cookie"
       rc=CookieReverser.new
       rc.run
     }
@@ -262,10 +267,11 @@ module Revok
     }
 
     if use_smtp == "off"
-      pretreated(runCase.scanConfigObj.sendnotify, 'send a pop-up notification') {
+      pretreated(runCase.scanConfigObj.sendnotify, 'send notification') {
         FileUtils.mv("#{File.dirname(__FILE__)}/modules/report/report_#{$datastore['timestamp']}.html", "#{File.dirname(__FILE__)}/../report/report_#{$datastore['timestamp']}.html")
         notify = NotifySender.new
-        notify.send_msg("Revok", "Your scan has finished, access {revok_directory}/report to review it")
+        notify.send_msg("Revok", "Your scan has finished, access {revok_directory}/report to view it")
+        log "Notification of report is sent\n\n"
       }
     else
       pretreated(runCase.scanConfigObj.sendemail,'send report email'){

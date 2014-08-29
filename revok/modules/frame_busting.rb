@@ -16,7 +16,7 @@ class FrameBustingTester
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -62,6 +62,7 @@ class FrameBustingTester
     vul_urls = Array.new()
     issues = Array.new()
     result = false
+    log "Checking for X-Frame-Options header..."
     begin
       data = JSON.parse(@session_data, {create_additions:false})
       config = JSON.parse(@config, {create_additions:false})
@@ -103,31 +104,29 @@ class FrameBustingTester
       result = true if vul_urls.empty?
     rescue => exp
       issues.push(exp.to_s)
-      log exp.to_s 
       result = false
     end
 
     if result
       abstain
-      log "RESULT: PASS" 
     else
       #If any error happened, report here
       if issues.size > 0
         issues.each do |issue|
-          log "\tIssue: #{issue}" 
+          log "ERROR: #{issue}" 
         end
         error
-        log "RESULT: ERROR" 
         return
       end
       if !vul_urls.empty?
         log "The following #{vul_urls.length.to_s} URLs miss the field \"X-Frame-Options\" in HTTP headers:" 
         vul_urls.each do |vul_url|
-          log "\tURL: #{vul_url}" 
+          log "URL: #{vul_url}" 
           list(vul_url)
         end
         advise({'vul_urls'=>vul_urls})
-        log "RESULT: FAIL" 
+      else
+        log "X-Frame-Options is set for all URLs"
       end
     end
 

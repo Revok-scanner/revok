@@ -100,6 +100,8 @@ class MimeTypeChecker
     report = Array.new()
     @mismatch_report = Array.new()
     aff_url = String.new
+
+    log "Checking for nosniff header and mismatched content type..."
     begin
       session = JSON.parse(@session_data, {create_additions:false})
       config = JSON.parse(@config, {create_additions:false})
@@ -114,8 +116,8 @@ class MimeTypeChecker
         else
           url = requests[v].split("\r\n")[0].gsub(/HTTP\/1.*/, "").gsub(/=[^&]*/,"=param")
           if url.include? domain
-                  sniff_urls.push(url)
-                  check_mismatch(url, k)
+            sniff_urls.push(url)
+            check_mismatch(url, k)
           end
         end
       end
@@ -137,7 +139,6 @@ class MimeTypeChecker
 
     if report == []
       abstain
-      log "RESULT: PASS" 
     else
       report.each do |k|
         k = k.gsub(/POST/, "POST request for").gsub(/GET/, "GET request for")
@@ -147,9 +148,8 @@ class MimeTypeChecker
       if @mismatch_report.size != 0 then num=num-1 end
       if sniff_urls.size != 0 then num=num-1 end
       advise({ "num" => num })
-      log "RESULT: FAIL" 
     end
-
+    log "mime_type_check is done"
   end
 
 end

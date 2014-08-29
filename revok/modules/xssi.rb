@@ -55,8 +55,7 @@ class XSSChecker
 
     data = JSON.parse($datastore['session'],{create_additions:false})
     @cookie=data['cookie']
-
-    result = "PASS"
+    log "Filtering requests to do xssi test..."
 
     patterns = PATTERNS
     dangers = ["'","\"","<",">"]
@@ -99,7 +98,7 @@ class XSSChecker
           # avoid repeated injection
           next if checked.include? "#{url}; #{prm_k}"
           checked.push("#{url}; #{prm_k}")
-          log "\tchecking param #{prm_tck}:" 
+          log "\tChecking param #{prm_tck}:" 
 
           patterns.each do |pat|
             bracket = counter.next
@@ -110,7 +109,7 @@ class XSSChecker
               resp = conn.send_recv(req_sent,30)
               # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
             rescue
-              log "Problem #{$!}" 
+              log "ERROR: #{$!}" 
               next
             end
 
@@ -125,7 +124,7 @@ class XSSChecker
               begin
                 resp = conn.send_recv(req_sent,30)
               rescue
-                log "Problem #{$!}" 
+                log "ERROR: #{$!}" 
                 next
               end
             end
@@ -151,7 +150,7 @@ class XSSChecker
 
     rescue => excep
       error
-      log excep.to_s 
+      log "ERROR: #{excep.to_s}" 
     end
 
     if not bad.empty?
@@ -162,12 +161,11 @@ class XSSChecker
       end
       lists.uniq!
       lists.each {|k| list(k)}
-      result = "FAIL"
       warn
     else
       abstain
     end
-    log "RESULT: #{result}" 
+    log "xssi is done"
   end
 
   def dechunk(chunks)

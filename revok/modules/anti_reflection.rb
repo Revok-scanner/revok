@@ -15,7 +15,7 @@ class AntiReflectionChecker
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -29,6 +29,7 @@ class AntiReflectionChecker
   def run
     abstain
     header_found = false
+    log "Checking for X-XSS-PROTECTION header..."
 
     begin
       data = JSON.parse(@session_data, {create_additions:false})
@@ -38,22 +39,20 @@ class AntiReflectionChecker
       responses.each_pair do |k,v|
         if v.scan(/X-XSS-PROTECTION: 1/i) !=[]
           next if not data['requests'][k].lines.first.include? config['whitelist'][0]
-          log "found X-XSS-PROTECTION is being enabled in response ##{k}" 
+          log "Found X-XSS-PROTECTION is being enabled in response ##{k}" 
           header_found = true
           break
         end
       end
 
-      if header_found
-        log "RESULT: PASS" 
-      else
+      if header_found == false
         advise
-        log "RESULT: FAIL" 
+        log "X-XSS-PROTECTION is not found"
       end
+
     rescue => excep
       error
-      log "#{excep}" 
-      log "RESULT: ERROR" 
+      log "ERROR: #{excep}" 
     end#begin
     
   end #run

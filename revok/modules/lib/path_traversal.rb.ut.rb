@@ -57,7 +57,6 @@ module PATH_TRAV
 
   end
 
-
   def filter_urls(urls)
     uniq_url_tmp = Array.new()
     pram_url = Hash.new()
@@ -87,12 +86,12 @@ module PATH_TRAV
           flag = true
         end
       end
+
       if flag == true
         uniq_url_tmp.push pram_url
         @uniq_url[url] = [p_name_arr,p_value_arr]
         @has_f_url.push(url)
       end
-
       pram_url = {}
 
     end
@@ -104,8 +103,6 @@ module PATH_TRAV
     p_name_arr = Array.new()
     p_value_arr = Array.new()    
 
-
-
     if req.scan(/boundary=(.*?)\r$/) == []
       params = req.scan(/\r\n\r\n(.*?)$/)[0][0]
       p_name_arr, p_value_arr, flg = chk_param_n_v(params)
@@ -115,7 +112,6 @@ module PATH_TRAV
       end
       return false
     else
-
       params = ""
       param_parts = req.split(/Content-Disposition: form-data;/)
       param_parts.each_with_index do |p, n|
@@ -143,8 +139,7 @@ module PATH_TRAV
 
   end
 
-
-    #get the URLs that have a patameter contains file
+  #get the URLs that have a patameter contains file
   def filter_request
     post_req = Hash.new()
 
@@ -205,7 +200,6 @@ module PATH_TRAV
   end
 
   def send_req(req)
-    
     uri=URI(@target)
     host=uri.host
     port = uri.port
@@ -215,12 +209,11 @@ module PATH_TRAV
     proxies = nil
     conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
     begin
-        resp = conn.send_recv(req,30)
-        #`touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
-      rescue
-        log "Problem #{$!}" 
-        resp = "error"
-      end
+      resp = conn.send_recv(req,30)
+    rescue
+      log "ERROR: #{$!}" 
+      resp = "error"
+    end
     return resp
   end
 
@@ -242,7 +235,6 @@ module PATH_TRAV
       else
         dom = domain[0][0] + "://"  + domain[0][1]
       end
-
 
       log "Now checking path traversal against URL: #{url}..." 
       req = @data['requests'][v]

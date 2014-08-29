@@ -11,8 +11,6 @@ require 'admin_url'
 require 'rex'
 require 'typhoeus'
 
-
-
 class AdminAccessor
   include AdminURLs
   include ReportUtils
@@ -36,7 +34,6 @@ class AdminAccessor
     config = JSON.parse(@config, {create_additions:false})
     cookie=data['cookie'].gsub(/security=high/,"security=low")
 
-
     logtype = config['logtype']
     username = config['username']
     password = config['password']
@@ -44,8 +41,6 @@ class AdminAccessor
 
     encoded_auth = encode64(username + ":" + password)
 
-
-    result = "PASS"
     urls = AURLS
     rpt_uri = Array.new()
     flg = true
@@ -56,7 +51,7 @@ class AdminAccessor
 
     target = target + '/' if !flg
 
-    log "Start sending requests to possible admin URIs..." 
+    log "Sending requests to possible admin URIs..." 
 
     urls.each do |a_uri|
       #generate a GET request for each url in the list
@@ -68,7 +63,6 @@ class AdminAccessor
       else
         g_uri = target + a_uri
       end
-
 
       #Generate the request for 2 different authentications
       if logtype == "basic"
@@ -88,22 +82,17 @@ class AdminAccessor
         )
       end
 
-
       begin
-
         resp = req.run
-        # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
         if resp.code == 200 or (resp.code > 300 and resp.code < 308 and resp.response_headers.grep(/login/) == [])
           if resp.code > 300 and resp.code < 308 and resp.response_body.scan(/<input .*?value="(Login|login|log in|Log in)"/)
             next
           end
-           result = "FAIL"
            uri = target + a_uri
            rpt_uri.push uri
         end
       rescue
-        log "Problem #{$!}" 
-        result = "ERROR"
+        log "ERROR: #{$!}" 
         break
       end
     end
@@ -116,8 +105,7 @@ class AdminAccessor
     else
       abstain
     end
-
-    log "RESULT: #{result}" 
+    log "access_admin is done"
 
   end
 

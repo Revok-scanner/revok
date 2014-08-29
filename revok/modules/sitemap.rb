@@ -44,7 +44,7 @@ class Sitemaper
       target=@target
       domain = URI(target).host
       requests = session['requests']
-      log "Generating the directory structure of this site" 
+      log "Generating the directory structure of this site..." 
 
       #extracting url from each request
       requests.each_pair {|key,value|
@@ -85,16 +85,15 @@ class Sitemaper
         session['sitemap'] = path_list
         $datastore['session'] = JSON.dump(session).to_s
       end
-      log "RESULT: PASS" 
     else
       if issues.size > 0
         issues.each do |issue|
-          log "\tIssue: #{issue}" 
+          log "ERROR: #{issue}" 
         end
       end
       error
-      log "RESULT: ERROR"  
     end
+   
   end
 end
 

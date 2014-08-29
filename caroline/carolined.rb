@@ -46,7 +46,7 @@ begin
     next unless active
 
     begin
-      puts "Checking for test cases to be run..."
+      puts "Checking for test scans to be run..."
       runCase=$runCaseServer.getRunCaseFromQueue
       if runCase
         if runCase.scanConfigObj.screenshot==0
@@ -59,7 +59,7 @@ begin
     end
 
     to_run.each do |run| 
-      puts "Running Case #{run.id}..."
+      puts "Running scan #{run.id}..."
       Dir.chdir($CAROLINE_PATH) do 
         break unless active
         $runCaseServer.run(run)
