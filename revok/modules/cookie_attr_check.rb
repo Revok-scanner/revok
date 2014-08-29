@@ -34,6 +34,7 @@ class CookieAttrChecker
     @session = JSON.parse(@session_data, {create_additions:false})
     @config = JSON.parse(@config, {create_additions:false})
     cookie_attr_check
+    log "cookie_attr_check is done"
   end
   
   def cookie_attr_check
@@ -67,7 +68,7 @@ class CookieAttrChecker
       end
     rescue => excep
        error
-       log excep.to_s 
+       log "ERROR: #{excep.to_s}"
     end
 
     if not not_secure.empty?
@@ -105,9 +106,6 @@ class CookieAttrChecker
 
     if not_secure.empty? and not_httponly.empty? and expired.empty?
       abstain
-      log "RESULT: PASS" 
-    else
-      log "RESULT: FAIL" 
     end
   end
 

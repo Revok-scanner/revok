@@ -79,7 +79,7 @@ def initialize(config=$datastore['config'],advice_report=$datastore['advice_repo
 
     Dir.chdir("#{File.dirname(__FILE__)}/template") do
       Dir.glob("**/") do |subdir|
-        log "Rendering #{subdir}..."
+        log "#{subdir}..."
         Dir.chdir(subdir) do
           to_fill = (report.send File.basename(subdir).to_sym).select {|mod| File.exist?(mod['module_name'] + '.erb')}
           to_fill.each do |hash|
@@ -114,11 +114,10 @@ def initialize(config=$datastore['config'],advice_report=$datastore['advice_repo
 
     $datastore['advice_email_body'] = rendered
 
-    log "Report rendered..."
+    log "Report is rendered"
     $datastore['timestamp'] = Time.now.strftime('%Y%m%d%H%M%S')
     File.open("#{File.dirname(__FILE__)}/report_#{$datastore['timestamp']}.html",'w') {|f| f.write $datastore['advice_report']  }
-    system("if test -f  #{File.dirname(__FILE__)}/report_#{$datastore['timestamp']}.html ;then echo -e \" [*] Create report Successfully.\"; else echo -e \" [*] Create  report failed.\"; fi")
-    log "RESULT: PASS"
+    system("if test -f  #{File.dirname(__FILE__)}/report_#{$datastore['timestamp']}.html ;then echo -e \" [*] Create report successfully.\"; else echo -e \" [*] Create  report failed.\"; fi")
   end
 
 end

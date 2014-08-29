@@ -28,7 +28,7 @@ class SQLiChecker
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -47,7 +47,7 @@ class SQLiChecker
     begin
       @session = JSON.parse(@session_data, {create_additions:false})
       @config=JSON.parse(@config, {create_additions:false})
-      log "Error based test." 
+      log "Error based testing..." 
       begin
         aResultE = fErrorBased
       rescue => exp
@@ -55,7 +55,7 @@ class SQLiChecker
         log "#{exp.backtrace.join("\n")}"
         aResultE=Array.new
       end
-      log "Time based test." 
+      log "Time based testing..." 
       begin
         aResultT = fTimeBased(aResultE)
       rescue => exp
@@ -78,7 +78,7 @@ class SQLiChecker
     rescue Timeout::Error
       log "Timeout error." 
     rescue => exp
-      log "#{exp.backtrace.join("\n")}" 
+      #log "#{exp.backtrace.join("\n")}" 
       aIssues.push(exp.to_s)
       result = false
     end
@@ -89,14 +89,12 @@ class SQLiChecker
 
     if result
       abstain
-      log "RESULT: PASS" 
     else
       if aIssues.size > 0
         aIssues.each do |issue|
-          log "\tIssue: #{issue}" 
+          log "ERROR: #{issue}" 
         end
         error
-        log "RESULT: ERROR" 
         return
       end
       hUrls = Hash.new
@@ -112,8 +110,8 @@ class SQLiChecker
         list(url, {'method'=>"#{method}"})
       end
       warn({'vul_urls' => hUrls})
-      log "RESULT: FAIL" 
     end
+    log "sqli is done"
   end
 
 

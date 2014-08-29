@@ -1,6 +1,6 @@
 #
 # Cross-Origin Resource Sharing Module
-# Check whether Access-Control-Allow-Origin header is set. And find URLs which allow access from other origins by sending crafted HTTP requests.
+# Check whether URLs allow access from other or all origins by sending crafted HTTP requests.
 #
 
 $: << "#{File.dirname(__FILE__)}/lib/"
@@ -23,7 +23,6 @@ class CorssChecker
   end
 
   def run
-    result = "PASS"
     data = JSON.parse(@session_data, {create_additions:false})
     config = JSON.parse(@config, {create_additions:false})
 
@@ -34,10 +33,10 @@ class CorssChecker
     #generate CORS requests
     req_hash = gen_cors_reqs(uniq_tcks, target, config, data)
     #send CORS requests and check the result headers
+    log "Sending CORS requests and checking the result headers..."
     allow_oth, allow_all = send_cors_reqs(req_hash, data)
     
     if allow_oth == "error" and allow_all == "error"
-      result = "ERROR"
       error
     else
       allow_oth.uniq!
@@ -54,12 +53,10 @@ class CorssChecker
       end
 
       if allow_oth != []
-        result = "FAIL"
         advise
       end
 
       if allow_all != []
-        result = "FAIL"
         warn
       end
 
@@ -67,8 +64,8 @@ class CorssChecker
         abstain
       end
     end
+    log "corss is done"
 
-    log "RESULT: #{result}" 
   end
 end
 

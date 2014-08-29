@@ -7,7 +7,6 @@ module CORS
   def filter_simple_req(req, tck)
     flg = true
     non_std = ['X-Requested-With: ', 'DNT: ', 'X-Forwarded-For: ', 'X-Forwarded-Proto: ', 'Front-End-Https: ', 'X-ATT-DeviceId: ', 'X-Wap-Profile: ', 'Proxy-Connection: ']
-
     plain_txt_1 = req.scan(/^Content-Type: application\/x-www-form-urlencoded(\r\n|; charset)/)
     plain_txt_2 = req.scan(/^Content-Type: text\/plain(\r\n|; charset)/)
     plain_txt_3 = req.scan(/^Content-Type: multipart\/form-data(\r\n|; charset)/)
@@ -17,12 +16,9 @@ module CORS
       plain_txt_4.push re.to_s if re != []
     end
 
-#    url = req.scan(/http(.*?) HTTP/)[0][0]
-
     flg = false if (plain_txt_1 == [] and plain_txt_2 == [] and plain_txt_3 == [] and plain_txt_4 == [])
     return "simple" if (req.scan(/^GET http.*?HTTP\//) != [] and plain_txt_4 == []) or (req.scan(/^HEAD http.*?HTTP\//) != [] and plain_txt_4 == []) or (req.scan(/^POST http.*?HTTP\//) != [] and flg)
     return "preflt"
-
   end
 
   def grab_origin(req,target)
@@ -35,7 +31,6 @@ module CORS
   end
 
   def grab_allow_header(resp)
-
     begin
       alw_dom = resp["access-control-allow-origin"]
     rescue
@@ -63,7 +58,6 @@ module CORS
   end
 
   def del_dulp_reqs(data)
-
     befr_uniq_urls = Hash.new()
     uniq_urls = Hash.new()
     uniq_tcks = Array.new()
@@ -85,6 +79,7 @@ module CORS
         next
       end
     end
+
     befr_uniq_urls.each do |k, v|
       flg = false
       if uniq_urls == {}
@@ -137,12 +132,12 @@ module CORS
       same_org, has_org = grab_origin(req,target)
       res = filter_simple_req(req,tck)
 
-        methd = req.scan(/^(.*?) http/)
-        if methd != []
-          methd = methd[0][0]
-        else
-          methd = 'GET'
-        end
+      methd = req.scan(/^(.*?) http/)
+      if methd != []
+        methd = methd[0][0]
+      else
+        methd = 'GET'
+      end
 
       if res == "preflt"
         request = Net::HTTP::Options.new(uri.request_uri)
@@ -194,7 +189,7 @@ module CORS
         begin
           res = http.request(request)
         rescue
-          log tck.to_s + "Problem #{$!}"  
+          log "ERROR: #{tck.to_s} #{$!}"  
           n = n + 1
           if n == len
             return "error", "error"

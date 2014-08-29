@@ -29,10 +29,10 @@ class PathTravelor
   end
 
   def run
-    result = "PASS"
     vul_url = Array.new()
 
     #Filter the URLs that have a parameter which is a file
+    log "Filtering URLs with file parameters..."
     tcks, params = filter_url_request
 
     if tcks != {}
@@ -41,7 +41,6 @@ class PathTravelor
     end
 
     if vul_url == "error"
-       result = "ERROR"
        error
     elsif vul_url != []
       vul_url.each do |v|
@@ -49,12 +48,11 @@ class PathTravelor
         v = v[1].gsub(/\\/, "")
         list(v, 'mthd' => m)
       end
-      result = "FAIL"
       warn
     else
       abstain
     end
+    log "path_traversal is done"
 
-    log "RESULT: #{result}" 
   end
 end

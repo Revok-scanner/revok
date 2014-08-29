@@ -66,17 +66,17 @@ class SSLChecker
         return true
       end
     rescue => excep
-      log excep
+      log "ERROR: #{excep}"
     end
     return false
   end
 
   def run
     abstain
-    result = "PASS"
     config = JSON.parse(@config, {create_additions:false})
     @url=config['target'].delete("\C-M")
     uri=URI(@url)
+    log "Checking SSL/TLS mis-configuration..."
 
     begin
       if ssl_available_check == true
@@ -88,18 +88,16 @@ class SSLChecker
       end
     rescue => excep
       error
-      result="ERROR"
-      log "#{excep}"
+      log "ERROR: #{excep}"
     ensure
       finalize
     end
 
     if ssl_report!=nil && ssl_report.length>0
-      result="FAIL"
       advise({"ssl_report" => ssl_report})
     end
 
-    log "#{ssl_report}"
-    log "RESULT: #{result}"
+    #log "#{ssl_report}"
+    log "ssl_check is done"
   end
 end

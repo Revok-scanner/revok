@@ -15,7 +15,7 @@ class MethodCheckor
       begin
         @session_data=File.open(session_data,'r').read 
       rescue =>exp
-        log exp.to_s 
+        log "ERROR: #{exp.to_s}" 
         @session_data=""
       end
     elsif flag=="s"
@@ -68,7 +68,7 @@ class MethodCheckor
       raise ArgumentError, "Lack of the sitemap" if urls_list == nil
 
       #checking http method
-      log "Checking each directory" 
+      log "Checking http methods for each directory..." 
       urls_list.each {|url|
         uri = URI(url)
         if !uri.path.include?(".")
@@ -83,20 +83,17 @@ class MethodCheckor
       }
     rescue => exp
       issues.push(exp.to_s)
-      log exp.to_s 
       result = false
     end
 
     if result
       abstain
-      log "RESULT: PASS" 
     else
       if issues.size > 0
         issues.each do |issue|
-          log "\tIssue: #{issue}" 
+          log "ERROR: #{issue}" 
         end
         error
-        log "RESULT: ERROR" 
         return
       end
       if !vul_paths.empty?
@@ -107,8 +104,8 @@ class MethodCheckor
         }
       end
       advise({"vul_paths" => vul_paths})
-      log "RESULT: FAIL" 
     end
+    log "method_check is done"
 
   end
 

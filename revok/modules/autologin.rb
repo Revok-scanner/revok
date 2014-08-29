@@ -19,11 +19,10 @@ class Autologin
 
   def run
     config = JSON.parse(@config, {create_additions:false})
-    return if config['logtype'] != "normal" or config['positions']['button']['x'] > 0
-
-    result = "PASS"
-
-    # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
+    if config['logtype'] != "normal" or config['positions']['button']['x'] > 0
+      log "No need to autologin"
+      return
+    end
 
     cleanProcs
 
@@ -39,13 +38,14 @@ class Autologin
       end
     end
 
-    log "mitmdump running..."
+    log "mitmdump is started"
 
     phantom_in, phantom_out, phantom_err = Open3.popen3("phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/autologin.js")
     phantom_in.puts @config
     phantom_in.close
 
-    log "phantomjs running..."
+    log "phantomjs is started"
+    log "Detecting position of the login form..."
 
     new_conf = nil
     begin
@@ -53,14 +53,13 @@ class Autologin
         new_conf = phantom_out.gets
       end
     rescue Timeout::Error
-      result = "FAILED"
       sock = nil
       begin
-        log "asking phantomjs to stop"
+        log "Asking phantomjs to stop..."
         sock = TCPSocket.new '127.0.0.1', 4447
         sock.write("GET / HTTP/1.1\n\n")
       rescue
-        log "problem asking crawler to stop"
+        log "phantomjs is probably still running"
       ensure
         sock.close() if not sock.nil?
       end
@@ -76,7 +75,6 @@ class Autologin
         JSON.parse(new_conf, {create_additions:false})
         valid = true
       rescue JSON::ParserError
-        result = "FAILED"
         valid = false
       end
       $datastore['config'] = new_conf if valid
@@ -84,14 +82,14 @@ class Autologin
 
     begin
       mitmdump = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
-      log "asking mitmdump to stop" if mitmdump > 0
-      log "#{mitmdump}" if mitmdump > 0
+      log "Asking mitmdump to stop..." if mitmdump > 0
+      #log "#{mitmdump}" if mitmdump > 0
       Process.kill 'INT', mitmdump if mitmdump > 0
     rescue
-      log "mitmdump was probably already running"
+      log "mitmdump is probably still running"
     end
 
-    log "RESULT: #{result}"
+    log "autologin is done"
 
   end
 end

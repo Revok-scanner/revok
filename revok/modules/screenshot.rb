@@ -15,8 +15,9 @@ class Photographer
     
   def shot
     result = "FAIL"
-
     filename = "/tmp/" + `uuidgen`.chomp + '.png'
+    log "Generating screenshot of the login page..."
+
     shot_in, shot_out, shout_err = Open3.popen3("phantomjs --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/longshot.js #{filename}")
     shot_in.puts "#{@url}"
     shot_in.close
@@ -31,8 +32,7 @@ class Photographer
       log "----screenshot\n#{payload}\n----screenshot\n"
     end
     system("rm -rf #{filename}")
-    log "#{filename} remove error!!!" if File.exists?("#{filename}")
-    log "RESULT: #{result}"
+    log "ERROR: #{filename} cannot be removed" if File.exists?("#{filename}")
   end
 
 end

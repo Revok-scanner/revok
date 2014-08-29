@@ -40,13 +40,13 @@ class Crawler
     config = JSON.dump(config)
 
     cleanProcs
-    sleep 10
+    sleep 5
+
     mitm_in, mitm_out, mitm_err, mitm_thd = Open3.popen3("mitmdump -s #{File.dirname(__FILE__)}/creep/creep.py #{ip} -q")
     mitmid = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
     if mitmid>0
-      log 'mitmdump'
+      log "mitmdump is started"
     else
-      log "RESULT: FAIL"
       return
     end
     mitm_in.close
@@ -55,13 +55,13 @@ class Crawler
     crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{File.dirname(__FILE__)};phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{File.dirname(__FILE__)}/creep/webcrawler.js")
     phantomjsid = `ps -ef | grep phantomjs | grep -v grep | grep -v sh |awk '{print $2}'`.to_i
     if phantomjsid>0
-      log 'phantomjs'
+      log "phantomjs is started"
     else
-      log "RESULT: FAIL"
       return
     end
     crawl_in.puts config
     crawl_in.close
+    log "Crawling the application #{target}..."
 
     buffer = Array.new
     start = Time.now.to_i
@@ -100,11 +100,11 @@ class Crawler
 
     begin
       mitmdump = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
-      log "asking mitmdump to stop" if mitmdump > 0
-      log "#{mitmdump}" if mitmdump > 0
+      log "Asking mitmdump to stop..." if mitmdump > 0
+      #log "#{mitmdump}" if mitmdump > 0
       Process.kill 'INT', mitmdump if mitmdump > 0
     rescue
-      log "mitmdump was probably already running"
+      log "mitmdump is probably still running"
     end
 
     while report_idle < 30
@@ -123,7 +123,7 @@ class Crawler
     crawl_err.close
     mitm_out.close
     mitm_err.close
-    log "pipes closed"
+    #log "pipes closed"
 
     injections = injections.join('')
     walk = walk.join('')
@@ -133,19 +133,17 @@ class Crawler
     $datastore['injections']=injections
     $datastore['walk']=walk
 
-
     sleep 10
     cleanProcs
 
-    log walk.size
-    log injections.size
-    #p injections
+    #log walk.size
+    #log injections.size
 
     if injections.nil? or injections.size < 1 or walk.nil? or walk.size < 1
-      log "RESULT: FAIL"
-    else
-      log "RESULT: PASS"
+      # No crawling result
     end
+
+    log "crawler is done"
 
   end
 

@@ -65,7 +65,6 @@ class SessionExposureCheckor
         req  = requests["#{login_request+1}"]
       else
         log "Login request or request after login isn't scanned." 
-        log "RESULT: FAIL" 
         return
       end
     end
@@ -87,9 +86,8 @@ class SessionExposureCheckor
 
         begin
           resp = conn.send_recv(test_req, 30)
-          # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
         rescue
-          log "Problem #{$!}" 
+          log "ERROR: #{$!}" 
         end
 
         if resp.headers['Location'] != nil
@@ -111,12 +109,9 @@ class SessionExposureCheckor
     if session_id != ""
       @session_id=session_id
       $datastore['session_id'] = session_id
-      log session_id 
-      log "The key of Session ID is detected: #{session_id}" 
-      log "RESULT: PASS" 
+      log "The key of session ID is detected: #{session_id}" 
     else
       log "Session ID isn't detected" 
-      log "RESULT: FAIL" 
     end
 
   end
@@ -151,16 +146,14 @@ class SessionExposureCheckor
     if vul.size == 0
       abstain
       log "No session ID found in urls"  
-      log "RESULT: PASS" 
     else
       vul=vul.uniq
       vul.each do |k|
-        log "session exposed in url of request: #{k}" 
+        log "Session exposed in url of request: #{k}" 
         k = k.gsub(/POST/, "POST request for").gsub(/GET/, "GET request for")
         list("#{k}")  
       end
       warn({"name" => "session_exposed_in_url"})
-      log "RESULT: FAIL" 
     end
 
   end
