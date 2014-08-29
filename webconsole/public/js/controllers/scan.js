@@ -35,7 +35,7 @@ revok.controller('scanController', function($scope,$http) {
 
     $http.post('/scan',config)
     .success(function(data, status, headers, config) {
-      $scope.message = "Your scan request has been received. You can check {Revok_install_dir}/report to view the report when scan finish.";
+      $scope.message = "Your scan request has been received. You can check {revok_directory}/report to view the report when the scan is finished.";
     })
     .error(function(data, status, headers, config) {
       $scope.message = "There was a problem requesting this scan.";
