@@ -18,7 +18,7 @@ class PasswordAutoCompleteChecker
 
   def find_auto_complete(node)
     if node.to_s.include?("autocomplete=\"off\"")
-      log "auto-complete is enabled"
+      log "auto-complete is not enabled"
       return true
     elsif node.name == "form" || node.name == "html"
       return false
@@ -65,7 +65,7 @@ class PasswordAutoCompleteChecker
         return
       end
       advise({'login_page'=>target})
-      log "auto-complete is not enabled"
+      log "auto-complete is enabled"
     end
 
   end

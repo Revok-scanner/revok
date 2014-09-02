@@ -7,14 +7,15 @@ JavaScript-aware crawler - built on PhantomJS, a headless WebKit. (Crawler impro
 
 Vulnerability Checks and Alignment to OWASP Top 10 2013
 --------------------------------------------------------
-Cross-site scripting (XSS)		A3
+Cross-site Scripting (XSS)		A3
 Session Fixation			A2
 Bruteforce				A2
 SQL Injection				A1
 Path Traversal				A4
 SSL Login				A6
-Access to admin pages			A7
-URL redirection				A10
+Access to Admin Pages			A7
+URL Redirection				A10
+Session Exposed in URL			A2
 
 
 Security Hardening Checks and Alignment to OWASP Top 10 2013
@@ -24,9 +25,9 @@ Cross Origin Policy
 Password Auto-complete			A6
 Strict MIME Types	 
 HTTP Method Check (TRACE, etc.)	 
-SSL Check	 
+SSL Misconfiguration Check	 	A5
 Cookie Attributes - Secure flag		A6
-Cookie Attributes - Session expiration	 
+Cookie Attributes - Session expiration	A2 
 Cookie Attributes - HTTPOnly flag	 
 
 

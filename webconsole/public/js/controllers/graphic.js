@@ -231,7 +231,7 @@ revok.controller('graphicController', function($scope,$timeout,$http) {
       $scope.prev_button_style = "btn-prev"; //for button status (enable/disable)
       $scope.prev_icon_style = "btn-icon icon-arrow-left";
       $scope.message = "Problem (see below)";
-      $scope.help = "Revok has encountered an issue trying to retrieve and analyze this page. You are welcome to try again. If the problem persist, please contact <a href=\"mailto:revok2014@gmail.com\">revok2014@gmail.com</a>. ";
+      $scope.help = "Revok has encountered an issue trying to retrieve and analyze this page. You are welcome to try again. If the problem persist, please contact <a href=\"mailto:revok-scanner-users@googlegroups.com\">revok-scanner-users@googlegroups.com</a>. ";
       if ($scope.guru_meditation.length > 0) {
         //$scope.help += "You can provide us with this guru meditation #: " + $scope.guru_meditation + ".";
       }
@@ -246,7 +246,7 @@ revok.controller('graphicController', function($scope,$timeout,$http) {
       $scope.prev_button_style = "btn-prev"; //for button status (enable/disable)
       $scope.prev_icon_style = "btn-icon icon-arrow-left";
       $scope.message = "Operation timed out.";
-      $scope.help = "The cluster may be under heave load. If this problem persist, please contact <a href=\"mailto:revok2014@gmail.com\">revok2014@gmail.com</a>.";
+      $scope.help = "The cluster may be under heave load. If this problem persist, please contact <a href=\"mailto:revok-scanner-users@googlegroups.com\">revok-scanner-users@googlegroups.com</a>.";
     }
 
     if ($scope.state.pic.url != $scope.state.login) {
