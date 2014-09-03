@@ -47,6 +47,7 @@ init() {
   # Softlink docs
   eval ln -s $ROOT_PATH/docs $ROOT_PATH/webconsole/public/docs $NULL
   eval ln -s $ROOT_PATH/README $ROOT_PATH/webconsole/public/docs/About $NULL
+  eval ln -s $ROOT_PATH/COPYING $ROOT_PATH/webconsole/public/docs/COPYING $NULL
 
   # Config iptables
   echo "To make revok work, we need to execute the below commands to add rules in iptables:"
