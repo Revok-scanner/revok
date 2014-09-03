@@ -3,7 +3,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width" />
   <title>Revok</title>
   <link rel="stylesheet" href="stylesheets/foundation.custom.css"/>
@@ -12,29 +12,28 @@
   <link rel="stylesheet" href="stylesheets/loda-button.css"/>
 </head>
 <body>
-  <div class="row" style="margin-top:7px; margin-bottom:7px;">
-    <a href="/">
-      <div class="small-6 large-6 columns" style="margin-left: 0px;">
-        <img id="logo" src="images/revok.png" width="90" height="90"/>
-      </div>
-    </a>
-    <div class="small-6 large-6 columns" style="text-align:right;line-height:30px;">
-      <div style="margin-right:0px">
-        <a class="toplink" href="#" target="_blank">About</a>
-        <a class="toplink" href="#" target="_blank">Features</a>
-        <a class="toplink" href="#" target="_blank">FAQ</a>
-      </div>
+
+<div class="row" id="nav_row">
+  <a href="/">
+    <div class="small-6 large-6 columns" id="logo_div">
+      <img id="logo" src="images/revok.png" width="90" height="90"/>
     </div>
+  </a>
+  <div class="small-6 large-6 columns" id="toplinks_div">
+    <a class="toplink" href="#" target="_blank">About</a>
+    <a class="toplink" href="#" target="_blank">Features</a>
+    <a class="toplink" href="#" target="_blank">FAQ</a>
   </div>
-  <div style="background-color:#1D8CBA;">
-  <div class="row" style="height:378px;text-align:center;background-color:#1D8CBA;">
-    <div class="small-12 large-12 columns" style="line-height:8px;margin-top:85px;">
+</div>
+<div id="down_div">
+  <div id="down_row" class="row">
+    <div id="down_p_grid" class="small-12 large-12 columns">
       <p style="color:white;font-size:25px;font-weight:bold;">Enter your web url and Scan for vulnerabilities.<p>
       <p style="color:white">Find XSS, SQLi etc. and get remedy advice.</p>
     </div>
 
-    <div class="small-12 large-12 columns" style="text-align:center;">
-      <div style="height:50px;margin-top:40px;">
+    <div id="down_btn_grid" class="small-12 large-12 columns">
+      <div id="down_btn_div">
         <a href="#" class="loda-btn">
           <span aria-hidden="true" class="loda-icon icon-download"></span>Binary Package
         </a>
@@ -46,11 +45,10 @@
   </div>
 </div>
 
-<center>News:&nbsp;&nbsp;Revok 0.7.6 released on 12 Aug. 2014 · <a href="#"  target="_blank" style="text-decoration:none; color:#808184">changelog</a></center>
+<center>News:&nbsp;&nbsp;Revok 0.7.6 released on 12 Aug. 2014 · <a id="news_a" href="#" target="_blank" style="text-decoration:none;color:#808184">changelog</a></center>
 
-
-<div class="row" style="line-height:24px;background-color:#F4F2F0;">
-  <div class="small-12 large-6 columns" style="padding-top:5em; padding-bottom:3em;">
+<div id="video_row" class="row">
+  <div id="video_grid" class="small-12 large-6 columns">
     <center>
       <video width="460" height="260" controls>
         <source src="video/Revok0.7.mp4" type="video/mp4">
@@ -60,23 +58,23 @@
     </center>
   </div>
 
-  <div class="small-12 large-6 columns" style="padding-top:8em; line-hight:24px;" >
-    <div class="landing" style="color:#808184;">A security scan is simple, just three steps.</div>
-    <p style="color:#808184;">1. Enter target URL; Revok auto-detects authentication type<br/>2. Enter login info<br/>3. Confirm inputs and submit<br/><br/>When scan is complete, an email report will be sent to you.<p>
+  <div id="video_text_grid" class="small-12 large-6 columns">
+    <div class="landing">A security scan is simple, just three steps.</div>
+    <p>1. Enter target URL; Revok auto-detects authentication type<br/>2. Enter login info<br/>3. Confirm inputs and submit<br/><br/>When scan is complete, an email report will be sent to you.<p>
   </div>
 </div>
 
-<div class="row" style="line-height:24px;background-color:#F4F2F0">
-  <div class="small-5 large-5 columns" style="padding-top:1em;line-hight:24px;" >
+<div id="rpt_row" class="row">
+  <div id="rpt_img_grid" class="small-5 large-5 columns">
     <div style="margin:auto; width:inherit;">
-    <a class="click-link" href="#" target="_blank"><img src="images/Clipboard.png" /></a>
-    <p style="text-align:center;"><a class="click-link" href="#" target="_blank">Sample Report</a></p>
+      <a class="click-link" href="#" target="_blank"><img src="images/Clipboard.png" /></a>
+      <p style="text-align:center;"><a class="click-link" href="#" target="_blank">Sample Report</a></p>
     </div>
   </div>
 
-  <div class="small-7 large-7 columns" style="padding-bottom:5em;">
+  <div id="rpt_text_grid" class="small-7 large-7 columns">
     <div class="feature-list">
-      <div class="landing" style="color:#808184;">The comprehensive vulnerability scan report for you</div><p>Click the left icon to view a sample report for DVWA, which contains:</p>
+      <div class="landing">The comprehensive vulnerability scan report for you</div><p>Click the left icon to view a sample report for DVWA, which contains:</p>
         <li>Summary</li>
         <li>Vulnerability</li> 
         <li>Security Hardening</li>
@@ -90,11 +88,11 @@
 <div class="footer">
   <div class="row">
     <div class="small-6 large-6 columns">
-        <p style="font-size:12px">Revok is released under the <a class="footerlink" href="#" target="_blank" style="margin-left:0px;">GNU AGPLv3</a></p>
+        <p style="font-size:12px">Revok is released under the <a class="footerlink" href="#" target="_blank" style="margin-left:0;">GNU AGPLv3</a></p>
         <p style="font-size:12px">Copyright &copy; 2014 Revok Team</p>
     </div>
     <div class="small-6 large-6 columns end">
-      <div class="row" style="float:right;height:3.5em;line-height:3.5em;overflow:hidden;">
+      <div id="footerlinks_row" class="row">
         <a class="footerlink" href="#" target="_blank">Roadmap</a>
         <a class="footerlink" href="#" target="_blank">Changelog</a>
         <a class="footerlink" href="#">Contact</a>
