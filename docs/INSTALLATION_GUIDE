@@ -1,91 +1,46 @@
 Installation Guide
 -------------------
 
-1 Architecture overview
+1 Deployment
 
-1.1 Components
-Revok consists of the following components. They can be deployed in both integrated (single node) and distributed (multiple nodes) environment.
+1.1 Start Revok with binary package
 
-(1) Web console
-Revok web console provides the user interface for submitting scan tasks.
-
-(2) REST API
-Revok REST APIs are defined to receive and handle requests from the web console.
-
-(3) Messaging server
-Messaging server stores scan requests and distributes them to Caroline nodes. When requests were received, new messages would be produced and kept in a queue until Caroline nodes consume messages from the queue.
-
-(4) Caroline nodes
-Revok Caroline nodes (working nodes) implement scans with a group of testing modules and generate final scan reports.
-
-(5) Database
-Details for all scan tasks are recorded in the database. It can be used for data query or statistic.
-
-
-1.2 Communication among components
-Communication for Revok components is as below. The messaging flow is from left to right.
-
-
-    frontend      |      backend                    --------------
-                  |                                |Caroline Node1|
-   -----------    |    -----------     --------    |Caroline Node2|    ---------
-  |Web Console|---|---|REST Server|---|ActiveMQ|---|      .       |---|DB Server|
-   -----------    |    -----------     --------    |      .       |    ---------
-                  |                                |      .       |
-                  |                                |Caroline Noden|
-                  |                                 --------------
-
-
-
-2 Deployment
-
-2.1 Start Revok in a single node
-
-Step 1: downloading and decompressing the binary version
+Step 1: download and decompress the binary package
 $ wget {placeholder}
 $ tar xJvf revok-0.7.6_x86_64.tar.xz
 
-Step 2: initializing Revok
+Step 2: initialize Revok
 $ cd revok-0.7.6_x86_64
 $ ./revokd init
 
-Step 3: running Revok
+Step 3: run Revok
 $ ./revokd start
 
-Step 4: accessing the web console to submit a scan at http://localhost:3030
-
-Step 5: monitoring scan process from log file (var/log/carolined.log) and checking report (report/report_$time.html) when finished
+Step 4: accesse the web console to submit a scan at http://localhost:3030
 
 
-2.2 Deploy Revok in distributed environment
+1.2 Deploy Revok with source code
 
-The five components of Revok can be deployed on separated hosts. In addition, you can add more than one working nodes to support parallel scans.
+Web console, REST API server, messaging server, Caroline nodes (working nodes) and database server can be deployed in both centralized (single node) and distributed (multiple nodes) environment. In addition, you can add more than one working nodes to support parallel scans. 
 
-2.2.1 Preparation
+1.2.1 Preparation
 
 (1) Get source code 
-The source code can be cloned from {placeholder}.
+The source code can be got from {placeholder}. Clone it for each node in distributed environment.
 
-(2) Initial settings
-The global configuration file (conf/revok.conf) defines the settings for starting Revok service. Please reset or keep the default values according to your requirements.
+(2) Global configuration file
+File conf/revok.conf defines the settings for starting Revok service. Please make sure changes of this file is synchronized on all nodes in distributed environment.
 
-(3) Iptables rules
-Define iptables rules correctly to make sure remote connections among Revok components are available.
-
-(4) SELinux rules
-Configure SELinux rules if needed to make Revok service run smoothly.
-
-(5) DNS settings (Optional)
+(3) DNS settings (Optional)
 Add maps of hostnames and IP addresses to the hosts file in distributed environment when hostnames are used to communicate.
 
 
-2.2.2 Database server
+1.2.2 Database server
 PostgreSQL is the storage for Revok history data. Other database options will be added in the future.
 
-Step 1: installing and initializing PostgreSQL
-Download and install the right version for your operating system referring to http://www.postgresql.org/download/. Edit configuration file ($PGSQL_DATA_DIR/postgresql.conf) to set the listening IP address and port.
+Step 1: install and initialize PostgreSQL
+Download and install the right version for your operating system referring to http://www.postgresql.org/download/. Edit configuration file to set the listening IP address and port.
 
-[Demo for Fedora 20]
 $ yum install -y postgresql-server postgresql
 $ postgresql-setup initdb
 $ vi /var/lib/pgsql/data/postgresql.conf
@@ -93,55 +48,73 @@ listen_addresses = '*'
 port = 5432
 $ systemctl enable postgresql.service
 
-Step 2: creating user and database
+Step 2: create user and database
 Start PostgreSQL service. Create database for Revok and the user for its maintenance.
 
-[Demo for Fedora 20]
 $ systemctl start postgresql.service
 $ su - postgres
 $ psql
-postgres=# create database $DB_NAME;
-postgres=# create user $DB_USER with password '$DB_PASSWORD';
+postgres=# create database revok_db;
+postgres=# create user revok with password 'password';
 
-Step 3: configuring client authentication
-Edit the configuration file ($PGSQL_DATA_DIR/pg_hba.conf) for client authentication. Apply MD5 authentication to revok user and restart the service.
+Step 3: configure client authentication
+Edit the configuration file for client authentication. Apply MD5 authentication to revok user and restart the service.
 
-[Demo for Fedora 20]
 $ vi /var/lib/pgsql/data/pg_hba.conf
 (Add the following line in # IPv4 local connections section)
-host revok revok 0.0.0.0/0 md5
+host revok_db revok 0.0.0.0/0 md5
 $ systemctl restart postgresql.service
 
+Step 4: update DB settings in the global configuration file 
+# DB config
+DB_USER=revok
+DB_PASSWORD=password
+DB_HOST=db.example.com
+DB_NAME=revok_db
+DB_PORT=5432
 
-2.2.3 Message queue server
+Step 5: add iptables rule
+# iptables -I INPUT 1 -p tcp -m tcp --dport 5432 -j ACCEPT
+
+
+1.2.3 Message queue server
 ActiveMQ works as the messaging server in Revok.
 
-Step 1: installing ActiveMQ
+Step 1: install ActiveMQ
 Download from http://activemq.apache.org/download.html.
 
-[Demo for Fedora 20]
 $ wget http://mirror.metrocast.net/apache/activemq/5.10.0/apache-activemq-5.10.0-bin.tar.gz
 $ tar xzvf apache-activemq-5.10.0-bin.tar.gz
 
-Step 2: configuring ActiveMQ
-Edit configuration file ($ACTIVEMQ_DIR/conf/activemq.xml) to add authentication plugin, then start ActiveMQ service.
+Step 2: configure ActiveMQ
+Edit configuration file to add authentication plugin, then start ActiveMQ service.
 
-[Demo for Fedora 20]
 $ vi apache-activemq-5.10.0/conf/activemq.xml
 (Add the following lines in <broker></broker> section)
 <plugins>
     <simpleAuthenticationPlugin>
         <users>
-            <authenticationUser username="$AMPQ_USER" password="$AMPQ_PASSWORD" groups="users"/>
+            <authenticationUser username="caroline" password="password" groups="users"/>
         </users>
     </simpleAuthenticationPlugin>
 </plugins>
 $ apache-activemq-5.10.0/bin/activemq start
 
+Step 3: update activemq settings in the global configuration file 
+# ActiveMQ config
+AMPQ_USER=caroline
+AMPQ_PASSWORD=password
+AMPQ_HOST=activemq.example.com
+AMPQ_PORT=61613
+AMPQ_QUEUE=/revok/queue
 
-2.2.4 REST API server
+Step 4: add iptables rule
+# iptables -I INPUT 1 -p tcp -m tcp --dport 61613 -j ACCEPT
 
-Step 1: preparing dependent packages
+
+1.2.4 REST API server
+
+Step 1: prepare dependent packages
 The list of basic packages required by REST API server.
 - ruby (>=1.9.3)
 - ruby-devel
@@ -150,34 +123,38 @@ The list of required gems.
 - bundle
 - see 'Gemfile' for others
 
-[Demo for Fedora 20]
 $ yum install -y ruby rubygems
 $ gem install bundle
 $ cd revok
 $ bundle install
 
-Step 2: setting environment variables
+Step 2: update REST settings in the global configuration file 
+# REST config
+REST_USER=revok
+REST_PASSWORD=password
+REST_PORT=8443
+
+Step 3: set environment variables
 Set options defined in the global configuration file as environment variables.
 
-[Demo for Fedora 20]
 $ cd revok
 $ sh bin/setenv.sh
 
-Step 3: importing data schema to database
+Step 4: import data schema to database
 Create tables in the revok database.
 
-[Demo for Fedora 20]
 $ ruby db/initdb.rb
 
-Step 4: starting rest-served
-
-[Demo for Fedora 20]
+Step 5: start rest-served
 $ rest/rest-served start
 
+Step 6: add iptables rule
+# iptables -I INPUT 1 -p tcp -m tcp --dport 8443 -j ACCEPT
 
-2.2.5 Caroline nodes
 
-Step 1: preparing dependent packages
+1.2.5 Caroline nodes
+
+Step 1: prepare dependent packages
 All dependent packages of REST API Server are required. Other dependency is as below.
 - python (>=2.6)
 - pip (https://pip.pypa.io/en/latest/installing.html)
@@ -189,7 +166,6 @@ All dependent packages of REST API Server are required. Other dependency is as b
 - expect
 - zip
 
-[Demo for Fedora 20]
 $ yum install -y python ImageMagick openssl sslscan expect
 $ wget https://bootstrap.pypa.io/get-pip.py
 $ python get-pip.py
@@ -198,8 +174,9 @@ $ wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86
 $ tar xjvf phantomjs-1.9.7-linux-x86_64.tar.bz2
 $ cp phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/bin/
 
-Step 2: setting SMTP server
-A SMTP server is needed to send scan reports to users. Set it in the global configuration file (conf/revok.conf).
+Step 2: update SMTP settings in the global configuration file
+A SMTP server is needed to send scan reports to users.
+
 # Report config
 USE_SMTP=on
 SMTP_ADDRESS=smtp.example.com
@@ -208,52 +185,54 @@ SMTP_USER=username
 SMTP_PASSWORD=password
 EMAIL_ADDRESS=revok@example.com
 
-Step 3: setting environment variables
+Step 3: set environment variables
 The same as step 2 for REST API Server.
 
-Step 4: starting carolined
-
-[Demo for Fedora 20]
+Step 4: start carolined
 $ caroline/carolined start
 
 
-2.2.6 Web console
+1.2.6 Web console
 
 (1) Start by WEBrick
 
-Step 1: preparing dependent packages
+Step 1: prepare dependent packages
 All dependent packages of REST API Server are required.
 
-Step 2: starting rackd
+Step 2: update web settings in the global configuration file
+# Web UI config
+WEB_PORT=3030
 
-[Demo for Fedora 20]
+Step 3: set environment variables
+The same as step 2 for REST API Server.
+
+Step 4: start rackd
 $ cd revok
 $ webconsole/rackd start
 
+Step 5: add iptables rule
+# iptables -I INPUT 1 -p tcp -m tcp --dport 3030 -j ACCEPT
+
 (2) Start by Apache
 
-Step 1: preparing dependent packages
+Step 1: prepare dependent packages
 All dependent packages of REST API Server are required. Other dependency is as below.
 The list of required packages.
 - httpd
 The list of required gems.
 - passenger
 
-[Demo for Fedora 20]
 $ yum install -y httpd
 $ gem install passenger
 $ passenger-install-apache-module
 
-Step 2: copying code to httpd data directory
-
-[Demo for Fedora 20]
+Step 2: copy code to httpd data directory
 $ cp -r revok/webconsole /var/www/html/revok
 $ ln -s /var/www/html/revok/public /var/www/html/scanner
 
-Step 3: configuring httpd
+Step 3: configure httpd
 Add loadmodule option for passenger and vhost setting for the application to httpd.conf, then start httpd service.
 
-[Demo for Fedora 20]
 $ vi /etc/httpd/conf/httpd.conf
 (Add the following lines)
 LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.48/buildout/apache2/mod_passenger.so
@@ -261,8 +240,8 @@ LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.4
     PassengerRoot /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.48
     PassengerDefaultRuby /usr/local/gems/ruby-1.9.3-p547/wrappers/ruby
 </IfModule>
-<VirtualHost *:$FRONT_PORT>
-    ServerName $FRONT_HOST
+<VirtualHost *:3030>
+    ServerName localhost
     RewriteEngine on
     RewriteRule ^/$ scanner/html/ [R]
     PassengerAppRoot /var/www/html/revok/public
@@ -275,13 +254,17 @@ LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.4
     </Directory>
 </VirtualHost>
 $ systemctl start httpd.service
-Access the web console via url http://$WEB_HOST:$WEB_PORT.
+
+Step 4: add iptables rule
+# iptables -I INPUT 1 -p tcp -m tcp --dport 3030 -j ACCEPT
+
+Access the web console via URL http://localhost:3030.
 
 
 
-3 Monitor and troubleshoot
+2 Monitoring and troubleshooting
 
-3.1 Service status
+2.1 Service status
 After startup, check service status to confirm all of the services are running.
 
 (1) Status for ActiveMQ
@@ -297,7 +280,7 @@ $ rest/rest-served status
 $ webconsole/rackd status
 
 
-3.2 Log files
+2.2 Log files
 Turn to log files for detailed running information or for troubleshooting when error occured.
 
 (1) Log file for ActiveMQ
