@@ -44,7 +44,7 @@ Communication for Revok components is as below. The messaging flow is from left 
                   |                                 --------------
 
 
-Quik start guide for single node
+Quick start guide for single node
 ----------------------------------
 Step 1: download and decompress the binary package
 $ wget {placeholder}
