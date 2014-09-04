@@ -28,7 +28,7 @@ A: Top web vulnerabilities such as XSS, SQL injection, etc.. Check the complete 
 
 
 Q: Is there a quickstart?
-A: Watch the demo or just try it.
+A: See README.
 
 
 Q: Can I use Revok to test any web targets?
