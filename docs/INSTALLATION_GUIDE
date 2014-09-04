@@ -29,17 +29,17 @@ Web console, REST API server, messaging server, Caroline nodes (working nodes) a
 The source code can be got from {placeholder}. Clone it for each node in distributed environment.
 
 (2) Global configuration file
-File conf/revok.conf defines the settings for starting Revok service. Please make sure changes of this file is synchronized on all nodes in distributed environment.
+File conf/revok.conf defines the settings for starting Revok service. Please make sure changes of this file are synchronized on all nodes in the distributed environment.
 
 (3) DNS settings (Optional)
-Add maps of hostnames and IP addresses to the hosts file in distributed environment when hostnames are used to communicate.
+Add mapping of hostnames and IP addresses to the /etc/hosts file in distributed environment when hostnames are used to communicate.
 
 
 1.2.2 Database server
-PostgreSQL is the storage for Revok history data. Other database options will be added in the future.
+PostgreSQL is the storage for Revok history data. Other database options may be added in the future.
 
 Step 1: install and initialize PostgreSQL
-Download and install the right version for your operating system referring to http://www.postgresql.org/download/. Edit configuration file to set the listening IP address and port.
+Download and install the right version of PostgreSQL for your OS (refer to http://www.postgresql.org/download/). Edit configuration file to set the listening IP address and port.
 
 $ yum install -y postgresql-server postgresql
 $ postgresql-setup initdb
@@ -49,7 +49,7 @@ port = 5432
 $ systemctl enable postgresql.service
 
 Step 2: create user and database
-Start PostgreSQL service. Create database for Revok and the user for its maintenance.
+Start PostgreSQL service. Create database "revok_db"and user "revok"
 
 $ systemctl start postgresql.service
 $ su - postgres
@@ -134,15 +134,11 @@ REST_USER=revok
 REST_PASSWORD=password
 REST_PORT=8443
 
-Step 3: set environment variables
-Set options defined in the global configuration file as environment variables.
-
+Step 3: set environment variables that defined in the global configuration file
 $ cd revok
 $ sh bin/setenv.sh
 
-Step 4: import data schema to database
-Create tables in the revok database.
-
+Step 4: initialize database, importing data schema to database
 $ ruby db/initdb.rb
 
 Step 5: start rest-served
@@ -185,8 +181,9 @@ SMTP_USER=username
 SMTP_PASSWORD=password
 EMAIL_ADDRESS=revok@example.com
 
-Step 3: set environment variables
-The same as step 2 for REST API Server.
+Step 3: set environment variables that defined in the global configuration file
+$ cd revok
+$ sh bin/setenv.sh
 
 Step 4: start carolined
 $ caroline/carolined start
@@ -203,8 +200,9 @@ Step 2: update web settings in the global configuration file
 # Web UI config
 WEB_PORT=3030
 
-Step 3: set environment variables
-The same as step 2 for REST API Server.
+Step 3: set environment variables that defined in the global configuration file
+$ cd revok
+$ sh bin/setenv.sh
 
 Step 4: start rackd
 $ cd revok
@@ -213,7 +211,7 @@ $ webconsole/rackd start
 Step 5: add iptables rule
 # iptables -I INPUT 1 -p tcp -m tcp --dport 3030 -j ACCEPT
 
-(2) Start by Apache
+(2) Start Apache HTTP server
 
 Step 1: prepare dependent packages
 All dependent packages of REST API Server are required. Other dependency is as below.
@@ -281,7 +279,7 @@ $ webconsole/rackd status
 
 
 2.2 Log files
-Turn to log files for detailed running information or for troubleshooting when error occured.
+Turn to log files for detailed running information or for troubleshooting when error occurs.
 
 (1) Log file for ActiveMQ
 var/log/activemqd.log
