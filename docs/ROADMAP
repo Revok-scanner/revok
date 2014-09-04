@@ -14,12 +14,11 @@ Revok 0.7, released on 6 Mar. 2014
 
 Revok 0.8, estimated Oct. 2014
 - Enhance scalability for adding modules 
+
+
+Backlog:
 - Improve crawler: advanced Javascript support 
-
-Revok 0.9, estimated Feb. 2015
-- Commond line tool and REST API for Revok service
+- REST API for Revok service
+- Command line tool
 - Enhance vulnerability checking
-
-Revok 1.0, estimated Apr. 2015
 - Use lightweight components (db, messaging server) as default selection
-- Support different options for components
