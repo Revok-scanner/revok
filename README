@@ -24,14 +24,14 @@ Revok REST APIs are defined to receive and handle requests from the web console.
 Messaging server stores scan requests and distributes them to Caroline nodes. When requests were received, new messages would be produced and kept in a queue until Caroline nodes consume messages from the queue.
 
 (4) Caroline nodes
-Revok Caroline nodes (working nodes) implement scans with a group of testing modules and generate final scan reports.
+Revok Caroline nodes (working nodes) run scans with a group of testing modules and generate final scan reports.
 
 (5) Database
 Details for all scan tasks are recorded in the database. It can be used for data query or statistic.
 
 
 2 Communication among components
-Communication for Revok components is as below. The messaging flow is from left to right.
+Communication among Revok components is as below. The messaging flow is from left to right.
 
 
     frontend      |      backend                    --------------
@@ -40,11 +40,11 @@ Communication for Revok components is as below. The messaging flow is from left 
   |Web Console|---|---|REST Server|---|ActiveMQ|---|      .       |---|DB Server|
    -----------    |    -----------     --------    |      .       |    ---------
                   |                                |      .       |
-                  |                                |Caroline Noden|
+                  |                                |Caroline NodeN|
                   |                                 --------------
 
 
-Quick start guide for single node
+Quick start guide (all in one)
 ----------------------------------
 Step 1: download and decompress the binary package
 $ wget {placeholder}
@@ -74,7 +74,7 @@ Step 4: monitor scan progress from log file (var/log/carolined.log) and check re
 Deploy Revok with source code
 ------------------------------
 
-You can choose to deploy web console, REST API server, messaging server, Caroline nodes (working nodes) and database server on the same host or separated hosts. In addition, you can add more than one working nodes to support parallel scans. Please refer to the installation guide for detailed steps to deploy Revok with source code.
+You can deploy web console, REST API server, messaging server, Caroline nodes (working nodes) and database server on the same host or separated hosts. In addition, you can add more than one working nodes to support parallel scans. Please refer to the installation guide for detailed steps to deploy Revok with source code.
 
 
 Documents
@@ -90,9 +90,9 @@ Issues for Revok is listed at {placeholder}.
 Contact us
 --------------
 Mailing lists
-revok-scanner-users@googlegroups.com (for user)
-revok-scanner-devel@googlegroups.com (for development)
-revok-scanner-announce@googlegroups.com (for release notices)
+revok-scanner-users@googlegroups.com (for users)
+revok-scanner-devel@googlegroups.com (for developers)
+revok-scanner-announce@googlegroups.com (for release announcement)
 
 IRC discussion
 #revok-scanner (irc.freenode.net/6665)
