@@ -1,6 +1,6 @@
 revok.controller('stateController',function($scope,$location) {
 
-    $scope.root = "http://127.0.0.1:3030";
+    $scope.root = "";
 
     if ($location.path() != '' && $location.path() != '/') {
       document.location = $scope.root;
