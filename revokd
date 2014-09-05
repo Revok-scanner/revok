@@ -65,10 +65,16 @@ init() {
   echo "iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT (required by Rest-server)"
   echo "iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT (required by Rack web server)"
   echo "We need the password of root, it'll never be saved"
-  su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
-  iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
-  iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
-  iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT"
+  
+  # to set $? as non-zero, execute an invalid command
+  eval qwertyasdfg $NULL
+
+  until [ $? -eq 0 ]; do
+    su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT"
+  done
   echo "done"
 }
 
