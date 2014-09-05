@@ -7,6 +7,15 @@ NULL="> /dev/null 2>&1"
 
 init() {
   # Pre-init check
+  # no superuser check
+  echo -en "Check current user..."
+  username=$(whoami)
+  if [ $username == "root" ]; then
+    echo "No superuser (root) access is required, switch to another user and try again"
+    exit 1
+  fi
+  echo "done"
+
   # JRE check
   echo -en "Check JRE installation..."
   which java > /dev/null
