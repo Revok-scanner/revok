@@ -29,7 +29,7 @@
     </table>
 
     <p>Risk: Revok injects data during scan and may corrupt your database.<br/> We recommend you run against a *test environment*.</p>
-    <p><input type="checkbox" style="min-height:18px;min-width:18px;vertical-align:middle;" ng-model="state.confirm" ng-change="check()"><span style="color:#f04124;vertical-align:middle;">&nbsp;I understand the risk</span><br/><br/></p>
+    <p><input type="checkbox" style="min-height:18px;min-width:18px;vertical-align:middle;" ng-model="state.confirm" ng-change="check()"><span style="color:#f04124;vertical-align:middle;margin-left:0.5em">I understand the risk</span><br/><br/></p>
   </center>
   </div>
 </div>
@@ -37,8 +37,8 @@
 <div class="row" style="margin-top:55px;margin-bottom:270px;">
   <div class="small-12 large-12 columns">
     <center>
-      <a href="javascript:;" class="btn-prev pop" ng-click="action.back();state.valid_pass=false;state.valid_user=flase;state.valid=false;state.valid_email=false"><span aria-hidden="true" class="btn-icon icon-arrow-left"></span>&nbsp;&nbsp;&nbsp;Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href="javascript:;" class="pop" ng-class="confirm_button_style" ng-click="next()" ><span aria-hidden="true" ng-class="icon_style"></span>Submit&nbsp;&nbsp;&nbsp;</a>
+      <a href="javascript:;" class="btn-prev pop" ng-click="action.back();state.valid_pass=false;state.valid_user=flase;state.valid=false;state.valid_email=false"><span aria-hidden="true" class="btn-icon icon-arrow-left"></span>Cancel</a>
+      <a href="javascript:;" class="pop" ng-class="confirm_button_style" ng-click="next()" ><span aria-hidden="true" ng-class="icon_style"></span>Submit</a>
     </center>
   </div>
 </div>
