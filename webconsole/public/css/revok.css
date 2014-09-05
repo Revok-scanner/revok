@@ -41,6 +41,8 @@ b{
   text-decoration:none;
   font-size:15px;
   color:black;
+  margin-left:8px;
+  margin-right:8px;
 }
 .toplink:hover {
   color: #f04124;
@@ -48,6 +50,8 @@ b{
 .footerlink{
   color:#F4F2F0;
   text-decoration:none;
+  margin-left:8px;
+  margin-right:8px;
 }
 .footerlink:hover {
   color: #f04124;
@@ -110,6 +114,7 @@ font-size: 1.2em;
   color: #f04124;
   top:9px;
   font-size: 12px;
+  margin-left:1em;
 }
 .screenshot {
   border: solid 1px black;
@@ -129,9 +134,8 @@ font-size: 1.2em;
 .footer {
   background-color: #313232;
   margin-top:0px;
-  /*border-radius:0 0 6px 6px;*/
-  padding:10px 0;
-  height:76px;
+  padding:5px 0;
+  height:66px;
   color:white;
   line-height: 10px;
 }
@@ -851,11 +855,12 @@ fieldset[disabled] .form-control + .input-icon,
 }
 .btn-prev .btn-icon{
   top: 0.75em;
-  left: 1em;
+  left: 0.5em;
 }
 .btn-prev{
   position:              relative;
   display:               inline-block;
+  margin:                0 25px 0 25px;
 }
 .btn-prev .btn-icon {
   position: absolute;
@@ -913,11 +918,12 @@ fieldset[disabled] .form-control + .input-icon,
 }
 .btn-next .btn-icon{
   top: 0.75em;
-  right: 1em;
+  right: 0.5em;
 }
 .btn-next{
   position:              relative;
   display:               inline-block;
+  margin:                0 25px 0 25px;
 }
 .btn-next .btn-icon {
   position: absolute;
@@ -948,4 +954,10 @@ fieldset[disabled] .form-control + .input-icon,
   box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5), 0px 1px 3px rgba(0,0,0,0.4);
     -moz-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5), 0px 1px 3px rgba(0,0,0,0.4);
     -webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.5), 0px 1px 3px rgba(0,0,0,0.4);
+}
+
+.type_radio {
+  margin: 0 30px 15px 30px;
+  padding: 0;
+  display: inline-block;
 }

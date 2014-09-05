@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if IE 8]> 	<html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width" />
   <title>Revok</title>
   <link rel="stylesheet" href="css/foundation.custom.css"/>
@@ -13,51 +13,36 @@
   <link rel="stylesheet" href="css/loda-button.css"/>
 </head>
 <body ng-controller="stateController">
-
-
-
-  <div class="row" style="margin-top:10px;">
+  <div class="row" style="margin-top:7px;margin-bottom:7px;">
     <a href="/">
-    <div class="large-6 columns " style="margin-left: 0px;">
-      <img id="logo" src="imgs/revok.png" width="90" height="90"/>
-      
-    </div>
+      <div class="small-6 large-6 columns " style="margin-left: 0px;">
+        <img id="logo" src="imgs/revok.png" width="90" height="90"/>
+      </div>
     </a>
-    
-
-    <div class="smal large-6 columns" style="text-align:right;line-height:30px;">
-      <div style="margin-right:0px">
-          <a class="toplink" href="docs/About" target="_blank">About</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a class="toplink" href="docs/FEATURES" target="_blank">Features</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <a class="toplink" href="docs/FAQ" target="_blank">FAQ</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </div>
+    <div class="small-6 large-6 columns" style="margin-right:0;text-align:right;line-height:30px;">
+      <a class="toplink" href="docs/About" target="_blank">About</a>
+      <a class="toplink" href="docs/FEATURES" target="_blank">Features</a>
+      <a class="toplink" href="docs/FAQ" target="_blank">FAQ</a>
     </div>
-
   </div>
-
-
-
-
-
-
   <div ng-view></div>
-</div><!--end wrapper-->
+<!--</div>-->
 
-<div class="footer">
-  <div class="row">
-    <div class="small-6 large-6 columns">
-        <p style="font-size:12px">&nbsp;Revok is released under the <a class="footerlink" href="docs/COPYING" target="_blank">GNU AGPLv3</a></p>
-        <p style="font-size:12px">&nbsp;Copyright &copy; 2014 Revok Team</p>
-    </div>
-    <div class="smal large-6 columns">
-      <div class="row" style="float:right; padding-top:1.2em;">  
-          <a class="footerlink" href="docs/ROADMAP" target="_blank">Roadmap&nbsp;&nbsp;&nbsp;</a>
-          <a class="footerlink" href="docs/CHANGELOG" target="_blank">Changelog&nbsp;&nbsp;&nbsp;</a>
-          <a class="footerlink" href="docs/About">Contact&nbsp;&nbsp;&nbsp;</a>
+  <div class="footer">
+    <div class="row">
+      <div class="small-6 large-6 columns">
+        <p style="font-size:12px">Revok is released under the <a class="footerlink" href="docs/COPYING" target="_blank">GNU AGPLv3</a></p>
+        <p style="font-size:12px">Copyright &copy; 2014 Revok Team</p>
+      </div>
+      <div class="small-6 large-6 columns">
+        <div class="row" style="float:right;height:3.5em;line-height:3.5em;overflow:hidden;">  
+          <a class="footerlink" href="docs/ROADMAP" target="_blank">Roadmap</a>
+          <a class="footerlink" href="docs/CHANGELOG" target="_blank">Changelog</a>
+          <a class="footerlink" href="docs/About" target="_blank">Contact</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <script src="js/vendor/jquery.js"></script>
   <script src="js/loda-button.js"></script>
