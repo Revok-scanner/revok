@@ -48,10 +48,10 @@ start() {
     fi
     # The process running as pid $PID is not a process of the right type, remove subsys
     # lock and start mydaemon
-    echo "daemon lock file still exists, removing..."
+    echo "Daemon lock file still exists, removing..."
     rm -f $ACTIVEMQD_LOCK_FILE
   fi
-  echo "Starting $NAME: "
+  echo "Starting $NAME... "
   cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_START >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
 
   sleep 3
@@ -63,7 +63,7 @@ start() {
 stop() {
   checkpid
   if [ "${PID}" != "" ]; then
-    echo "Stopping $NAME: "
+    echo "Stopping $NAME... "
     cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_STOP >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
     for i in {1..30}
     do

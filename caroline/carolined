@@ -47,10 +47,10 @@ start() {
       fi
     fi
     # The process running as pid $PID is not a process of the right type, remove subsys lock and start mydaemon
-    echo "daemon lock file still exists, removing..."
+    echo "Daemon lock file still exists, removing..."
     rm -f $LOCK_FILE
   fi
-  echo "Starting $NAME: "
+  echo "Starting $NAME... "
   while true; do sleep 1; unbuffer ruby $SCRIPTS_DIR/$NAME.rb; done >> $SVC_LOG_FILE 2>> $SVC_LOG_FILE & sleep 1; echo $! > $PID_FILE
 
   sleep 3
@@ -62,7 +62,7 @@ start() {
 stop() {
   check_pid
   if [ "${PID}" != "" ]; then
-    echo "Stopping $NAME: "
+    echo "Stopping $NAME... "
     CPID=$(ps -o pid= --ppid $PID)
     kill $PID
     kill $CPID
