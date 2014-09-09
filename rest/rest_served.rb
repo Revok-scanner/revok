@@ -162,8 +162,15 @@ s.mount('/',CarolineAPIServlet)
 
 ['TERM','INT'].each do |signal|
   trap(signal) do
-    $runCaseServer.clean
-    $runCaseServer=nil
+    begin
+      t = Thread.new do
+        $runCaseServer.clean
+        $runCaseServer=nil
+      end
+      t.join
+    rescue => exp
+      puts exp.to_s
+    end
     s.shutdown
   end
 end

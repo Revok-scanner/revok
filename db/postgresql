@@ -9,7 +9,7 @@ SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
 # SERVICE ENTRY POINTS (START/STOP)
 # Start Command
 restart() {
-  echo "Starting $NAME: "
+  echo "Starting $NAME... "
   pg_ctl restart -D $DB_DATA_DIR -s -o "-p ${DB_PORT}" -w -t 300 -m fast -l $SVC_LOG_FILE >> $SVC_LOG_FILE 2>&1
   
   if [ $? -eq 0 ]; then
@@ -21,7 +21,7 @@ restart() {
 }
 
 stop() {
-  echo "Stopping $NAME: "
+  echo "Stopping $NAME... "
   pg_ctl stop -D $DB_DATA_DIR -s -m fast -l $SVC_LOG_FILE
 
   if [ $? -eq 0 ]; then

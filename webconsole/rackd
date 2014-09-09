@@ -47,10 +47,10 @@ start() {
     fi
     # The process running as pid $PID is not a process of the right type, remove subsys
     # lock and start mydaemon
-    echo "daemon lock file still exists, removing..."
+    echo "Daemon lock file still exists, removing..."
     rm -f $LOCK_FILE
   fi
-  echo "Starting $NAME: "
+  echo "Starting $NAME... "
   cd $SCRIPTS_DIR; rackup -p $WEB_PORT $ROOT_PATH/webconsole/config.ru >> $SVC_LOG_FILE 2>> $SVC_LOG_FILE & sleep 1; echo $! > $PID_FILE
 
   sleep 3
@@ -62,7 +62,7 @@ start() {
 stop() {
   checkpid
   if [ "${PID}" != "" ]; then
-    echo $"Stopping $NAME: "
+    echo $"Stopping $NAME... "
     kill -INT $PID
     for i in {1..30}
     do
