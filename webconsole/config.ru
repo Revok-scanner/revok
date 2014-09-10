@@ -233,7 +233,15 @@ map '/login_detect' do
             end
             response = http.get("/" + uri.path)
           else
-            uri = URI(uri.to_s + "/" + response['Location'].to_s)
+            uri.path = '/' if uri.path == ""
+            path_list = uri.path.squeeze('/').split('/')
+            path_list.push("") if path_list == []
+            if uri.path[-1,1] == '/'
+              path_list.push(response['Location'].to_s)
+            else
+              path_list[-1] = response['Location'].to_s
+            end
+            uri.path = path_list.join('/')
             response = http.get(uri.path)
           end
         else
