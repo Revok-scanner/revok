@@ -85,7 +85,7 @@ class SessionExposureCheckor
         conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
 
         begin
-          resp = conn.send_recv(test_req, 30)
+          resp = conn.send_recv(test_req, 125)
         rescue
           log "ERROR: #{$!}" 
         end
