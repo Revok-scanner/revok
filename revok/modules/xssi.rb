@@ -107,7 +107,6 @@ class XSSChecker
             req_sent = req.gsub(data['tags'][prm_tck],warhead)
             begin
               resp = conn.send_recv(req_sent,30)
-              # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
             rescue
               log "ERROR: #{$!}" 
               next
@@ -129,14 +128,11 @@ class XSSChecker
               end
             end
 
-            content = resp.to_s
-            if content.include? "Transfer-Encoding: chunked" then
-              splt = content.index("\r\n\r\n")
-              content = content.slice(splt+4,content.size)
-              content = dechunk(content)
-            end
-            content.scan(Regexp.new "#{bracket}.{1,1}#{bracket}").each do |mat|
-              dangers.each {|dngr| if mat.include? dngr then threats << dngr end}
+            if resp != nil
+              content = "#{resp.body}"
+              content.scan(Regexp.new "#{bracket}.{1,1}#{bracket}").each do |mat|
+                dangers.each {|dngr| if mat.include? dngr then threats << dngr end}
+              end
             end
           end #end of patterns
 
@@ -166,20 +162,6 @@ class XSSChecker
       abstain
     end
     log "xssi is done"
-  end
-
-  def dechunk(chunks)
-    content = Array.new
-    idx = 0
-    while (idx < chunks.size)
-      crlf = chunks.slice(idx,chunks.size).index("\r\n")
-      num = chunks.slice(idx,crlf+2).to_i(16)
-      break if num == 0
-      chunk = chunks.slice(idx+crlf+2,num)
-      content << chunk
-      idx = idx+crlf+2+num+2
-    end
-    return content.join('')
   end
 
 end

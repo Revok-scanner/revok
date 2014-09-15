@@ -227,7 +227,6 @@ class RedirChecker
 
           begin
             resp = conn.send_recv(req,30)
-            # `touch /tmp/caroline-console-#{datastore['CONSOLE_ID']}`
           rescue
             log "ERROR: #{$!}" 
           end
