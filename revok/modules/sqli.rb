@@ -166,22 +166,19 @@ class SQLiChecker
       next if hReq[j].id == nil
 
       resp = conn.send_recv(req,30)
-      content = "#{resp}"
-      if content.include? "Transfer-Encoding: chunked" then
-        splt = content.index("\r\n\r\n")
-        preamble = content.slice(0,splt+1)
-        content = content.slice(splt+4,content.size)
-        content = dechunk(content)
-      end
-      aKeywords.each_with_index do |keyword,index|
-        if content[keyword] and !content[/AND/] then
-          log "Keyword found: " << keyword.to_s[/\)\w*\[/].slice(1..-2) 
-          aResponses[cnt] = req
-          class << aResponses[cnt]
-            attr_accessor :key
+
+      if resp != nil
+        content = "#{resp.body}"
+        aKeywords.each_with_index do |keyword,index|
+          if content[keyword] and !content[/AND/] then
+            log "Keyword found: " << keyword.to_s[/\)\w*\[/].slice(1..-2) 
+            aResponses[cnt] = req
+            class << aResponses[cnt]
+              attr_accessor :key
+            end
+            aResponses[cnt].key = hReq[j].id
+            cnt += 1
           end
-          aResponses[cnt].key = hReq[j].id
-          cnt += 1
         end
       end
     end
@@ -250,24 +247,6 @@ class SQLiChecker
     return aFinal
   end
 
-
-  #===================================================#
-  #                  DECHUNK FUNCTION                 #
-  #===================================================#
-  def dechunk(chunks)
-    content = Array.new
-    idx = 0
-    while (idx < chunks.size)
-      crlf = chunks.slice(idx,chunks.size).index("\r\n")
-      num = chunks.slice(idx,crlf+2).to_i(16)
-      break if num == 0
-      chunk = chunks.slice(idx+crlf+2,num)
-      content << chunk
-      idx = idx+crlf+2+num+2
-    end
-    return content.join('')
-  end
-  
   
   #===================================================#
   #          GET ORIGINAL REQUEST FUNCTION            #

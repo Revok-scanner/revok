@@ -47,6 +47,7 @@ module Utils
     end
     return JSON.dump(composite).to_s
   end
+
   def fake_session
     injections = Hash.new
     tags = Hash.new
@@ -85,6 +86,7 @@ a_resp
       injections=JSON.dump(injections)
       return [injections,walk]
   end
+
   def pretreated(flag,module_name=nil)
     if flag==0 or flag=="" or flag==nil
       return
@@ -98,6 +100,23 @@ a_resp
            log "ERROR: An issue occurred when running this module"
       	end
       end
-     end
-   end
+    end
+  end
+
+  #===================================================#
+  #                  DECHUNK FUNCTION                 #
+  #===================================================#
+  def dechunk(content)
+    content = Array.new
+    idx = 0
+    while (idx < chunks.size)
+      crlf = chunks.slice(idx,chunks.size).index("\r\n")
+      num = chunks.slice(idx,crlf+2).to_i(16)
+      break if num == 0
+      chunk = chunks.slice(idx+crlf+2,num)
+      content << chunk
+      idx = idx+crlf+2+num+2
+    end
+    return content.join('')
+  end
 end

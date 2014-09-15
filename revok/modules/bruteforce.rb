@@ -191,7 +191,7 @@ class BruteForceCheckor
         end
 
         #resp = conn.send_recv(new_test_req, time_out)
-        #NOTE: if basic login fails with 401 error when calling send_recv(), req attribute should have req.opts and a string-type req can not be used. That's because send_recv() will automatically try send_auth() when auth fails. see send_auth() in /opt/metasploit/apps/pro/msf3/lib/rex/proto/http/client.rb:217
+        #NOTE: if basic login fails with 401 error when calling send_recv(), req attribute should have req.opts and a string-type req can not be used. That's because send_recv() will automatically try send_auth() when auth fails. see send_auth() in lib/rex/proto/http/client.rb:217 (librex)
         conn.send_request(new_test_req, time_out)
         resp = conn.read_response(time_out)
         resp.request = new_test_req.to_s if resp
