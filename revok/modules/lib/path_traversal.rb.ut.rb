@@ -209,7 +209,7 @@ module PATH_TRAV
     proxies = nil
     conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
     begin
-      resp = conn.send_recv(req,30)
+      resp = conn.send_recv(req,125)
     rescue
       log "ERROR: #{$!}" 
       resp = "error"

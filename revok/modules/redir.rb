@@ -226,7 +226,7 @@ class RedirChecker
           #p "Req to send: #{req}"
 
           begin
-            resp = conn.send_recv(req,30)
+            resp = conn.send_recv(req,125)
           rescue
             log "ERROR: #{$!}" 
           end
