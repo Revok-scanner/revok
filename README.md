@@ -28,7 +28,7 @@ Details for all scan tasks are recorded in the database. It can be used for data
 
 ### Communication among components
 The messaging flow among Revok components is as below.
-![Alt text](http://example.com)
+![Alt text](![Alt text](http://revok-scanner.github.io/revok/images/revok_arch.png)
 
 ## Quick start guide (all in one)
 Step 1: download and decompress the binary package
@@ -69,9 +69,9 @@ Issues for Revok is listed at [issues page](https://github.com/Revok-scanner/rev
 
 ## Contact us
 * Mailing lists
-[revok-scanner-users@googlegroups.com](http://example.com) (for users)
-[revok-scanner-devel@googlegroups.com](http://example.com) (for developers)
-[revok-scanner-announce@googlegroups.com](http://example.com) (for release announcement)
+[revok-scanner-users@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-users/join) (for users)
+[revok-scanner-devel@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-devel/join) (for developers)
+[revok-scanner-announce@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-announce/join) (for release announcement)
 
 * IRC discussion
 `#revok-scanner` (irc.freenode.net/6665)
