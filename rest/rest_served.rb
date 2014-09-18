@@ -147,7 +147,7 @@ class CarolineAPIServlet < HTTPServlet::AbstractServlet
 
     runCase=$runCaseServer.loadRunCaseFromDBByID(id)
 
-    if runCase.nil?
+    if runCase.nil? or runCase.log==""
       @body.puts "404: Not found."
       @code,@mime = 404,'text/plain'
     else

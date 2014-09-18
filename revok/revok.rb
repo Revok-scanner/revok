@@ -270,7 +270,7 @@ module Revok
       pretreated(runCase.scanConfigObj.sendnotify, 'send notification') {
         FileUtils.mv("#{File.dirname(__FILE__)}/modules/report/report_#{$datastore['timestamp']}.html", "#{File.dirname(__FILE__)}/../report/report_#{$datastore['timestamp']}.html")
         notify = NotifySender.new
-        notify.send_msg("Revok", "Your scan has finished, please access {revok_directory}/report to view the report")
+        notify.send_msg("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
         log "Notification of report is sent\n\n"
       }
     else
