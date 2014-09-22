@@ -45,6 +45,11 @@ Step 3: run Revok
 ```
 $ ./revokd start
 ```
+Other commands for revokd:
+```
+$ ./revokd
+Usage: ./revokd {init|start|stop|status|restart}
+```
 Step 4: access the web console to submit a scan at <http://localhost:3030>
 
 ## Use Revok to scan a target
