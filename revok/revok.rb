@@ -73,6 +73,9 @@ module Revok
         notify.send_msg("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan is finished in about an hour.")
         log "Notification of scan start is sent"
       }
+      f= File.open("#{File.dirname(__FILE__)}/../report/STATUS",'w')
+      f.write("Scan #{$datastore['RUN_ID']} is running...")
+      f.close
     else
       pretreated(runCase.scanConfigObj.sendemail,'send introduction email'){
         p1=Postman1.new
@@ -273,6 +276,9 @@ module Revok
         notify.send_msg("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
         log "Notification of report is sent\n\n"
       }
+      f= File.open("#{File.dirname(__FILE__)}/../report/STATUS",'w')
+      f.write("Scan #{$datastore['RUN_ID']} is FINISHED.")
+      f.close
     else
       pretreated(runCase.scanConfigObj.sendemail,'send report email'){
         p2=Postman2.new

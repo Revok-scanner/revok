@@ -24,7 +24,7 @@ begin
     next unless active
 
     begin
-      puts "Checking for test scans to be run..."
+      puts "Checking for test scans to be run...\n\n"
       runCase=$runCaseServer.getRunCaseFromQueue
       if runCase
         $runCaseServer.ackRunCaseToQueue
@@ -41,6 +41,7 @@ begin
         $runCaseServer.saveRunCaseToDB(run,true)
         to_run.delete(run)
       end
+      puts "Scan #{run.id} is finished.\n\n"
     end
   end
 rescue => exp
