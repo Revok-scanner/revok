@@ -165,7 +165,7 @@ class SQLiChecker
       end
       next if hReq[j].id == nil
 
-      resp = conn.send_recv(req,125)
+      resp = conn.send_recv(req,30)
 
       if resp != nil
         content = "#{resp.body}"
@@ -322,18 +322,18 @@ class SQLiChecker
         end
       end
       ini = Time.now.to_f
-      resp = conn.send_recv(req,125)
+      resp = conn.send_recv(req,30)
       ini_1=Time.now.to_f
       interval_1=ini_1 - ini
-      resp = conn.send_recv(req,125)
+      resp = conn.send_recv(req,30)
       ini_2=Time.now.to_f
       interval_2=ini_2 - ini_1
       if interval_2>0.6 * interval_1 && interval_2 < 1.4 * interval_1
         otime[i] = (ini_2 - ini) * 0.5
       else
-        resp = conn.send_recv(req,125)
-        resp = conn.send_recv(req,125)
-        resp = conn.send_recv(req,125)
+        resp = conn.send_recv(req,30)
+        resp = conn.send_recv(req,30)
+        resp = conn.send_recv(req,30)
         otime[i] = (Time.now.to_f - ini) * 0.2
       end
       i+=1
@@ -362,22 +362,22 @@ class SQLiChecker
       next if hReqi[j].id == nil
 
       ini = Time.now.to_f
-      resp = conn.send_recv(req,125)
+      resp = conn.send_recv(req,30)
       ini_1=Time.now.to_f  
       interval_1=ini_1 - ini
       if  interval_1 > 10*otime[i] && interval_1 > 5
         itime[i] = interval_1
       else
-        conn.send_recv(req,125)
+        conn.send_recv(req,30)
         ini_2=Time.now.to_f
         interval_2=ini_2 - ini_1
         if interval_2>0.6 * interval_1 && interval_2 < 1.4 * interval_1
           itime[i] = (ini_2 - ini) * 0.5
         else
-          resp = conn.send_recv(req,125)
-          resp = conn.send_recv(req,125)
-          resp = conn.send_recv(req,125)
-          resp = conn.send_recv(req,125)
+          resp = conn.send_recv(req,30)
+          resp = conn.send_recv(req,30)
+          resp = conn.send_recv(req,30)
+          resp = conn.send_recv(req,30)
           itime[i] = (Time.now.to_f - ini) * 0.2
         end
       end

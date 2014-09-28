@@ -106,7 +106,7 @@ class XSSChecker
             warhead = missile.gsub(missile[0, payload.size], payload)
             req_sent = req.gsub(data['tags'][prm_tck],warhead)
             begin
-              resp = conn.send_recv(req_sent,125)
+              resp = conn.send_recv(req_sent,30)
             rescue
               log "ERROR: #{$!}" 
               next
@@ -121,7 +121,7 @@ class XSSChecker
               req_sent = req_sent.gsub(req_url.gsub(data['tags'][prm_tck],warhead), "GET #{uri}")
 
               begin
-                resp = conn.send_recv(req_sent,125)
+                resp = conn.send_recv(req_sent,30)
               rescue
                 log "ERROR: #{$!}" 
                 next

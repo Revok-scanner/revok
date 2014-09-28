@@ -222,11 +222,15 @@ class RedirChecker
           #req = t[:req].gsub(missile,warhead)
           #NOTE: if tag is shorter than payload, the test goes wrong
           req = t[:req].gsub(missile,payload)
+          if req[/Content-Length:.*/] != nil
+            new_length = req[/Content-Length:.*/].sub('Content-Length: ','').to_i+payload.length-missile.length
+            req = req.gsub(/Content-Length:.*/,"Content-Length: #{new_length}")
+          end
           
           #p "Req to send: #{req}"
 
           begin
-            resp = conn.send_recv(req,125)
+            resp = conn.send_recv(req,30)
           rescue
             log "ERROR: #{$!}" 
           end
