@@ -209,7 +209,7 @@ module PATH_TRAV
     proxies = nil
     conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
     begin
-      resp = conn.send_recv(req,125)
+      resp = conn.send_recv(req,30)
     rescue
       log "ERROR: #{$!}" 
       resp = "error"
@@ -239,6 +239,9 @@ module PATH_TRAV
       log "Now checking path traversal against URL: #{url}..." 
       req = @data['requests'][v]
       mthd = req.scan(/^(.*?) /)[0][0]
+      if mthd == "POST"
+        req = req.sub(/\nContent-Length:.*/,"")
+      end
       req = req.gsub("#{dom}","")
 
       p_value = params.values[n][1]

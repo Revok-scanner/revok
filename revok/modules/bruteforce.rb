@@ -147,7 +147,7 @@ class BruteForceCheckor
   def run
     abstain
     max_run = 10
-    time_out = 125
+    time_out = 30
     cnt = 0
     begin
       @session_data = JSON.parse(@session_data, {create_additions:false})
