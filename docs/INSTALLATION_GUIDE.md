@@ -26,14 +26,14 @@ Web console, REST API server, messaging server, Caroline nodes (working nodes) a
 The source code can be got from  [Revok git repo](https://github.com/Revok-scanner/revok). Clone it for each node in distributed environment.
 * Global configuration file
 File [conf/revok.conf](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf) defines the settings for starting Revok service. Please make sure changes of this file are synchronized on all nodes in the distributed environment.
-* DNS settings (Optional)
+* DNS settings [Optional]
 Add mapping of hostnames and IP addresses to the /etc/hosts file in distributed environment when hostnames are used to communicate.
 
 ### 1.2.2 Database server
 PostgreSQL is the storage for Revok history data. Other database options may be added in the future.
 
 Step 1: install and initialize PostgreSQL
-Download and install the right version of PostgreSQL for your OS (refer to <http://www.postgresql.org/download/>). Edit configuration file to set the listening IP address and port.
+Download and install the suitable version of PostgreSQL for your OS (refer to <http://www.postgresql.org/download/>). Edit configuration file to set the listening IP address and port.
 ```
 $ yum install -y postgresql-server postgresql
 $ postgresql-setup initdb
@@ -42,8 +42,20 @@ listen_addresses = '*'
 port = 5432
 $ systemctl enable postgresql.service
 ```
+SSL configuration [Optional]
+a. Create self-signed certificate and private key for the server, then edit configuration file.
+```
+$ vi /var/lib/pgsql/data/postgresql.conf
+ssl = on
+ssl_cert_file = 'server.crt'
+ssl_key_file = 'server.key'
+```
+b. Get the certificate and move it to ~/.postgresql/ on Caroline and REST nodes.
+```
+$ echo -n | openssl s_client -connect pg.example.com:5432 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > root.crt
+```
 Step 2: create user and database
-Start PostgreSQL service. Create database "revok_db"and user "revok".
+Start PostgreSQL service. Create database "revok_db" and user "revok".
 ```
 $ systemctl start postgresql.service
 $ su - postgres
@@ -95,6 +107,23 @@ $ vi apache-activemq-5.10.0/conf/activemq.xml
 </plugins>
 $ apache-activemq-5.10.0/bin/activemq start
 ```
+SSL configuration [Optional] 
+a. Create certificate for the server (refer to http://activemq.apache.org/how-do-i-use-ssl.html), then edit configuration file.
+```
+$ vi apache-activemq-5.10.0/conf/activemq.xml
+<!-- Add the following lines in <broker></broker> section -->
+<transportConnectors>
+    <transportConnector name="stomp+ssl" uri="stomp+ssl://0.0.0.0:61613"/>
+</transportConnectors>
+<sslContext>
+    <sslContext keyStore="file:${activemq.conf}/broker.ks"
+    keyStorePassword="${keystore.password}"/>
+</sslContext>
+```
+b. Get the certificate and move it to activemq/ on Caroline and REST nodes.
+```
+$ echo -n | openssl s_client -connect activemq.example.com:61613 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > queue.pem
+```
 Step 3: update activemq settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
 ```
 # ActiveMQ config
@@ -132,6 +161,34 @@ Step 2: update REST settings in the [global configuration file](https://github.c
 REST_USER=revok
 REST_PASSWORD=password
 REST_PORT=8443
+```
+SSL configuration [Optional] 
+a. Create self-signed certificate and private key for the server, then edit file [rest/rest_served.rb](https://github.com/Revok-scanner/revok/blob/master/rest/rest_served.rb).
+```
+$ vi rest/rest_served.rb
+pkey = OpenSSL::PKey::RSA.new(File.open("#{REST_PATH}/revok.key",'r').read)
+cert = OpenSSL::X509::Certificate.new(File.open("#{REST_PATH}/revok.crt",'r').read)
+s = HTTPServer.new(
+  :Port => port,
+  :BindAddress => "0.0.0.0"
+  :SSLEnable => true,
+  :SSLCertificate => cert,
+  :SSLPrivateKey => pkey,
+)
+```
+b. Get the certificate and move it to webconsole/ on webconsole node, then modify [webconsole/config.ru](https://github.com/Revok-scanner/revok/blob/master/webconsole/config.ru).
+```
+$ echo -n | openssl s_client -connect rest.example.com:8443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >revok.crt
+$ vi webconsole/config.ru
+$revok_http = lambda {
+  uri = URI.parse("http://rest.example.com:8443")
+  http = Net::HTTP.new(uri.host, uri.port)
+  # If you want to enable SSL, make the below lines functional
+  http.use_ssl = true
+  http.ca_file = "revok.crt"
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  http
+}
 ```
 Step 3: set environment variables that defined in the global configuration file
 ```
@@ -262,6 +319,21 @@ LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.4
     </Directory>
 </VirtualHost>
 $ systemctl start httpd.service
+```
+SSL configuration [Optional] 
+Create self-signed certificate and private key for the server, then edit configuration file.
+```
+$ vi /etc/httpd/conf/httpd.conf
+(Add the following lines)
+LoadModule ssl_module modules/mod_ssl.so
+<VirtualHost *:3030>
+    ...
+    SSLEngine on
+    SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP
+    SSLCertificateFile /etc/httpd/conf/ssl.crt/revok.crt
+    SSLCertificateKeyFile /etc/httpd/conf/ssl.key/revok.key
+    ...
+</VirtualHost>
 ```
 Step 4: add iptables rule
 ```
