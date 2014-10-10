@@ -18,7 +18,7 @@ class Photographer
     filename = "/tmp/" + `uuidgen`.chomp + '.png'
     log "Generating screenshot of the login page..."
 
-    shot_in, shot_out, shout_err = Open3.popen3("phantomjs --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/longshot.js #{filename}")
+    shot_in, shot_out, shout_err = Open3.popen3("phantomjs --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/longshot.js #{filename} 20000")
     shot_in.puts "#{@url}"
     shot_in.close
     result = "PASS" if shot_out.read.match(/status: fail/).nil?
