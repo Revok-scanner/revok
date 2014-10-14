@@ -37,7 +37,7 @@ class AntiReflectionChecker
       responses = data['responses']
 
       responses.each_pair do |k,v|
-        if v.scan(/X-XSS-PROTECTION: 1/i) !=[]
+        if v.scan(/X-XSS-PROTECTION: *1/i) !=[]
           next if not data['requests'][k].lines.first.include? config['whitelist'][0]
           log "Found X-XSS-PROTECTION is being enabled in response ##{k}" 
           header_found = true
