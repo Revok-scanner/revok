@@ -111,7 +111,7 @@ class MimeTypeChecker
 
       responses.each do |v, k|
         resp_header = k.split("\r\n\r\n")[0]
-        if resp_header.scan(/Content-Type:/i)==[] or resp_header.scan(/X-Content-Type-Options: nosniff/i)!=[]
+        if resp_header.scan(/Content-Type:/i)==[] or resp_header.scan(/X-Content-Type-Options: *nosniff/i)!=[]
           next 
         else
           url = requests[v].split("\r\n")[0].gsub(/HTTP\/1.*/, "").gsub(/=[^&]*/,"=param")

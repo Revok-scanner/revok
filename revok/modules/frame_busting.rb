@@ -91,9 +91,11 @@ class FrameBustingTester
 
       #Fliter the vulnerability URLs
       responses.each_pair {|number, header|
-        if (header.downcase.include?("x-frame-options: deny") || header.downcase.include?("x-frame-options: sameorigin"))
+        #if (header.downcase.include?("x-frame-options: deny") || header.downcase.include?("x-frame-options: sameorigin"))
+        if (header.scan(/x-frame-options: *deny|x-frame-options: sameorigin/i)!=[])
           next;
-        elsif (header.downcase.include?("frame-options: deny") || header.downcase.include?("frame-options: sameorigin"))
+        #elsif (header.downcase.include?("frame-options: deny") || header.downcase.include?("frame-options: sameorigin"))
+        elsif (header.scan(/frame-options: *deny|frame-options: *sameorigin/i)!=[])
           next;
         else
           url = /\b(https?|ftp|file):\/\/\S+/.match(requests[number])
