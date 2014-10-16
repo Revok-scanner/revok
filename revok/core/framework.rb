@@ -8,12 +8,12 @@ module Revok
 
 		def init_module_path
 			if (Dir.exist?(Revok::Config.mudule_directory))
-				Datastore['ModulesPath'] = Revok::Config.mudule_directory
+				DATASTORE['ModulesPath'] = Revok::Config.mudule_directory
 			end
 		end
 
 		def load_modules
-			path = Datastore['ModulesPath'].to_s + '/'
+			path = DATASTORE['ModulesPath'].to_s + '/'
 			begin
 				if (Dir.exist?(path))
 					Dir.foreach(path) {|filename|
@@ -58,7 +58,7 @@ module Revok
 			begin
 				instance = Revok::Modules.const_get(clazz).new
 				if ((instance.name != nil) && (instance.class.superclass == Revok::Module))
-					Modules[instance.name.to_s] = instance
+					MODULES[instance.name.to_s] = instance
 				else
 					raise NameError, "#{instance.class.name} is a invalid module definition", caller
 				end

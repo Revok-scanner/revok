@@ -1,4 +1,4 @@
 module Revok
-	Datastore = Hash.new
-	Modules = Hash.new
+	DATASTORE = Hash.new
+	MODULES = Hash.new
 end
