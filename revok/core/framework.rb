@@ -1,3 +1,7 @@
+require_relative 'config'
+require_relative 'module'
+require_relative 'modules'
+
 module Revok
 
 	class Framework

@@ -1,3 +1,6 @@
+require_relative 'module'
+require_relative 'modules'
+
 module Revok
 
 	class ModuleExecutor
