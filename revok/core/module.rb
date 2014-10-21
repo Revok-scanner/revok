@@ -22,7 +22,7 @@ module Revok
 					raise ArgumentError, "#{self.class.name}: Invalid module info type, it should be Hash", caller
 				end
 
-				info["group_name"] = "default" if (!info.has_key?("group_name")
+				info["group_name"] = "default" if (!info.has_key?("group_name"))
 				info["group_priority"] = 10 if (!info.has_key?("group_priority"))
 				info["group_priority"] = 10 if ((info["group_name"] == "default") && (info["group_priority"] != 10))
 				info["priority"] = 10 if (!info.has_key?("priority"))
