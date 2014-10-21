@@ -11,8 +11,8 @@ module Revok
 		end
 
 		def init_module_path
-			if (Dir.exist?(Revok::Config.mudule_directory))
-				DATASTORE['ModulesPath'] = Revok::Config.mudule_directory
+			if (Dir.exist?(Revok::Config::MODULES_DIR))
+				DATASTORE['ModulesPath'] = Revok::Config::MODULES_DIR
 			end
 		end
 
@@ -25,7 +25,7 @@ module Revok
 						next if (File.extname(filename) != ".rb")
 						begin
 							load_module(path, filename)
-						rescue IOError, NameError
+						rescue IOError, NameError, SyntaxError
 							self.load_error_modules.push(path + filename)
 						end
 					}
@@ -60,21 +60,28 @@ module Revok
 
 		def init_module(clazz)
 			begin
-				instance = Revok::Modules.const_get(clazz).new
+				symbol = Revok::Modules.const_get(clazz)
+				if (!symbol.instance_methods(false).include?(:run))
+					raise NotImplementedError, "#{symbol.to_s} is a invalid module definition", caller
+				end
+				instance = symbol.new
 				if ((instance.name != nil) && (instance.class.superclass == Revok::Module))
 					MODULES[instance.name.to_s] = instance
 				else
 					raise NameError, "#{instance.class.name} is a invalid module definition", caller
 				end
-			rescue NameError => exp
+			rescue NameError, NotImplementedError, ArgumentError => exp
 				# Temporary function to output
 				puts(exp.to_s)
 			end
 		end
 
+		attr_reader		:modules_loaded
+		attr_reader		:load_error_modules
+
 		protected
 
-			attr_accessor	:load_error_modules
-			attr_accessor	:modules_loaded
+			attr_writer	:load_error_modules
+			attr_writer	:modules_loaded
 	end
 end
