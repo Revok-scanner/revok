@@ -1,15 +1,8 @@
 module Revok
 
-	class Config < Hash
-		
-		Defaults =
-			{
-				'ModulesDirectory'		=> "modules"
-			}
+	class Config
+		MODULES_DIR = File.expand_path("../modules", File.dirname(__FILE__))
 
-		def self.modules_directory
-			return self.new.module_directory
-		end
 	end
 
 end
