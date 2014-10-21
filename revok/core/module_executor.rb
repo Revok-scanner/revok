@@ -5,30 +5,31 @@ module Revok
 
 	class ModuleExecutor
 		def initialize
-			self.modules = MODULES
-			self.exec_list = Array.new
+			@modules = MODULES
+			@exec_list = Array.new
 		end
 
 		def gen_exec_list_all
-			self.exec_list.clear
-			modules_list = Array.new
-			self.modules.each {|instance|
+			@exec_list.clear
+			modules.each {|_module|
+				instance = _module[1]
 				module_info = [instance.name,
 								instance.info["group_name"],
 								instance.info["group_priority"],
 								instance.info["priority"]]
-				self.exec_list.push(module_info)
+				@exec_list.push(module_info)
 			}
-			self.exec_list.sort_by! {|name, g_name, g_priority, priority|
+			@exec_list.sort_by! {|name, g_name, g_priority, priority|
 				[g_priority, priority]
 			}
 		end
 
 		def execute
-			return if (self.exec_list.empty?)
+			return false if (self.exec_list.empty?)
 			self.exec_list.each {|name, g_name, g_priority, priority|
-				self.modules[name].run
+				modules[name].run
 			}
+			return true
 		end
 
 		attr_reader		:exec_list
