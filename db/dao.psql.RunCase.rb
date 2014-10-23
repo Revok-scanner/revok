@@ -2,6 +2,7 @@ $ROOT_PATH=ENV['ROOT_PATH'] if not $ROOT_PATH
 $: << "#{$ROOT_PATH}/model/"
 $: << "#{$ROOT_PATH}/db/"
 
+require 'base64'
 require 'model.Bean.RunCase'
 require 'psqlHelper.rb'
 
