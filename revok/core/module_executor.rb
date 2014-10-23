@@ -4,14 +4,17 @@ require_relative 'modules'
 module Revok
 
 	class ModuleExecutor
-		def initialize
-			@modules = MODULES
+		def initialize(modules = {})
+			@modules = modules
 			@exec_list = Array.new
 		end
 
 		def gen_exec_list_all
 			@exec_list.clear
-			modules.each {|_module|
+			if (self.modules.empty?)
+				raise RuntimeError, "No any instance of modules", caller
+			end
+			self.modules.each {|_module|
 				instance = _module[1]
 				module_info = [instance.name,
 								instance.info["group_name"],
@@ -33,10 +36,10 @@ module Revok
 		end
 
 		attr_reader		:exec_list
+		attr_accessor	:modules
 
 		private
 
-			attr_accessor	:modules
 			attr_writer		:exec_list
 	end
 

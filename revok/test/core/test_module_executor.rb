@@ -6,11 +6,18 @@ require 'core/module_executor'
 describe Revok::ModuleExecutor, "execute modules" do
 	before do
 		@framework = Revok::Framework.new
-		@framework.init_module_path
-		Revok::DATASTORE["ModulesPath"] = File.dirname(__FILE__) + "/ab_module"
+		@framework.modules_path = File.dirname(__FILE__) + "/ab_module"
 		@framework.load_modules
 		@framework.init_modules
 		@executor = Revok::ModuleExecutor.new
+	end
+
+	it "throws a runtime exception with empty modules table" do
+		@executor.gen_exec_list_all
+	end
+
+	before do
+		@executor.modules = @framework.modules
 		@executor.gen_exec_list_all
 	end
 

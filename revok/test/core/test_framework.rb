@@ -6,11 +6,10 @@ describe Revok::Framework, "basic framework" do
 
 	before do
 		@framework = Revok::Framework.new
-		@framework.init_module_path
 	end
 
 	it "has a default modules directory" do
-		Revok::DATASTORE["ModulesPath"].should_not == nil
+		@framework.modules_path.should_not == nil
 	end
 
 	it "can load a module" do
@@ -20,13 +19,13 @@ describe Revok::Framework, "basic framework" do
 
 	it "can create a instance of module" do
 		@framework.init_module(Revok::Modules.constants[0])
-		Revok::MODULES["TestModule_Pass"].should_not be_nil
+		@framework.modules["TestModule_Pass"].should_not be_nil
 	end
 
 	context "when load modules from a directory" do
 		before do
-			Revok::DATASTORE["ModulesPath"] = File.dirname(__FILE__) + "/ab_module"
-			Revok::MODULES.clear
+			@framework.modules_path = File.dirname(__FILE__) + "/ab_module"
+			@framework.modules.clear
 			@framework.load_modules
 		end
 		
@@ -40,7 +39,7 @@ describe Revok::Framework, "basic framework" do
 		
 		it "can create all instances of modules" do
 			@framework.init_modules
-			Revok::MODULES.length.should == 4
+			@framework.modules.length.should == 4
 		end
 	end
 
