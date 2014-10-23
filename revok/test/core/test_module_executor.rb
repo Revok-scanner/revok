@@ -3,7 +3,7 @@ require 'revok'
 require 'core/framework'
 require 'core/module_executor'
 
-describe Revok::ModuleExecutor, "execute modules" do
+describe Revok::ModuleExecutor  do
 	before do
 		@framework = Revok::Framework.new
 		@framework.modules_path = File.dirname(__FILE__) + "/ab_module"
@@ -13,22 +13,24 @@ describe Revok::ModuleExecutor, "execute modules" do
 	end
 
 	it "throws a runtime exception with empty modules table" do
-		@executor.gen_exec_list_all
+		expect { @executor.gen_exec_list_all }.to raise_error{ RuntimeError }
 	end
 
-	before do
-		@executor.modules = @framework.modules
-		@executor.gen_exec_list_all
-	end
+	context "when exec list is ready" do
+		before do
+			@executor.modules = @framework.modules
+			@executor.gen_exec_list_all
+		end
+	
+		it "generates a list to execute all modules" do
+			puts @executor.exec_list.to_s
+			@executor.exec_list.should_not be_nil
+		end
 
-	it "generates a list to execute all modules" do
-		puts @executor.exec_list.to_s
-		@executor.exec_list.should_not be_nil
-	end
-
-	it "executes modules that specified by exec list" do
-		status = @executor.execute
-		status.should be_true
+		it "executes modules that specified by exec list" do
+			status = @executor.execute
+			status.should be_true
+		end
 	end
 
 	it "should not write or read the origin modules list"
