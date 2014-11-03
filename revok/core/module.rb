@@ -1,3 +1,4 @@
+require_relative 'utils'
 
 module Revok
 
@@ -12,6 +13,7 @@ module Revok
 
 		attr_reader		:name
 		attr_reader		:info
+		attr_accessor		:datastore
 
 		protected
 			def info_register(name, info = {}) 
