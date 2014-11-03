@@ -32,14 +32,14 @@ module Revok
 				end
 
 				if (!self.load_error_modules.empty?)
-					puts("Some modules are failed to load: #{self.load_error_modules.to_s}")
+					Log.warn("Some modules are failed to load: #{self.load_error_modules.to_s}")
 					return false
 				end
 
 				return true
 			rescue RuntimeError => exp
 				# Temporary function to output
-				puts(exp.to_s)
+				Log.error(exp.to_s)
 			end
 		end
 
@@ -70,7 +70,7 @@ module Revok
 				end
 			rescue NameError, NotImplementedError, ArgumentError => exp
 				# Temporary function to output
-				puts(exp.to_s)
+				Log.error(exp.to_s)
 			end
 		end
 
