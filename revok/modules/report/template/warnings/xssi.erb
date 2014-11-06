@@ -1,0 +1,24 @@
+<% priority 10 %>
+
+<% if details['list'].size >1 %>
+<% name "Cross-Site Scripting (XSS) [#{details['list'].size} urls]" %>
+<% else %>
+<% name "Cross-Site Scripting (XSS) [1 url]" %>
+<% end %>
+
+<b>Description:</b> Client-side malicious script can be injected into the web application which is then returned to the user's browser. This law can be exploited to access cookies and other sensitive information retained by your browser and rewrite the content of the HTML page.<br/>
+
+
+
+<%= "<b>Affected URLs:</b><br/>" %>
+
+<% details['list'].each do |endpoint| %>
+	<%= "#{endpoint['url']}<br/>" %>
+<% end %>
+
+
+
+
+<b>Remediation:</b> User inputs must be validated, filtered or encoded before being returned as part of the HTML code of a page.<br/>
+<b>References:</b></br> 
+CWE-931 - http://cwe.mitre.org/data/definitions/931.html<br/>

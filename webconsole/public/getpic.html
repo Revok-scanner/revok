@@ -1,0 +1,22 @@
+<div class="row" style="margin-top:70px;margin-bottom:307px;">
+  <div class="large-8 columns">
+    <center>
+      <div id="screenshot_placeholder" class="screenshot" style="width: 640px; height: 400px;">
+        <img id="spinner" src="../imgs/ajax-loader.gif" style="position: absolute; left: 310px; top: 180px;"/>
+      </div>
+    </center>
+  </div>
+  <div class="large-4 columns top bottom">
+    <div class="title">{{message}}</div>
+    <div id="help" ng-bind-html-unsafe="help" ></div>
+    <div style="padding-left:3em;">
+    <div id="username_point"></div>
+    <div id="password_point"></div>
+    <div id="button_point"></div>
+    </div>
+    <div style="float:center; margin-top:60px;">
+      <a href="javascript:;" class="pop" ng-class="prev_button_style" ng-click="pic_prev()"><span aria-hidden="true" ng-class="prev_icon_style"></span>Prev</a>
+      <a href="javascript:;" class="pop" ng-class="next_button_style" ng-click="pic_next()"><span aria-hidden="true" ng-class="next_icon_style"></span>Next</a>
+    </div>
+  </div>
+</div>

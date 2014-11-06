@@ -1,0 +1,38 @@
+<div class="row" style="margin-top:90px;">
+  <div class="large-12 columns">
+    <center><div class="title"><span style="color:#f04124">{{titleMessage}}</span> detected.<br/>Please enter login info for <span style="color:#f04124">{{URLInfo}}</span>.<br/><span style="font-size:15px">(Your password will NOT be logged or stored.)</span></div></center>
+  </div>
+</div>
+
+
+<div class="row" style="margin-top:45px;">
+  <div class="large-12  columns">
+    <form>
+      <div class="login-form">
+        <center style="">
+          <div ng-class="username_input">
+            <input class="form-control login-field" size="25" ng-model="state.username" placeholder="Username"/>
+            <span class="user-info-error" ng-show="state.valid_user">Username can not be empty</span>
+          </div>
+          <div ng-class="password_input">
+            <input class="form-control login-field" size="25" type="password" ng-model="state.password" placeholder="Password"/>
+          </div>
+          <div ng-class="password_input">
+            <input class="form-control login-field" size="25" type="password" ng-model="state.repeated"  placeholder="Confirm Password"/>
+            <span class="user-info-error" ng-show="state.valid_pass">Passwords do not match</span>
+          </div>
+        </center>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="row" style="margin-top:40px;margin-bottom:357px;">
+  <div class="small-12 large-12 columns">
+    <center>
+      <a href="javascript:;"  class="btn-prev pop" ng-click="action.nav('/');state.valid_pass=false;state.valid_user=flase;"><span aria-hidden="true" class="btn-icon icon-arrow-left"></span>Prev</a>
+      <a href="javascript:;" class="pop" ng-class="btn_next_style" ng-click="basic_next()"><span aria-hidden="true" class="btn-icon icon-arrow-right"></span>Next</a>
+    </center>
+  </div>
+</div>

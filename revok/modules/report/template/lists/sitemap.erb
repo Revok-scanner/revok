@@ -1,0 +1,36 @@
+<% name "Sitemap" %>
+<% priority 10 %>
+<p style="font-style: italic;">A whole url list of the scanned target. Number of pages:<%= details['list'].size %></p>
+<hr>
+<% i=0 %>
+
+				<ul style="margin-bottom: 0px;">
+
+<% details['list'].each do |endpoint| %>
+		
+		<% if i==5 %>
+
+		    </ul>
+            <ul id="sitmap_more_table" style="margin-top:0px;">
+			<li><a href="<%= "#{endpoint['url']}" %>"><%= "#{endpoint['url']}" %></a></li>
+
+		<% else %>
+
+			 <li><a href="<%= "#{endpoint['url']}" %>"><%= "#{endpoint['url']}<br/>" %></a></li>
+
+
+		<% end %>
+
+		<% i+=1 %>
+
+<% end %>
+
+<% if i>5 %>
+
+			</ul>
+            <a id='sitmap_more_a' href="javascript:;" onclick="show_more('sitmap');"  class="show_more">
+                <span>show more...</span>
+            </a>
+
+<% end %>
+

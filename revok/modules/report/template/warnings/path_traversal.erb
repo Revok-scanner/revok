@@ -1,0 +1,23 @@
+
+<% priority 10 %>
+
+<% if details['list'].size >1 %>
+<% name "Path Traversal [#{details['list'].size} urls]" %>
+<% else %>
+<% name "Path Traversal [1 url]" %>
+<% end %>
+
+<b>Description:</b> Path traversal vulnerabilities exist in this web server, which may enable an attacker to read sensitive information from the server, or overwrite sensitive files, leading ultimately to arbitrary command execution on the server.<br/>
+
+
+
+
+<%= "<b>Affected URLs:</b>  <br/>" %>
+
+<% details['list'].each do |endpoint| %>
+		<%= "#{endpoint['mthd']} request for #{endpoint['url']}<br/>" %>
+<% end %>
+
+<b>Remediation:</b> Avoid passing user-submitted data to any file system API.<br/>
+<b>References:</b></br> 
+OWASP - https://www.owasp.org/index.php/Path_traversal<br/>

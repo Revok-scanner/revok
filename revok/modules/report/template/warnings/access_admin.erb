@@ -1,0 +1,23 @@
+
+<% priority 10 %>
+
+<% if details['list'].size >1 %>
+<% name "Access Admin Pages [#{details['list'].size} urls]" %>
+<% else %>
+<% name "Access Admin Pages [1 url]" %>
+<% end %>
+<b>Description:</b> Following administrative URLs are exposed to current test account. Check whether it is expected or not.<br/>
+
+
+<%= "<b>Affected URLs:</b> <br/>" %>
+<% details['list'].each do |endpoint| %>
+
+<%= "GET request for " "#{endpoint['url']}<br/>" %>
+
+<% end %>
+
+
+<b>Remediation:</b> Check all the affected URLs, making sure they are expected.<br/>
+<b>References:</b></br> 
+CWE-285 - http://cwe.mitre.org/data/definitions/285.html<br/>
+OWASP - https://www.owasp.org/index.php/Top_10_2013-A7-Missing_Function_Level_Access_Control<br/>

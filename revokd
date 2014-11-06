@@ -1,0 +1,126 @@
+#!/bin/bash
+
+export ROOT_PATH=$(dirname $(readlink -f $0))
+NULL="> /dev/null 2>&1"
+
+. $ROOT_PATH/bin/setenv.sh
+
+init() {
+  # Pre-init check
+  # no superuser check
+  echo -en "Checking current user..."
+  username=$(whoami)
+  if [ $username == "root" ]; then
+    echo "No superuser (root) access is required, switch to another user and try again"
+    exit 1
+  fi
+  echo "Done"
+
+  # JRE check
+  echo -en "Checking JRE installation..."
+  which java > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install Java Runtime Environment at first"
+    exit 1
+  fi
+  echo "Done"
+
+  # Tcl check
+  echo -en "Checking Tcl installation..."
+  which tclsh > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install Tcl at first"
+    exit 1
+  fi
+  echo "Done"
+
+  # Make dirs
+  echo -en "Creating directories..."
+  eval mkdir -p var/lock $NULL
+  eval mkdir -p var/run $NULL
+  eval mkdir -p var/log $NULL
+  eval mkdir -p report $NULL
+  echo "Done"
+
+  # Softlink bin files
+  echo -en "Creating softlinks..."
+  eval ln -s $PHANTOM_JS_DIR/bin/phantomjs $ROOT_PATH/bin/phantomjs $NULL
+  eval ln -s $MITMPROXY_DIR/mitmproxy $ROOT_PATH/bin/mitmproxy $NULL
+  eval ln -s $MITMPROXY_DIR/mitmdump $ROOT_PATH/bin/mitmdump $NULL
+  eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so $NULL
+  eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so.5 $NULL
+  eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml.so $NULL
+  eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml-0.so.2 $NULL
+  echo "Done"
+
+  # Softlink docs
+  eval ln -s $ROOT_PATH/docs $ROOT_PATH/webconsole/public/docs $NULL
+  eval ln -s $ROOT_PATH/README $ROOT_PATH/webconsole/public/docs/About $NULL
+  eval ln -s $ROOT_PATH/COPYING $ROOT_PATH/webconsole/public/docs/COPYING $NULL
+
+  # Config iptables
+  echo "To make revok work, we need to execute the below commands to add rules in iptables:"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT (required by ActiveMQ)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT (required by PostgreSQL)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT (required by Rest-server)"
+  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT (required by Rack web server)"
+  echo "We need the password of root, it'll never be saved"
+  
+  # to set $? as non-zero, execute an invalid command
+  eval qwertyasdfg $NULL
+
+  until [ $? -eq 0 ]; do
+    su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
+    iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT"
+  done
+  echo "Done"
+}
+
+start() {
+  $ROOT_PATH/activemq/activemqd start
+  $ROOT_PATH/db/postgresql start
+  $ROOT_PATH/caroline/carolined start
+  $ROOT_PATH/rest/rest-served start
+  $ROOT_PATH/webconsole/rackd start
+  echo "Web console is started at http://127.0.0.1:3030. Have a nice journey with Revok!"
+}
+
+stop() {
+  $ROOT_PATH/webconsole/rackd stop
+  $ROOT_PATH/rest/rest-served stop
+  $ROOT_PATH/caroline/carolined stop
+  $ROOT_PATH/db/postgresql stop
+  $ROOT_PATH/activemq/activemqd stop
+}
+
+status() {
+  $ROOT_PATH/activemq/activemqd status
+  $ROOT_PATH/rest/rest-served status
+  $ROOT_PATH/caroline/carolined status
+  $ROOT_PATH/webconsole/rackd status
+  $ROOT_PATH/db/postgresql status
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
+  restart|reload)
+    stop
+    start
+  ;;
+  init)
+    init
+  ;;
+  *)
+    echo $"Usage: $0 {init|start|stop|status|restart}"
+    exit 1
+esac

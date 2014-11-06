@@ -1,0 +1,27 @@
+
+<% priority 10 %>
+
+<% if details['num'] >1 %>
+<% name "Strict MIME Type [#{details['num']} urls]" %>
+<% else %>
+<% name "Strict MIME Type [1 url]" %>
+<% end %>
+
+<b>Description:</b> MIME type mismatch found or nosniff header missed. Some browsers will automatically switch to using an interpreter for the real content type. This increases exposure to XSS attack.<br/>
+
+
+<%= "<b>Affected URLs:</b><br/>" %>
+
+<% details['list'].each do |endpoint| %>
+	
+	<%= "#{endpoint['url']}<br/>" %>
+<% end %>
+
+<b>Advice: </b> Use response header X-Content-Type-Options: nosniff to prevent MIME sniffing or make sure MIME type mismatch not exist.<br/>
+<b>References:</b><br/>
+OWASP - https://www.owasp.org/index.php/List_of_useful_HTTP_headers<br/>
+CAPEC-209 - http://capec.mitre.org/data/definitions/209.html<br/>
+
+
+
+

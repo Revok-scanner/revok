@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Name for the service, used in logging
+NAME=activemqd
+
+# Construct the command the will cd into the right directory, and invoke the script
+ACTIVEMQD_COMMAND_START="bin/activemq start"
+ACTIVEMQD_COMMAND_STOP="bin/activemq stop"
+
+# How can the script be identified if it appears in a 'ps' command via grep?
+#  Examples to use are 'java', 'python' etc.
+ACTIVEMQD_PROCESS_TYPE=java
+
+# Where to write the log file?
+ACTIVEMQD_SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
+
+# Lock file
+ACTIVEMQD_LOCK_FILE="$ROOT_PATH/var/lock/$NAME"
+
+# Where to write the process identifier - this is used to track if the service is already running
+# Note: the script noted in the COMMAND must actually write this file
+PID_FILE=$ACTIVEMQ_PIDFILE
+
+# Is the service already running? If so, capture the process id
+checkpid(){
+  if [ -f $PID_FILE ]; then
+    PID=`cat $PID_FILE`
+  else
+    PID=""
+  fi
+}
+
+# SERVICE ENTRY POINTS (START/STOP)
+# Start Command
+start() {
+  checkpid
+  if [ "${PID}" != "" ]; then
+    # Check to see if the /proc dir for this process exists
+    if [ -a /proc/${PID} ]; then
+      # check to make sure this is likely the running service
+      ps aux | grep ${PID} | grep $ACTIVEMQD_PROCESS_TYPE | grep -v stop >> /dev/null
+      # If it is a process of the right type assume that it is mydaemon and just exit
+      # otherwise remove the subsys lock file and start mydaemon
+      if [ "$?" = "0" ]; then
+        echo "$NAME is running"
+        return 1
+      fi
+    fi
+    # The process running as pid $PID is not a process of the right type, remove subsys
+    # lock and start mydaemon
+    echo "Daemon lock file still exists, removing..."
+    rm -f $ACTIVEMQD_LOCK_FILE
+  fi
+  echo "Starting $NAME... "
+  cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_START >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
+
+  sleep 3
+  touch $ACTIVEMQD_LOCK_FILE
+  echo "Done"
+  return 0
+}
+
+stop() {
+  checkpid
+  if [ "${PID}" != "" ]; then
+    echo "Stopping $NAME... "
+    cd $ACTIVEMQD_SCRIPTS_DIR; $ACTIVEMQD_COMMAND_STOP >> $ACTIVEMQD_SVC_LOG_FILE 2>> $ACTIVEMQD_SVC_LOG_FILE
+    for i in {1..30}
+    do
+      if [ -n "`ps aux | grep $ACTIVEMQD_PROCESS_TYPE | grep activemq | grep -v stop`" ]; then
+        sleep 1 # Still running, wait a second.
+        echo -n .
+      else
+        # stopped
+        rm -f $ACTIVEMQD_LOCK_FILE
+        rm -f $PID_FILE
+        echo "Done"
+        return 0
+      fi
+    done
+    echo "Failed to stop in 30 seconds. Forcing off...Done"
+    kill -9 ${PID} # Request a thread dump so we can diagnose a hung shutdown
+    rm -f $ACTIVEMQD_LOCK_FILE
+    rm -f $PID_FILE
+    return 1
+  else
+    echo "$NAME is not running"
+  fi
+}
+
+status() {
+  ps aux | grep activemq | grep $ACTIVEMQD_PROCESS_TYPE | grep -v status | grep -v stop >> /dev/null
+  if [ "$?" == "1" ]; then
+    echo "$NAME is not running"
+  else
+    echo "$NAME is running"
+  fi
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  restart|reload)
+    stop
+    start
+  ;;
+  status)
+    status
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac

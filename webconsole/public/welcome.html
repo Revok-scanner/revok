@@ -1,0 +1,80 @@
+<div style="background-color:#1D8CBA;">
+  <div class="row" style="height:440px;text-align:center;background-color:#1D8CBA;">
+    <div class="large-12 columns" style="line-height:8px;margin-top:85px;">
+      <p style="color:white;font-size:25px;font-weight:bold;">Enter your web url and Scan for vulnerabilities.<p>
+      <p style="color:white">Find XSS, SQLi etc. and get remedy advice.</p>
+    </div>
+
+    <div class="large-12 columns" style="text-align:center;height:270px;">
+      <div style="height:50px;margin-top:40px;" ng-controller="loginDetectController">
+        <form name="targetForm" novalidate >
+          <div style="margin-right:420px;height:30px;">
+            <span class="warning" ng-show="need_http_error_log">Select http or https</span>
+          </div>
+          <div ng-class="input_style">
+            <input id="target" class="form-control" ng-model="state.target"  name="url" placeholder="http(s)://" ng-blur="do_blur()" ng-change="check_input()" ng-keyup="keypress($event)" ng-init="count=0" required autocomplete="off" style="height:50px;width:445px;"><a loda ng-class="button_style" href="javascript:;" ng-click="request_detect()" ng-disabled="(state.target.indexOf('http://') != 0 && state.target.indexOf('https://') != 0)" ><span aria-hidden="true" class="loda-icon icon-eye"></span>Scan</a>
+          </div>
+        </form>
+        <span ng-show="targetForm.url.$valid && need_suggest" >
+          <div class="dropdown" id="suggestion" style="opacity:0;background-color:white;line-height:10px">
+            <div ng-class="http_suggestion" style="height:25px;line-height:25px;" ng-click="select_http()">
+              {{suggestion1}}
+            </div>
+            <div ng-class="https_suggestion" style="height:25px;line-height:25px;" ng-click="select_https()">
+              {{suggestion2}}
+            </div>
+          </div>
+        </span>
+        <span ng-show="need_error_log" >
+          <div class="dropdown" id="error" style="opacity:0;background-color:white;color:#f04124;">
+            <p style="font-size:15px;line-height:20px">{{user_input_error}}<p>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<center>News:&nbsp;&nbsp;Revok 0.7.6 released on 12 Aug. 2014 · <a href="docs/change_log"  target="_blank" style="text-decoration:none; color:#808184">changelog</a></center>
+
+<div class="row" style="line-height:24px;background-color:#F4F2F0;">
+  <div class="small-12 large-6 columns" style="padding-top:5em; padding-bottom:3em;">
+    <center>
+      <video width="460" controls>
+        <source src="video/Revok0.7.mp4" type="video/mp4">
+        <source src="video/Revok0.7.ogv" type="video/ogg">
+      </video>
+      <p class="click-link">Demo</p>
+    </center>
+  </div>
+
+  <div class="small-12 large-6 columns" style="padding-top:8.5em; line-hight:24px;" >
+    <div class="landing" style="color:#808184;">A security scan is simple, just three steps.</div>
+     <p style="color:#808184;">1. Enter target URL; Revok auto-detects authentication type<br/>2. Enter login info<br/>3. Confirm inputs and submit<p>
+  </div>
+</div>
+
+
+<div class="row" style="line-height:24px;background-color:#F4F2F0">
+  <div class="small-5 large-5 columns" style="padding-top:1em;line-hight:24px;" >
+    <div style="margin:auto; width:inherit;">
+    <a class="click-link" href="report.html" target="_blank"><img src="imgs/Clipboard.png" /></a>
+    <p style="text-align:center;"><a class="click-link" href="report.html" target="_blank">Sample Report</a></p>
+    </div>
+  </div>
+
+  <div class="small-7 large-7 columns" style="padding-bottom:5em;">
+    <div class="feature-list">
+      <div class="landing" style="color:#808184;">The comprehensive vulnerability scan report for you</div><p>Click the left icon to view a sample report for DVWA, which contains:</p>
+        <li>Summary</li>
+        <li>Vulnerability</li> 
+        <li>Security Hardening</li>
+        <li>Sitemap</li>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#suggestion').css( "opacity", 1);
+  $('#error').css( "opacity", 1);
+</script>

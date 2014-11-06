@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Name for the service, used in logging
+NAME=rackd
+
+# In which directory is the shell script that this service will execute
+SCRIPTS_DIR="$ROOT_PATH/webconsole"
+
+# How can the script be identified if it appears in a 'ps' command via grep?
+#  Examples to use are 'java', 'python' etc.
+PROCESS_TYPE=ruby
+
+# Where to write the log file?
+SVC_LOG_FILE="$ROOT_PATH/var/log/$NAME.log"
+
+# Lock file
+LOCK_FILE="$ROOT_PATH/var/lock/$NAME"
+
+# Where to write the process identifier - this is used to track if the service is already running
+# Note: the script noted in the COMMAND must actually write this file
+PID_FILE="$ROOT_PATH/var/run/$NAME.pid"
+
+# Is the service already running? If so, capture the process id
+checkpid(){
+  if [ -f $PID_FILE ]; then
+    PID=`cat $PID_FILE`
+  else
+    PID=""
+  fi
+}
+
+# SERVICE ENTRY POINTS (START/STOP)
+# Start Command
+start() {
+  checkpid
+  if [ "${PID}" != "" ]; then
+    # Check to see if the /proc dir for this process exists
+    if [ -a /proc/${PID} ]; then
+      # check to make sure this is likely the running service
+      ps aux | grep ${PID} | grep $PROCESS_TYPE >> /dev/null
+      # If it is a process of the right type assume that it is mydaemon and just exit
+      # otherwise remove the subsys lock file and start mydaemon
+      if [ "$?" = "0" ]; then
+        echo "$NAME is running"
+        exit 1
+      fi
+    fi
+    # The process running as pid $PID is not a process of the right type, remove subsys
+    # lock and start mydaemon
+    echo "Daemon lock file still exists, removing..."
+    rm -f $LOCK_FILE
+  fi
+  echo "Starting $NAME... "
+  cd $SCRIPTS_DIR; rackup -p $WEB_PORT $ROOT_PATH/webconsole/config.ru >> $SVC_LOG_FILE 2>> $SVC_LOG_FILE & sleep 1; echo $! > $PID_FILE
+
+  sleep 3
+  touch $LOCK_FILE
+  echo "Done"
+  return 0
+}
+
+stop() {
+  checkpid
+  if [ "${PID}" != "" ]; then
+    echo $"Stopping $NAME... "
+    kill -INT $PID
+    for i in {1..30}
+    do
+      if [ -n "`ps aux | grep $PROCESS_TYPE | grep rackup `" ]; then
+        sleep 1 # Still running, wait a second.
+        echo -n .
+      else
+        # stopped
+        rm -f $LOCK_FILE
+        rm -f $PID_FILE
+        echo "Done"
+        return 0
+      fi
+    done
+  else
+    echo "$NAME is not running"
+    return 1
+  fi
+  echo "Failed to stop in 30 seconds. Forcing off...Done"
+  kill -9 $PID # Request a thread dump so we can diagnose a hung shutdown
+  rm -f $LOCK_FILE
+  rm -f $PID_FILE
+  return 1
+}
+
+status() {
+  ps aux| grep rackup| grep $PROCESS_TYPE |grep -v status >> /dev/null
+  if [ "$?" == "1" ]; then
+    echo "$NAME is not running"
+  else
+    echo "$NAME is running"
+  fi
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart|reload)
+    stop
+    start
+    ;;
+  status)
+    status
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac

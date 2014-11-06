@@ -1,0 +1,23 @@
+
+<% priority 10 %>
+
+<% if details['urls'].size >1 %>
+<% name "Unvalidated Redirect [#{details['urls'].size} urls]" %>
+<% else %>
+<% name "Unvalidated Redirect [1 url]" %>
+<% end %>
+
+<b>Description:</b> Unvalidated redirects have been found. Attacker could link to unvalidated redirect and trick victims into clicking it. <br/>
+<b>Affected URLs:</b><br/>
+
+
+<% details['urls'].each_pair do |url, method| %>
+
+<%= "#{method}" %> request for <%= "#{url}<br/>" %>
+
+<% end %>
+
+<b>Remediation:</b> Try not to use redirects. If used, do not involve user parameters.<br/>
+<b>References:</b></br> 
+OWASP - https://www.owasp.org/index.php/Top_10_2013-A10-Unvalidated_Redirects_and_Forwards<br/>
+

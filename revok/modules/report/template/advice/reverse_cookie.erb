@@ -1,0 +1,21 @@
+
+<% priority 10 %>
+<% if details['cookies'].split("<br/>").size >1 %>
+<% name "Cookie Reversion [#{details['cookies'].split("<br/>").size} cookies]" %>
+<% else %>
+<% name "Cookie Reversion [1 cookie]" %>
+<% end %>
+
+
+<b>Description:</b> Critical user information is found in cookies that are simply Base64 or Hex encoded.<br/>
+<% if details.has_key?('cookies') then %>
+
+<b>Affected cookies:</b> <br/>
+<%= "#{details['cookies']}" %>
+<% end%>
+
+
+
+<b>Advice: </b> Not use linear algorithm based on predictable variables like username, email address or client IP address.<br/>
+<b>References:</b> <br/>
+OWASP - https://www.owasp.org/index.php/Testing_for_Session_Management_Schema_(OWASP-SM-001)<br/>

@@ -1,0 +1,14 @@
+
+<% priority 10 %>
+<% name "Session Fixation [1 url]" %>
+
+
+<b>Description:</b> Session fixation attack is a class of session hijacking. The flaw is exploited by fixing an existent session ID on the victim's browser, and then hijacking the validated session ID after victim is authenticated.<br/>
+
+<% if details.has_key?('url') then %>
+	<b>Affected URLs:</b> <br/><%= "#{details['url']}<br/>" %>
+<% end%>
+
+<b>Remediation:</b> Always generate and assign a new session ID after user is authenticated.<br/>
+<b>References:</b></br> 
+CWE-384 - http://cwe.mitre.org/data/definitions/384.html<br/>

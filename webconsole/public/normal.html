@@ -1,0 +1,64 @@
+<div class="row" style="margin-top:70px;">
+  <div class="large-12 columns">
+    <center><div class="title"><div class="title"><span style="color:#f04124">Auto-detection failed.</span> <br>Please specify login info for {{state.target}} manually.</div></center>
+  </div>
+</div>
+
+
+<div class="row" style="margin-top:0px;">
+  <div class="large-12  columns">
+    <form name="targetForm" novalidate>
+      <div class="login-form">
+        <center style="text-align:center;margin:0 auto;padding:0;clear:both;">
+          <div class="type_radio">
+            <input ng-model="state.logtype" value="none" type="radio" name="login-type" id="radio-1"><label for="radio-1" style="cursor:pointer">No Login </label>
+          </div>
+          <div class="type_radio">
+            <input ng-model="state.logtype" value="normal" type="radio" name="login-type" id="radio-3"><label for="radio-3" style="cursor:pointer">Require Login </label>
+          </div>
+          <div ng-show="state.logtype == 'none'" style="padding:24px;"></div>
+          <div ng-show="state.logtype != 'none' ">
+            <div ng-class="login_input">
+              <input id="login_url" class="form-control login-field" style="width:240px;" name="url" ng-model="state.login" placeholder="Login URL" ng-change="check_input()" ng-keyup="keypress($event)" ng-blur="do_blur()"/>
+              <span class="user-info-error" ng-show="state.valid ">{{error_info}}</span>
+              <span ng-show="need_suggest">
+                <div class="dropdown" id="suggestion" style="margin-top:-1px;width:240px;margin-left:365px;z-index:3;opacity:0.8;background-color:white;">
+                  <div ng-class="http_suggestion" style="height:25px;line-height:25px;" ng-click="select_http()">
+                    {{suggestion1}}
+                  </div>
+                  <div ng-class="https_suggestion" style="height:25px;line-height:25px;" ng-click="select_https()">
+                    {{suggestion2}}
+                  </div>
+
+                </div>
+              </span>
+            </div>
+            <div ng-class="username_input">
+              <input class="form-control login-field" style="width:240px;" ng-model="state.username" placeholder="Username" />
+              <span class="user-info-error" ng-show="state.valid_user ">Username can not be empty</span>
+            </div>
+            <div ng-class="password_input">
+              <input class="form-control login-field" style="width:240px;" type="password" ng-model="state.password" placeholder="Password" />
+            </div>
+            <div ng-class="password_input">
+              <input class="form-control login-field" style="width:240px;"  type="password" ng-model="state.repeated"  placeholder="Confirm Password" />
+              <span class="user-info-error" ng-show="state.valid_pass ">Passwords do not match</span>
+            </div>
+          </div>
+        </center>
+      </div>
+      <div ng-show="state.logtype != 'none'"></div>
+    </form>
+  </div>
+</div>
+
+<div class="row" style="margin-top:15px;margin-bottom:321px;">
+  <div class="small-12 large-12 columns">
+    <center>
+      <a class="btn-prev pop" ng-click="action.nav('/');state.valid_pass=false;state.valid_user=flase;state.valid=false;" href="javascript:;" ><span aria-hidden="true" class="btn-icon icon-arrow-left"></span>Prev</a>
+      <a class="btn-next pop" ng-click="normal_next()"  href="javascript:;"><span aria-hidden="true" class="btn-icon icon-arrow-right "></span>Next</a>
+    </center>
+  </div>
+</div>
+
+<div ng-show="state.logtype == 'none'" class="row" style="margin-bottom:200px;"></div>

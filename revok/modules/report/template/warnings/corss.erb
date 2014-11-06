@@ -1,0 +1,29 @@
+
+<% alw_all = Array.new() %>
+
+<% details['list'].each do |endpoint| %>
+	<% if not endpoint.has_key?('allowed_dom') then %>
+	<% alw_all.push "#{endpoint['url']}" %>
+	<% end %>
+<% end %>
+
+<% priority 10 %>
+
+<% if alw_all.size >1 %>
+<% name "Cross-Origin Resource Sharing [#{alw_all.size} urls]" %>
+<% else %>
+<% name "Cross-Origin Resource Sharing [1 url]" %>
+<% end %>
+
+<b>Description:</b> Some URLs of this web server allow access from all origins, which makes it easier for remote attackers to conduct cross-site request forgery (CSRF) attacks.<br/>
+<b>Affected URLs:</b> <br/>
+
+
+
+<% alw_all.each do |al| %>
+	<%= "#{al}<br/>" %>
+<% end %>
+
+<b>Remediation:</b> Check all affected URLs, specify intended origins, and deny unexpected origins.<br/>
+<b>References:</b></br> 
+W3C - http://www.w3.org/TR/cors/<br/>
