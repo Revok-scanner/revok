@@ -11,24 +11,24 @@ The source code can be cloned from [Revok git repo](https://github.com/Revok-sca
 ###  Components
 Revok consists of the following components. They can be deployed in both centralized (single node) and distributed (multiple nodes) environment.
 
-* Web console
+* Web console  
 Revok web console provides the user interface for submitting scan tasks.
 
-* REST API
+* REST API  
 Revok REST APIs are defined to receive and handle requests from the web console.
 
-* Messaging server
+* Messaging server  
 Messaging server stores scan requests and distributes them to Caroline nodes. When requests were received, new messages would be produced and kept in a queue until Caroline nodes consume messages from the queue.
 
-* Caroline nodes
+* Caroline nodes  
 Revok Caroline nodes (working nodes) run scans with a group of testing modules and generate final scan reports.
 
-* Database
+* Database  
 Details for all scan tasks are recorded in the database. It can be used for data query or statistic.
 
 ### Communication among components
 The messaging flow among Revok components is as below.
-![Alt text](![Alt text](http://revok-scanner.github.io/revok/images/revok_arch.png)
+![Alt text](http://revok-scanner.github.io/revok/images/revok_arch.png)
 
 ## Quick start guide (all in one)
 Step 1: download and decompress the binary package
@@ -73,10 +73,10 @@ Issues for Revok is listed at [issues page](https://github.com/Revok-scanner/rev
 
 
 ## Contact us
-* Mailing lists
+* Mailing lists  
 [revok-scanner-users@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-users/join) (for users)
 [revok-scanner-devel@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-devel/join) (for developers)
 [revok-scanner-announce@googlegroups.com](https://groups.google.com/forum/#!forum/revok-scanner-announce/join) (for release announcement)
 
-* IRC discussion
+* IRC discussion  
 `#revok-scanner` (irc.freenode.net/6665)
