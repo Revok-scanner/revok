@@ -22,17 +22,17 @@ Step 4: access the web console to submit a scan at <http://localhost:3030>
 Web console, REST API server, messaging server, Caroline nodes (working nodes) and database server can be deployed in both **centralized** (single node) and **distributed** (multiple nodes) environment. In addition, you can add more than one working nodes to support parallel scans.
 
 ### 1.2.1 Preparation
-* Get source code
+* Get source code  
 The source code can be got from  [Revok git repo](https://github.com/Revok-scanner/revok). Clone it for each node in distributed environment.
-* Global configuration file
+* Global configuration file  
 File [conf/revok.conf](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf) defines the settings for starting Revok service. Please make sure changes of this file are synchronized on all nodes in the distributed environment.
-* DNS settings [Optional]
+* DNS settings [Optional]  
 Add mapping of hostnames and IP addresses to the /etc/hosts file in distributed environment when hostnames are used to communicate.
 
 ### 1.2.2 Database server
 PostgreSQL is the storage for Revok history data. Other database options may be added in the future.
 
-Step 1: install and initialize PostgreSQL
+Step 1: install and initialize PostgreSQL  
 Download and install the suitable version of PostgreSQL for your OS (refer to <http://www.postgresql.org/download/>). Edit configuration file to set the listening IP address and port.
 ```
 $ yum install -y postgresql-server postgresql
@@ -42,7 +42,7 @@ listen_addresses = '*'
 port = 5432
 $ systemctl enable postgresql.service
 ```
-SSL configuration [Optional]
+SSL configuration [Optional]  
 a. Create self-signed certificate and private key for the server, then edit configuration file.
 ```
 $ vi /var/lib/pgsql/data/postgresql.conf
@@ -54,7 +54,7 @@ b. Get the certificate and move it to ~/.postgresql/ on Caroline and REST nodes.
 ```
 $ echo -n | openssl s_client -connect pg.example.com:5432 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > root.crt
 ```
-Step 2: create user and database
+Step 2: create user and database  
 Start PostgreSQL service. Create database "revok_db" and user "revok".
 ```
 $ systemctl start postgresql.service
@@ -63,7 +63,7 @@ $ psql
 postgres=# create database revok_db;
 postgres=# create user revok with password 'password';
 ```
-Step 3: configure client authentication
+Step 3: configure client authentication  
 Edit the configuration file for client authentication. Apply MD5 authentication to revok user and restart the service.
 ```
 $ vi /var/lib/pgsql/data/pg_hba.conf
@@ -88,12 +88,12 @@ Step 5: add iptables rule
 ### 1.2.3 Message queue server
 ActiveMQ works as the messaging server in Revok.
 
-Step 1: install ActiveMQ
+Step 1: install ActiveMQ  
 Download from <http://activemq.apache.org/download.html> and unpack.
 ```
 $ tar xzvf apache-activemq-5.10.0-bin.tar.gz
 ```
-Step 2: configure ActiveMQ
+Step 2: configure ActiveMQ  
 Edit configuration file to add authentication plugin, then start ActiveMQ service.
 ```
 $ vi apache-activemq-5.10.0/conf/activemq.xml
@@ -107,7 +107,7 @@ $ vi apache-activemq-5.10.0/conf/activemq.xml
 </plugins>
 $ apache-activemq-5.10.0/bin/activemq start
 ```
-SSL configuration [Optional] 
+SSL configuration [Optional]   
 a. Create certificate for the server (refer to http://activemq.apache.org/how-do-i-use-ssl.html), then edit configuration file.
 ```
 $ vi apache-activemq-5.10.0/conf/activemq.xml
@@ -140,7 +140,7 @@ Step 4: add iptables rule
 
 ### 1.2.4 REST API server
 
-Step 1: prepare dependent packages
+Step 1: prepare dependent packages  
 The list of basic packages required by REST API server.
 - ruby (>=1.9.3)
 - ruby-devel
@@ -162,7 +162,7 @@ REST_USER=revok
 REST_PASSWORD=password
 REST_PORT=8443
 ```
-SSL configuration [Optional] 
+SSL configuration [Optional]  
 a. Create self-signed certificate and private key for the server, then edit file [rest/rest_served.rb](https://github.com/Revok-scanner/revok/blob/master/rest/rest_served.rb).
 ```
 $ vi rest/rest_served.rb
@@ -210,7 +210,7 @@ Step 6: add iptables rule
 
 ### 1.2.5 Caroline nodes
 
-Step 1: prepare dependent packages
+Step 1: prepare dependent packages  
 All dependent packages of REST API Server are required. Other dependency is as below.
 - python (>=2.6)
 - [pip](https://pip.pypa.io/en/latest/installing.html)
@@ -230,7 +230,7 @@ $ wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86
 $ tar xjvf phantomjs-1.9.7-linux-x86_64.tar.bz2
 $ cp phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/bin/
 ```
-Step 2: update SMTP settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
+Step 2: update SMTP settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)  
 A SMTP server is needed to send scan reports to users.
 ```
 # Report config
@@ -254,7 +254,7 @@ $ caroline/carolined start
 
 * Start by WEBrick
 
-Step 1: prepare dependent packages
+Step 1: prepare dependent packages  
 All dependent packages of REST API Server are required.
 
 Step 2: update web settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
@@ -278,7 +278,7 @@ Step 5: add iptables rule
 ```
 * Start Apache HTTP server
 
-Step 1: prepare dependent packages
+Step 1: prepare dependent packages  
 All dependent packages of REST API Server are required. Other dependency is as below.
 The list of required packages.
 - httpd
@@ -295,7 +295,7 @@ Step 2: copy code to httpd data directory
 $ cp -r revok/webconsole /var/www/html/revok
 $ ln -s /var/www/html/revok/public /var/www/html/scanner
 ```
-Step 3: configure httpd
+Step 3: configure httpd  
 Add loadmodule option for passenger and vhost setting for the application to httpd.conf, then start httpd service.
 ```
 $ vi /etc/httpd/conf/httpd.conf
@@ -320,7 +320,7 @@ LoadModule passenger_module /usr/local/gems/ruby-1.9.3-p547/gems/passenger-4.0.4
 </VirtualHost>
 $ systemctl start httpd.service
 ```
-SSL configuration [Optional] 
+SSL configuration [Optional]  
 Create self-signed certificate and private key for the server, then edit configuration file.
 ```
 $ vi /etc/httpd/conf/httpd.conf
