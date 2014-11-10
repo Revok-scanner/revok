@@ -55,7 +55,7 @@ init() {
 
   # Softlink docs
   eval ln -s $ROOT_PATH/docs $ROOT_PATH/webconsole/public/docs $NULL
-  eval ln -s $ROOT_PATH/README $ROOT_PATH/webconsole/public/docs/About $NULL
+  eval ln -s $ROOT_PATH/README.md $ROOT_PATH/webconsole/public/docs/About $NULL
   eval ln -s $ROOT_PATH/COPYING $ROOT_PATH/webconsole/public/docs/COPYING $NULL
 
   # Config iptables
