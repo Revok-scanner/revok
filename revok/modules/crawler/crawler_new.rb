@@ -52,7 +52,7 @@ class Crawler
     mitm_in.close
     sleep 5
 
-    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{File.dirname(__FILE__)};phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{File.dirname(__FILE__)}/creep/webcrawler.js")
+    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{File.dirname(__FILE__)};phantomjs --proxy=localhost:8080 --ssl-protocol=any --ignore-ssl-errors=true #{File.dirname(__FILE__)}/creep/webcrawler.js")
     phantomjsid = `ps -ef | grep phantomjs | grep -v grep | grep -v sh |awk '{print $2}'`.to_i
     if phantomjsid>0
       log "phantomjs is started"
