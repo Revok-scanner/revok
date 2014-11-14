@@ -40,7 +40,7 @@ class Autologin
 
     log "mitmdump is started"
 
-    phantom_in, phantom_out, phantom_err = Open3.popen3("phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/autologin.js")
+    phantom_in, phantom_out, phantom_err = Open3.popen3("phantomjs --proxy=localhost:8080 --ssl-protocol=any --ignore-ssl-errors=true #{File.dirname(__FILE__)}/js/autologin.js")
     phantom_in.puts @config
     phantom_in.close
 
