@@ -3,18 +3,20 @@
 # Check SSL/TLS mis-configuration which makes the communication between browser and server not secure, such as weak cipher, invalid certificate etc.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'timeout'
 require 'net/http'
 require 'typhoeus'
-require 'ssl_check.rb.ut'
-class SSLChecker
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/ssl_check.rb.ut"
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
+
+class SSLChecker < Revok::Module
   include SSLCheck
   include ReportUtils
-  def initialize(config=$datastore['config'],cert_file="#{File.dirname(__FILE__)}/ca-bundle.trust.crt")
-    @config=config
-    @cert_file=cert_file
+  def initialize    
+    info_register("SSLChecker", {"group_name" => "default", 
+                                "group_priority" => 10,
+                                "priority" => 10})
   end
 
   def https_check(url)
@@ -59,27 +61,26 @@ class SSLChecker
         time=time+1
       end
     end
-
     begin
       response =  Typhoeus::Request.new(@url,ssl_verifypeer: false,ssl_verifyhost: 1,connecttimeout:5,).run
       if response != nil && response.code!=404 && response.code!=0
         return true
       end
     rescue => excep
-      log "ERROR: #{excep}"
+      Log.error("#{excep}")
     end
     return false
   end
 
   def run
-    abstain
-    config = JSON.parse(@config, {create_additions:false})
-    @url=config['target'].delete("\C-M")
-    uri=URI(@url)
-    log "Checking SSL/TLS mis-configuration..."
-
     begin
+      Log.info( "Checking SSL/TLS mis-configuration...")
+      @config = @datastore['config']
+      config = JSON.parse(@config, {create_additions:false})
+      @url=config['target'].delete("\C-M")
+      uri=URI(@url)
       if ssl_available_check == true
+        @cert_file="#{Revok::Config::MODULES_DIR}/ca-bundle.trust.crt"
         @url=@url.gsub("http://", "https://")
         init(@url,@cert_file)
         ssl_report=run_check
@@ -87,17 +88,13 @@ class SSLChecker
         ssl_report={ssl_available_check:["Target URL does not appear to support SSL.","Enable SSL for your site, or at least make sure the urls which transmit sensitive data are only accessible through secure HTTPS connections."]}
       end
     rescue => excep
-      error
-      log "ERROR: #{excep}"
+      Log.error( "#{excep}")
+      return
     ensure
       finalize
     end
-
     if ssl_report!=nil && ssl_report.length>0
       advise({"ssl_report" => ssl_report})
     end
-
-    #log "#{ssl_report}"
-    log "ssl_check is done"
   end
 end
