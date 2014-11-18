@@ -3,120 +3,34 @@
 # Check whether session id is exposed in requested URLs.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'json'
 require 'typhoeus'
 require 'net/http'
 require 'rex'
-require 'session_check.rb.ut'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
+require "#{Revok::Config::MODULES_DIR}/lib/session_check.rb.ut.rb"
 
 include Sess
-class SessionExposureCheckor 
+class SessionExposureCheckor < Revok::Module
   include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("SessionExposureCheckor", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
   
-  def session_id_detect
-    session_id = String.new()
-    cookies = Array.new()
-    requests = Hash.new()
-    login_redir = Array.new()
-    login_request = 0
-
-    session = JSON.parse(@session_data, {create_additions:false})
-    config = JSON.parse(@config, {create_additions:false})
-    cookies = session['cookie'].scan(/Cookie:(.*?)$/)[0][0].split(";")
-    requests = session['requests']
-    logtype = config['logtype']
-    username = config['username']
-    password = config['password']
-    login = config['login']
-    login_page = login.split("/")[login.split("/").size-1]
-
-    if logtype == "normal"
-      #Scan for login request    
-      requests.each_pair do |k,v|
-        body = v.gsub(v.split("\r\n\r\n")[0], "")
-        if v.scan(/^POST/)!=[] and body!= "" and body.scan(/#{username}/)!=[] and body.scan(/#{password}/)!=[]
-          login_request = k.to_i
-          @login_request = login_request
-          $datastore['login_request'] = @login_request
-          break
-        end
-      end
- 
-      #Scan for the first request after login 
-      if login_request > 0 and requests["#{login_request+1}"] != nil
-        req  = requests["#{login_request+1}"]
-      else
-        log "Login request or request after login isn't scanned." 
-        return
-      end
-    end
-
-    #Detect session ID from cookies
-    cookies.each do |k|
-      k=k.split("=")[0]
-      if logtype == "normal"
-        test_req = req.gsub(/#{k}=.*?;|#{k}=.*?$/, "")
-        url=req.match(/\s(http.*?)\sHTTP\//)[1]
-        uri=URI(url)
-        host=uri.host
-        port = uri.port
-        context = {}
-        ssl = (uri.scheme=='https'?true:false)
-        ssl_version = nil
-        proxies = nil
-        conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
-
-        begin
-          resp = conn.send_recv(test_req, 30)
-        rescue
-          log "ERROR: #{$!}" 
-        end
-
-        if resp.headers['Location'] != nil
-          location = resp.headers['Location']
-          login_redir = location.scan(/#{login}|#{login_page}/)
-        end
-
-        if (resp.code > 300 and login_redir != []) or resp.code == 403 #drupal returns 403
-          session_id = k.gsub(/=.*?$/, "").strip
-          break
-        end
-      
-      elsif logtype == "basic"
-        session_id = k.gsub(/=.*?$/, "").strip if k.scan(/sess/i) != []
-        break
-      end
-    end
-
-    if session_id != ""
-      @session_id=session_id
-      $datastore['session_id'] = session_id
-      log "The key of session ID is detected: #{session_id}" 
-    else
-      log "Session ID isn't detected" 
-    end
-
-  end
-  
-  def exposure_check
+#  def exposure_check
+  def run
     session_val = String.new
     url = String.new
     vul = Array.new
@@ -130,7 +44,6 @@ class SessionExposureCheckor
             break
           end
         end
-
         session['requests'].each_pair do |k, v|
           request = v.split("\r\n")[0].gsub(/HTTP\/1.*/, "")
           if request.include? session_val
@@ -138,24 +51,23 @@ class SessionExposureCheckor
           end
         end
       end
-    rescue => excep
-      error
-      log excep.to_s 
+    rescue => exp
+      Log.error("#{exp}")
+      return
     end
 
     if vul.size == 0
       abstain
-      log "No session ID found in urls"  
+      Log.info( "No session ID found in urls"  )
     else
       vul=vul.uniq
       vul.each do |k|
-        log "Session exposed in url of request: #{k}" 
+        Log.info( "Session exposed in url of request: #{k}" )
         k = k.gsub(/POST/, "POST request for").gsub(/GET/, "GET request for")
         list("#{k}")  
       end
-      warn({"name" => "session_exposed_in_url"})
+      Log. warn({"name" => "session_exposed_in_url"})
     end
-
+    Log.info("exposure_check is Done")
   end
-  
 end
