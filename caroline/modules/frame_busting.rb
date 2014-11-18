@@ -2,28 +2,25 @@
 # Frame Burst Checking Module
 # Check whether x-frame-options header is set.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'net/http'
 require 'json'
+require 'core/module'
 
-class FrameBustingTester
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+class FrameBustingTester < Revok::Module
+
+  def initialize(load_from_file = false, session_file = "")
+    info_register("Frame_Busting_test", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "detail" => "Check whether x-frame-options header is set.",
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log "ERROR: #{exp.to_s}" 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
@@ -59,10 +56,12 @@ class FrameBustingTester
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    @config = @datastore['config']
     vul_urls = Array.new()
     issues = Array.new()
     result = false
-    log "Checking for X-Frame-Options header..."
+    Log.info( "Checking for X-Frame-Options header...")
     begin
       data = JSON.parse(@session_data, {create_additions:false})
       config = JSON.parse(@config, {create_additions:false})
@@ -92,10 +91,10 @@ class FrameBustingTester
       #Fliter the vulnerability URLs
       responses.each_pair {|number, header|
         #if (header.downcase.include?("x-frame-options: deny") || header.downcase.include?("x-frame-options: sameorigin"))
-        if (header.scan(/x-frame-options: *deny|x-frame-options: sameorigin/i)!=[])
+        if (header.scan(/x-frame-options: *deny|x-frame-options: sameorigin/i) != [])
           next;
         #elsif (header.downcase.include?("frame-options: deny") || header.downcase.include?("frame-options: sameorigin"))
-        elsif (header.scan(/frame-options: *deny|frame-options: *sameorigin/i)!=[])
+        elsif (header.scan(/frame-options: *deny|frame-options: *sameorigin/i) != [])
           next;
         else
           url = /\b(https?|ftp|file):\/\/\S+/.match(requests[number])
@@ -115,20 +114,20 @@ class FrameBustingTester
       #If any error happened, report here
       if issues.size > 0
         issues.each do |issue|
-          log "ERROR: #{issue}" 
+          Log.error("#{issue}")
         end
         error
         return
       end
       if !vul_urls.empty?
-        log "The following #{vul_urls.length.to_s} URLs miss the field \"X-Frame-Options\" in HTTP headers:" 
+        Log.warn("The following #{vul_urls.length.to_s} URLs miss the field \"X-Frame-Options\" in HTTP headers:")
         vul_urls.each do |vul_url|
-          log "URL: #{vul_url}" 
+          Log.warn("URL: #{vul_url}")
           list(vul_url)
         end
         advise({'vul_urls'=>vul_urls})
       else
-        log "X-Frame-Options is set for all URLs"
+        Log.info("X-Frame-Options is set for all URLs")
       end
     end
 
