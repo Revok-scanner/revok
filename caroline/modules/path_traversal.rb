@@ -2,37 +2,33 @@
 # Path Traversal Checking Module
 # Check whether content of a file can be read by injecting its file path to requests.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'json'
-require 'path_traversal.rb.ut'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/path_traversal.rb.ut.rb"
 
-class PathTravelor
+class PathTravelor < Revok::Module
   include PATH_TRAV
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("Path_travelor", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "detail" => "Check whether content of a file can be read by injecting its file path to requests.",
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
   def run
     vul_url = Array.new()
-
     #Filter the URLs that have a parameter which is a file
-    log "Filtering URLs with file parameters..."
+    Log.info( "Filtering URLs with file parameters...")
+
     tcks, params = filter_url_request
 
     if tcks != {}
@@ -41,7 +37,7 @@ class PathTravelor
     end
 
     if vul_url == "error"
-       error
+      error
     elsif vul_url != []
       vul_url.each do |v|
         m = v[0]
@@ -52,7 +48,6 @@ class PathTravelor
     else
       abstain
     end
-    log "path_traversal is done"
-
+    Log.info("path_traversal is done")
   end
 end

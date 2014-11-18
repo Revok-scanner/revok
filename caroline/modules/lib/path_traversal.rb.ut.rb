@@ -210,8 +210,9 @@ module PATH_TRAV
     conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
     begin
       resp = conn.send_recv(req,30)
-    rescue
-      log "ERROR: #{$!}" 
+    rescue => exp
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
       resp = "error"
     end
     return resp
@@ -236,7 +237,7 @@ module PATH_TRAV
         dom = domain[0][0] + "://"  + domain[0][1]
       end
 
-      log "Now checking path traversal against URL: #{url}..." 
+      Log.info("Now checking path traversal against URL: #{url}...")
       req = @data['requests'][v]
       mthd = req.scan(/^(.*?) /)[0][0]
       if mthd == "POST"
@@ -271,7 +272,7 @@ module PATH_TRAV
         end
 
         if resp!= nil && resp.code != 200
-          log "'.' is not allowed in this URL." 
+          Log.info("'.' is not allowed in this URL.")
           next
         end
 
