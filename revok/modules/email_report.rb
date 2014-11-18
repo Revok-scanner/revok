@@ -2,16 +2,27 @@ require 'base64'
 require 'open3'
 require 'json'
 require 'mail'
+require 'core/module'
+class Postman2 < Revok::Module
 
-class Postman2
-
-  def initialize(config=$datastore['config'],advice_report=$datastore['advice_report'],advice_email_body=$datastore['advice_email_body'])
-    @config=config
-    @advice_report=advice_report
-    @advice_email_body=advice_email_body
+  def initialize
+    info_register("Postman2", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
   end
 
-  def send
+  def run
+    begin
+      config=$datastore['config']
+      advice_report=$datastore['advice_report']
+      advice_email_body=$datastore['advice_email_body']
+      @config=config
+      @advice_report=advice_report
+      @advice_email_body=advice_email_body
+    rescue => exp
+       Log.error("#{exp}")
+       return
+    end
     config = JSON.parse(@config, {create_additions:false})
     target = config['target']
     report = @advice_report
@@ -61,5 +72,4 @@ body
     log "Report email is sent\n"
    
   end
-
 end
