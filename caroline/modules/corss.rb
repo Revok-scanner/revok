@@ -2,39 +2,51 @@
 # Cross-Origin Resource Sharing Module
 # Check whether URLs allow access from other or all origins by sending crafted HTTP requests.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'webrick'
 require 'stringio'
 require 'json'
-require 'corss.rb.ut'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/corss.rb.ut.rb"
 
-class CorssChecker
+class CorssChecker < Revok::Module
   include CORS
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
-      @session_data=File.open(session_data).read
-    else
-      @session_data=session_data
+  def initialize(load_from_file = false, session_file = "")
+    info_register("Corss_checker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "detail" => "Check whether URLs allow access from other or all origins by sending crafted HTTP requests.",
+                              "priority" => 10})
+    if (load_from_file)
+      begin
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
+      end
     end
   end
 
   def run
-    data = JSON.parse(@session_data, {create_additions:false})
-    config = JSON.parse(@config, {create_additions:false})
+    @session_data = @datastore['session'] if @session_data == nil
+    config = @datastore['config']
+    begin
+      data = JSON.parse(@session_data, {create_additions:false})
+      config = JSON.parse(config, {create_additions:false})
+      target = config['target']
 
-    target = config['target']
+      #delete duplicated requests
+      uniq_tcks = del_dulp_reqs(data)
 
-    #delete duplicated requests
-    uniq_tcks = del_dulp_reqs(data)
-    #generate CORS requests
-    req_hash = gen_cors_reqs(uniq_tcks, target, config, data)
-    #send CORS requests and check the result headers
-    log "Sending CORS requests and checking the result headers..."
-    allow_oth, allow_all = send_cors_reqs(req_hash, data)
+      #generate CORS requests
+      req_hash = gen_cors_reqs(uniq_tcks, target, config, data)
+
+      #send CORS requests and check the result headers
+      Log.info( "Sending CORS requests and checking the result headers...")
+      allow_oth, allow_all = send_cors_reqs(req_hash, data)
+    rescue => exp
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
+    end
     
     if allow_oth == "error" and allow_all == "error"
       error
@@ -64,8 +76,6 @@ class CorssChecker
         abstain
       end
     end
-    log "corss is done"
-
+    Log.info("corss is done")
   end
 end
-
