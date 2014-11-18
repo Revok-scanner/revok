@@ -3,9 +3,6 @@
 # Inject dangerous characters ' "  < > and their encoded forms through parameters in HTTP request, then check whether these dangerous characters are filtered in the response.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib/"
-
-require 'report.ut'
 require 'rex/socket'
 require 'rex/proto/http'
 require 'rex/text'
@@ -15,27 +12,18 @@ require 'rex/proto/ntlm/constants'
 require 'rex/proto/ntlm/utils'
 require 'rex/proto/ntlm/exceptions'
 require 'json'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
+require "#{Revok::Config::MODULES_DIR}/lib/patterns.rb.ut.rb"
 
-require 'patterns.rb.ut'
-
-
-class XSSChecker
+class XSSChecker < Revok::Module
   include Patterns
   include ReportUtils
 
-  def initialize(targetURL=$datastore['target'])
-    uri=URI(targetURL)
-    host=uri.host
-    port = uri.port
-    context = {}
-    ssl = (uri.scheme=='https'?true:false)
-    ssl_version = nil
-    proxies = nil
-    @conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
-    @target=targetURL
-    if $datastore==nil or $datastore['session']==nil
-      return nil
-    end
+  def initialize
+     info_register("XSSChecker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})   
   end
   
   def get_conn
@@ -47,6 +35,27 @@ class XSSChecker
   end
 
   def run
+    begin
+      targetURL=$datastore['target']
+      uri=URI(targetURL)
+      host=uri.host
+      port = uri.port
+      context = {}
+      ssl = (uri.scheme=='https'?true:false)
+      ssl_version = nil
+      proxies = nil
+      @conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
+      @target=targetURL
+    rescue => exp
+      Log.error("#{exp}")
+      return
+    end
+
+    if $datastore==nil or $datastore['session']==nil
+      Log.error("$datastore is exp")
+      return nil
+    end
+    
     bad = Hash.new
     lists = Array.new
     checked = Array.new
@@ -55,7 +64,7 @@ class XSSChecker
 
     data = JSON.parse($datastore['session'],{create_additions:false})
     @cookie=data['cookie']
-    log "Filtering requests to do xssi test..."
+    Log.info( "Filtering requests to do xssi test...")
 
     patterns = PATTERNS
     dangers = ["'","\"","<",">"]
@@ -81,7 +90,7 @@ class XSSChecker
         url = req_url.gsub(/=[^&]*/,"=param")
 
         if not req_url.include? URI(@target).host then next end
-        log "Checking: #{req_url}" 
+        Log.warn( "Checking: #{req_url}" )
 
         params.each do |prm_tck|
           threats = Array.new
@@ -98,7 +107,7 @@ class XSSChecker
           # avoid repeated injection
           next if checked.include? "#{url}; #{prm_k}"
           checked.push("#{url}; #{prm_k}")
-          log "\tChecking param #{prm_tck}:" 
+          Log.warn( "\tChecking param #{prm_tck}:" )
 
           patterns.each do |pat|
             bracket = counter.next
@@ -108,7 +117,7 @@ class XSSChecker
             begin
               resp = conn.send_recv(req_sent,30)
             rescue
-              log "ERROR: #{$!}" 
+              Log.error( " #{$!}" )
               next
             end
 
@@ -123,7 +132,7 @@ class XSSChecker
               begin
                 resp = conn.send_recv(req_sent,30)
               rescue
-                log "ERROR: #{$!}" 
+                Log.error( " #{$!}" )
                 next
               end
             end
@@ -137,7 +146,7 @@ class XSSChecker
           end #end of patterns
 
           threats.uniq!
-          log "\t\t#{threats.to_s}" if not threats.empty? 
+          Log.warn( "\t\t#{threats.to_s}" ) if not threats.empty? 
           if threats.size > 0 then ref[prm_k] = threats end
         end #end of params
 
@@ -146,7 +155,7 @@ class XSSChecker
 
     rescue => excep
       error
-      log "ERROR: #{excep.to_s}" 
+      Log.error( " #{excep.to_s}" )
     end
 
     if not bad.empty?
@@ -157,11 +166,11 @@ class XSSChecker
       end
       lists.uniq!
       lists.each {|k| list(k)}
+
       warn
     else
+
       abstain
     end
-    log "xssi is done"
   end
-
 end
