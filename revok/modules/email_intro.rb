@@ -3,22 +3,32 @@ require 'open3'
 require 'json'
 require 'resolv'
 require 'mail'
+require 'core/module'
 
-class Postman1
-  def initialize(config=$datastore['config'])
-    @config=JSON.parse(config, {create_additions:false})
-    @requestor=@config['email']
-    @target=@config['target']
-    @whitelist=@config['whitelist']
+class Postman1 < Revok::Module
+  def initialize
+    info_register("Postman1", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
   end
 
-  def send
+  def run
+   begin
+     config=$datastore['config']
+     @config=JSON.parse(config, {create_additions:false})
+     @requestor=@config['email']
+     @target=@config['target']
+     @whitelist=@config['whitelist']
+   rescue => exp
+     Log.error("#{exp}")
+     return 
+   end
     whitelist = Array.new
     @whitelist.each do |item|
       begin
         whitelist.push(item)
       rescue
-        log "Couldn't look up #{item}."
+        Log.warn("Couldn't look up #{item}.")
       end
     end
     @config['whitelist']= whitelist
@@ -44,16 +54,14 @@ msg
                             :password   => ENV["SMTP_PASSWORD"],
                             :enable_starttls_auto => true }
     end
-
     Mail.deliver do
       from    ENV["EMAIL_ADDRESS"]
       to      to
       subject "Message from Revok: Your scan of #{target} has begun."
       body    msg
     end
-    log "Introduction email is sent" 
+    Log.info( "Introduction email is sent" )
    
   end
 
 end
-
