@@ -13,8 +13,7 @@ class AdminAccessor < Revok::Module
   include AdminURLs
   include ReportUtils
 
-  def initialize(load_from_file = false,session_file="",flag='s')
-   
+  def initialize(load_from_file = false,session_file="",flag='s')  
     info_register("AdminAccessor", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10})
@@ -24,14 +23,9 @@ class AdminAccessor < Revok::Module
 	@session_data = ""
     end
   end
-  
- 
 
-  def run
-    
+  def run  
     @session_data = @datastore['session'] if @session_data == nil
-
-    Log.info( "session_data is #{@session_data}")
     @config = @datastore['config']  
   
     def encode64(msg)
@@ -57,12 +51,10 @@ class AdminAccessor < Revok::Module
     if (target.scan(/\/$/) == [])
       flg = false
     end
-
     target = target.split("#")[0]
-
     Log.info( "Sending requests to possible admin URIs..." )
-
     urls.each do |a_uri|
+      
       #generate a GET request for each url in the list
       req = Hash.new()
 
@@ -103,11 +95,10 @@ class AdminAccessor < Revok::Module
            rpt_uri.push uri
         end
       rescue
-        Log.erroe( " #{$!}" )
+        Log.error( " #{$!}" )
         break
       end
     end
-    Log.info( "*****************AdminAccessor is DONE ********************")
     if rpt_uri != []
       rpt_uri.each do |ruri|
         list(ruri)
