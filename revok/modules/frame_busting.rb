@@ -2,28 +2,25 @@
 # Frame Burst Checking Module
 # Check whether x-frame-options header is set.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'net/http'
 require 'json'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
 
-class FrameBustingTester
+class FrameBustingTester < Revok::Module
   include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("FrameBustingTester", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log "ERROR: #{exp.to_s}" 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
@@ -59,17 +56,18 @@ class FrameBustingTester
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    @config = @datastore['config']
     vul_urls = Array.new()
     issues = Array.new()
     result = false
-    log "Checking for X-Frame-Options header..."
+    Log.info( "Checking for X-Frame-Options header...")
     begin
       data = JSON.parse(@session_data, {create_additions:false})
       config = JSON.parse(@config, {create_additions:false})
       domain = URI(config['target']).host
       responses = data['responses']
       requests = data['requests']
-
       #Delete the non text/html type request-response pairs.
       responses.delete_if {|key, value|
         judge_block? do
@@ -88,7 +86,6 @@ class FrameBustingTester
           end
         end
       }
-
       #Fliter the vulnerability URLs
       responses.each_pair {|number, header|
         #if (header.downcase.include?("x-frame-options: deny") || header.downcase.include?("x-frame-options: sameorigin"))
@@ -104,33 +101,33 @@ class FrameBustingTester
       }
       vul_urls = url_uniq(vul_urls)
       result = true if vul_urls.empty?
-    rescue => exp
+    rescue => exp    
+      Log.error("#{exp}")
       issues.push(exp.to_s)
       result = false
     end
 
     if result
-      abstain
+      Log.warn("The result is none")
     else
       #If any error happened, report here
       if issues.size > 0
         issues.each do |issue|
-          log "ERROR: #{issue}" 
+          Log.error( "#{issue}" )
         end
         error
         return
       end
       if !vul_urls.empty?
-        log "The following #{vul_urls.length.to_s} URLs miss the field \"X-Frame-Options\" in HTTP headers:" 
+        Log.warn( "The following #{vul_urls.length.to_s} URLs miss the field \"X-Frame-Options\" in HTTP headers:" )
         vul_urls.each do |vul_url|
-          log "URL: #{vul_url}" 
+          Log.debug( "URL: #{vul_url}" )
           list(vul_url)
         end
         advise({'vul_urls'=>vul_urls})
       else
-        log "X-Frame-Options is set for all URLs"
+        Log.info( "X-Frame-Options is set for all URLs")
       end
     end
-
   end
 end
