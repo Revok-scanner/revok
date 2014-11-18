@@ -2,41 +2,47 @@
 # Reverse Cookie Module
 # Check whether critical user information are kept in simply encoded cookies.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'time'
 require 'json'
 require 'net/http'
 require 'base64'
+require 'core/module'
 
-class CookieReverser
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s',session_id=$datastore['session_id'])
-    @config=config
-    @session_id=session_id
-    if flag=='f'
+class CookieReverser < Revok::Module
+
+  def initialize(load_from_file = false, session_file = "")
+    info_register("CookieReverser", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10,
+                              "detail" => "Check whether critical user information are kept in simply encoded cookies."})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
   def run
-    @session = JSON.parse(@session_data, {create_additions:false})
-    @config = JSON.parse(@config, {create_additions:false})
+    @session_data = @datastore['session'] if @session_data == nil
+    @session_id = @datastore['session_id'] if @session_id == nil
+    @config = @datastore['config']
+    begin
+      @session = JSON.parse(@session_data, {create_additions:false})
+      @config = JSON.parse(@config, {create_additions:false})
+    rescue => exp
+      Log.warn(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
+      error
+      return
+    end
     reverse_cookie_test
   end
   
-  def str_to_hex(s) 
+  def str_to_hex(s)
     s = s.gsub(/[^a-f0-9]/, "")
     data = s.scan(/../).map { |x| x.hex.chr }.join
     return check_decoded_str(s, data, "hex")
@@ -63,7 +69,7 @@ class CookieReverser
         flag += 1
         msg = "#{k} information is found in #{type} encoded cookie: #{plain_cookie}<br/>"
         @report += "#{msg}"
-        log msg 
+        Log.warn(msg)
       end
     end
     return flag
@@ -77,28 +83,26 @@ class CookieReverser
       cookies = @session['cookie'].scan(/Cookie:(.*?)$/)[0][0].split(";")
       @report = String.new()
 
-      log "Scan for critical information in plain, base64 and hex decoded cookies..." 
+      Log.info("Scan for critical information in plain, base64 and hex decoded cookies...")
       cookies.each do |k|
         cookie = k.gsub(/^.*?=/, "")
         if check_decoded_str(cookie, cookie, "plain") + str_to_base64(cookie) + str_to_hex(cookie) > 0
           result = false
         end
       end
-    rescue => excep
+    rescue => exp
       error
-      log excep.to_s 
+      Log.warn(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
     end
 
-    if result == true 
+    if result == true
       abstain
-      log "No critical info is found" 
+      Log.info("No critical info is found")
     else
       advise({"cookies" => @report})
     end
-
   end
-
 end
 
   
-
