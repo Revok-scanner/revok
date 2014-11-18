@@ -2,31 +2,28 @@
 # MIME Type Checking Module
 # Check whether nosniff header is set. And find reponses whose actual contect type is mismatched with the defined one.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'base64'
 require 'nokogiri'
 require 'rkelly'
 require 'json'
 require 'net/http'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
 
-class MimeTypeChecker
+class MimeTypeChecker < Revok::Module
   include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("MimeTypeChecker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
@@ -80,15 +77,15 @@ class MimeTypeChecker
     content_type = /\r\n(Content-Type:.*?)\r\n/.match(resp).to_s.strip
 
     if content_type.include? "text/html" and detect_html(resp_body) == false
-      log "Actual content type mismatchs with html: #{req}"
+      Log.warn( "Actual content type mismatchs with html: #{req}")
     elsif content_type.scan(/\/xml/)!=[] and detect_xml(resp_body)==false
-      log "Actual content type mismatchs with xml: #{req}"
+      Log.warn( "Actual content type mismatchs with xml: #{req}")
     elsif content_type.scan(/\/javascript|\/x-javascript/)!=[] and detect_js(resp_body)==false
-      log "Actual content type mismatchs with javascript: #{req}"
+      Log.warn( "Actual content type mismatchs with javascript: #{req}")
     elsif content_type.scan(/\/json/)!=[] and detect_json(resp_body)==false
-      log "Actual content type mismatchs with json: #{req}"
+      Log.warn( "Actual content type mismatchs with json: #{req}")
     elsif content_type.include? "text/plain" and detect_html(resp_body)|detect_js(resp_body)|detect_xml(resp_body)|detect_json(resp_body)==true
-      log "Actual content type mismatchs with plain: #{req}"
+      Log.warn( "Actual content type mismatchs with plain: #{req}")
     else
       return
     end
@@ -96,12 +93,13 @@ class MimeTypeChecker
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    @config = @datastore['config']
     sniff_urls = Array.new()
     report = Array.new()
     @mismatch_report = Array.new()
     aff_url = String.new
-
-    log "Checking for nosniff header and mismatched content type..."
+    Log.info( "Checking for nosniff header and mismatched content type...")
     begin
       session = JSON.parse(@session_data, {create_additions:false})
       config = JSON.parse(@config, {create_additions:false})
@@ -133,12 +131,12 @@ class MimeTypeChecker
       @mismatch_report.unshift("Actual content type is mismatched with Content-Type header. Number of pages: #{@mismatch_report.size}") if @mismatch_report != []
       report = sniff_urls + @mismatch_report
     rescue => excep
-      error
-      log excep.to_s 
+      Log.error( excep.to_s )
+      return
     end
 
     if report == []
-      abstain
+      Log.warn("The result is none")
     else
       report.each do |k|
         k = k.gsub(/POST/, "POST request for").gsub(/GET/, "GET request for")
@@ -149,7 +147,5 @@ class MimeTypeChecker
       if sniff_urls.size != 0 then num=num-1 end
       advise({ "num" => num })
     end
-    log "mime_type_check is done"
   end
-
 end
