@@ -3,10 +3,7 @@
 # Inject malicious SQLs to HTTP requests, then check keywords from responses or the response time to find out potential SQL injection vulnerability.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib"
-require 'report.ut'
 require 'json'
-require 'Approach1.rb.ut'
 require 'open-uri'
 require 'rex/socket'
 require 'rex/proto/http'
@@ -17,51 +14,55 @@ require 'rex/proto/ntlm/crypt'
 require 'rex/proto/ntlm/constants'
 require 'rex/proto/ntlm/utils'
 require 'rex/proto/ntlm/exceptions'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/Approach1.rb.ut.rb"
 
-class SQLiChecker
+class SQLiChecker < Revok::Module
   include Approach1
-  include ReportUtils
 
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("SQL_Injection_checker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10,
+                              "detail" => "Inject malicious SQLs to HTTP requests, then check keywords from responses or the response time to find out potential SQL injection vulnerability."})
+    
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log "ERROR: #{exp.to_s}" 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
   
   def run
+    @config = @datastore['config']
+    @session_data = @datastore['session'] if @session_data == nil
     aResultE,aResultT,aResult,aFinal = Array.new,Array.new,Array.new,Array.new
     aIssues = Array.new
     result = true
 
     begin
-      @session = JSON.parse(@session_data, {create_additions:false})
       @config=JSON.parse(@config, {create_additions:false})
-      log "Error based testing..." 
+      @session = JSON.parse(@session_data, {create_additions:false})
+      Log.info("Error based testing...")
       begin
         aResultE = fErrorBased
       rescue => exp
-        log "Exception in Error-Based Test:"
-        log "#{exp.backtrace.join("\n")}"
-        aResultE=Array.new
+        Log.error("Exception in Error-Based Test:")
+        Log.debug("#{exp.backtrace.join("\n")}")
+        aResultE = Array.new
       end
-      log "Time based testing..." 
+
+      Log.info("Time based testing...")
       begin
         aResultT = fTimeBased(aResultE)
       rescue => exp
-        log "Exception in Time-Based Test:" 
-        log "#{exp.backtrace.join("\n")}" 
-        aResultT=Array.new 
+        Log.error("Exception in Time-Based Test:")
+        Log.debug(exp.backtrace.join("\n"))
+        aResultT = Array.new
       end
       aResult = aResultE + aResultT
       #Cleaning up loop
@@ -76,9 +77,8 @@ class SQLiChecker
         if repeated == false then aFinal.push(value) end
       end
     rescue Timeout::Error
-      log "Timeout error." 
+      Log.error("Timeout error.")
     rescue => exp
-      #log "#{exp.backtrace.join("\n")}" 
       aIssues.push(exp.to_s)
       result = false
     end
@@ -92,7 +92,7 @@ class SQLiChecker
     else
       if aIssues.size > 0
         aIssues.each do |issue|
-          log "ERROR: #{issue}" 
+          Log.error("#{issue}")
         end
         error
         return
@@ -111,7 +111,7 @@ class SQLiChecker
       end
       warn({'vul_urls' => hUrls})
     end
-    log "sqli is done"
+    Log.info("sqli is done")
   end
 
 
@@ -171,7 +171,7 @@ class SQLiChecker
         content = "#{resp.body}"
         aKeywords.each_with_index do |keyword,index|
           if content[keyword] and !content[/AND/] then
-            log "Keyword found: " << keyword.to_s[/\)\w*\[/].slice(1..-2) 
+            Log.info("Keyword found: " << keyword.to_s[/\)\w*\[/].slice(1..-2))
             aResponses[cnt] = req
             class << aResponses[cnt]
               attr_accessor :key
