@@ -2,10 +2,6 @@
 # Login Brute Force Module
 # Check whether prevention for login brute force exists by logging in after several times' failed authentication.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-
-require 'report.ut'
 require 'rex/socket'
 require 'rex/proto/http'
 require 'rex/text'
@@ -15,23 +11,23 @@ require 'rex/proto/ntlm/constants'
 require 'rex/proto/ntlm/utils'
 require 'rex/proto/ntlm/exceptions'
 require 'json'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
 
-class BruteForceCheckor
+class BruteForceCheckor < Revok::Module
   include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("BruteForceCheckor", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log "ERROR: #{exp.to_s}" 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
@@ -145,19 +141,18 @@ class BruteForceCheckor
   end
 
   def run
-    abstain
+    @session_data = @datastore['session'] if @session_data == nil    
     max_run = 10
     time_out = 30
     cnt = 0
     begin
+      @config = @datastore['config']
       @session_data = JSON.parse(@session_data, {create_additions:false})
-      @config = JSON.parse(@config, {create_additions:false})
-      
-      log "Start bruteforcing..." 
-
+      @config = JSON.parse(@config, {create_additions:false})    
+      Log.info( "Start bruteforcing..." )
       @login_req = _get_login_req
       if not @login_req
-        log "No login request found" 
+        Log.error( "No login request found" )
         return
       end
 
@@ -210,7 +205,7 @@ class BruteForceCheckor
         else
           # if new response becomes different with the first invalid response
           if not _are_same_resp(resp, first_invalid_resp)
-            log "Bruteforcing mitigation is being applied" 
+            Log.info( "Bruteforcing mitigation is being applied" )
             break
           end
         end
@@ -218,11 +213,11 @@ class BruteForceCheckor
 
       if i == max_run
         advise({'method'=>_get_method_from_req(@login_req), 'login'=>@config['target']})
-        log "Bruteforcing is working" 
+        Log.info( "Bruteforcing is working" )
       end
     rescue => exp
-      error
-      log "ERROR: #{exp}" 
+      Log.error( "#{exp}" )
+      return 
     end
   end #run
 end
