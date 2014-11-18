@@ -2,7 +2,7 @@ $ROOT_PATH=ENV['ROOT_PATH'] if not $ROOT_PATH
 $: << "#{$ROOT_PATH}/activemq/"
 $: << "#{$ROOT_PATH}/model/"
 $: << "#{$ROOT_PATH}/db/"
-$: << "#{$ROOT_PATH}/revok/"
+$: << "#{$ROOT_PATH}/caroline/"
 
 require 'model.Bean.RunCase'
 require 'dao.activemq.RunCase'
