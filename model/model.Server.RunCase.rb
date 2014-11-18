@@ -10,8 +10,6 @@ require 'dao.psql.RunCase'
 require 'time'
 require 'revok'
 
-include Revok
-
 class RunCaseServer
   def initialize
     @default_option={
@@ -26,6 +24,9 @@ class RunCaseServer
     }
     @runCaseDaoActivemq=RunCaseDaoActivemq.new
     @runCaseDaoPsql=RunCaseDaoPsql.new
+    @framework=Revok::Framework.new
+    @framework.load_modules
+    @framework.init_modules
   end
 	
   def clean
@@ -35,7 +36,10 @@ class RunCaseServer
 	
   def run(runCase)
     begin
-      Revok.run_case(runCase)
+#      Revok.run_case(runCase)
+      executor = Revok::ModuleExecutor.new(runCase, @framework.modules)
+      executor.gen_exec_list_all
+      executor.execute
     rescue => exp
       puts $!
       puts "#{exp.backtrace.join("\n")}"
