@@ -3,9 +3,6 @@
 # Inject dangerous characters ' "  < > and their encoded forms through parameters in HTTP request, then check whether these dangerous characters are filtered in the response.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib/"
-
-require 'report.ut'
 require 'rex/socket'
 require 'rex/proto/http'
 require 'rex/text'
@@ -15,61 +12,69 @@ require 'rex/proto/ntlm/constants'
 require 'rex/proto/ntlm/utils'
 require 'rex/proto/ntlm/exceptions'
 require 'json'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/patterns.rb.ut.rb"
 
-require 'patterns.rb.ut'
-
-
-class XSSChecker
+class XSSChecker < Revok::Module
   include Patterns
-  include ReportUtils
 
-  def initialize(targetURL=$datastore['target'])
-    uri=URI(targetURL)
-    host=uri.host
-    port = uri.port
-    context = {}
-    ssl = (uri.scheme=='https'?true:false)
-    ssl_version = nil
-    proxies = nil
-    @conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
-    @target=targetURL
-    if $datastore==nil or $datastore['session']==nil
-      return nil
-    end
+  def initialize
+     info_register("XSS_checker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10,
+                              "detail" => "Inject dangerous characters \' \"  < > and their encoded forms through parameters in HTTP request, then check whether these dangerous characters are filtered in the response."})
   end
   
   def get_conn
     return @conn
   end
   
-  def redirect? code
+  def redirect?(code)
     [301, 302, 303, 307, 308].include?(code)
   end
 
   def run
+    begin
+      targetURL = @datastore['target']
+      uri = URI(targetURL)
+      host = uri.host
+      port = uri.port
+      context = {}
+      ssl = (uri.scheme == 'https'? true : false)
+      ssl_version = nil
+      proxies = nil
+      @conn = Rex::Proto::Http::Client.new(host, port, context, ssl, ssl_version, proxies)
+      @target = targetURL
+    rescue => exp
+      error
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
+      return
+    end
+    
     bad = Hash.new
     lists = Array.new
     checked = Array.new
     params = Array.new
     srcs = Array.new
 
-    data = JSON.parse($datastore['session'],{create_additions:false})
-    @cookie=data['cookie']
-    log "Filtering requests to do xssi test..."
+    data = JSON.parse(@datastore['session'], {create_additions:false})
+    @cookie = data['cookie']
+    Log.info("Filtering requests to do xssi test...")
 
     patterns = PATTERNS
-    dangers = ["'","\"","<",">"]
+    dangers = ["'", "\"", "<", ">"]
     counter = ('aaa'..'zzz').to_enum
 
-    conn=get_conn
+    conn = get_conn
 
-    data['snks'].each do |tck,details| 
+    data['snks'].each do |tck,details|
       params += details['params']
       srcs += details['srcs']
     end
     params.uniq!
     srcs.uniq!
-    patterns = PATTERNS[0,4] if srcs.size >5
+    patterns = PATTERNS[0, 4] if srcs.size > 5
 
     begin
       srcs.each do |src|
@@ -80,8 +85,8 @@ class XSSChecker
         req_url = req.lines.first.gsub(/HTTP.*?$/,"").strip
         url = req_url.gsub(/=[^&]*/,"=param")
 
-        if not req_url.include? URI(@target).host then next end
-        log "Checking: #{req_url}" 
+        next if not req_url.include?(URI(@target).host)
+        Log.info("Checking: #{req_url}")
 
         params.each do |prm_tck|
           threats = Array.new
@@ -98,17 +103,18 @@ class XSSChecker
           # avoid repeated injection
           next if checked.include? "#{url}; #{prm_k}"
           checked.push("#{url}; #{prm_k}")
-          log "\tChecking param #{prm_tck}:" 
+          Log.info("Checking param #{prm_tck}:")
 
           patterns.each do |pat|
             bracket = counter.next
             payload = "#{bracket}#{pat}#{bracket}"
             warhead = missile.gsub(missile[0, payload.size], payload)
-            req_sent = req.gsub(data['tags'][prm_tck],warhead)
+            req_sent = req.gsub(data['tags'][prm_tck], warhead)
             begin
-              resp = conn.send_recv(req_sent,30)
-            rescue
-              log "ERROR: #{$!}" 
+              resp = conn.send_recv(req_sent, 30)
+            rescue => exp
+              Log.error(exp.to_s)
+              Log.debug(exp.backtrace.join("\n"))
               next
             end
 
@@ -122,8 +128,9 @@ class XSSChecker
 
               begin
                 resp = conn.send_recv(req_sent,30)
-              rescue
-                log "ERROR: #{$!}" 
+              rescue => exp
+                Log.error(exp.to_s)
+                Log.debug(exp.backtrace.join("\n"))
                 next
               end
             end
@@ -131,22 +138,23 @@ class XSSChecker
             if resp != nil
               content = "#{resp.body}"
               content.scan(Regexp.new "#{bracket}.{1,1}#{bracket}").each do |mat|
-                dangers.each {|dngr| if mat.include? dngr then threats << dngr end}
+                dangers.each {|dngr| threats << dngr if mat.include?(dngr)}
               end
             end
           end #end of patterns
 
           threats.uniq!
-          log "\t\t#{threats.to_s}" if not threats.empty? 
-          if threats.size > 0 then ref[prm_k] = threats end
+          Log.info("#{threats.to_s}") if not threats.empty?
+          ref[prm_k] = threats if threats.size > 0
         end #end of params
 
-        if not ref.empty? then bad[url] = ref end
+        bad[url] = ref if not ref.empty?
       end #end of srcs
 
-    rescue => excep
+    rescue => exp
       error
-      log "ERROR: #{excep.to_s}" 
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
     end
 
     if not bad.empty?
@@ -161,7 +169,6 @@ class XSSChecker
     else
       abstain
     end
-    log "xssi is done"
+    Log.info("Cross-site scripting check is done")
   end
-
 end
