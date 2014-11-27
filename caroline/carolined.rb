@@ -29,11 +29,15 @@ begin
       if runCase
         $runCaseServer.ackRunCaseToQueue
         result=$runCaseServer.validate(runCase)
+        if(runCase.to_dict['type'] == "list_modules")
+          $runCaseServer.send_modules_list(runCase.to_dict['uid'])
+          next
+        end
         to_run << runCase if result
       end
     end
 
-    to_run.each do |run| 
+    to_run.each do |run|
       puts "Running scan #{run.id}..."
       Dir.chdir($CAROLINE_PATH) do 
         break unless active

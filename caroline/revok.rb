@@ -6,6 +6,7 @@ require_relative 'core/modules'
 require_relative 'core/module'
 require_relative 'core/framework'
 require_relative 'core/module_executor'
+require_relative 'core/activemq'
 require_relative 'core/utils'
 
 module Revok

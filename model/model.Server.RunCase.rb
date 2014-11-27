@@ -15,16 +15,16 @@ class RunCaseServer
     @default_option={
       "id"=>Time.now.to_f.to_s,
       "process"=>"----------",
-      "scanConfig"=>0,  
+      "scanConfig"=>0,
       "targetInfo"=>"",
-      "log"=>"",   
+      "log"=>"",
       "startTime"=>Time.now.to_i,
       "endTime"=>0,
       "requestor"=>"revok@example.com",
     }
     @runCaseDaoActivemq=RunCaseDaoActivemq.new
     @runCaseDaoPsql=RunCaseDaoPsql.new
-    @framework=Revok::Framework.new
+    @framework = Revok::Framework.new
     @framework.load_modules
     @framework.init_modules
   end
@@ -33,10 +33,25 @@ class RunCaseServer
     @runCaseDaoActivemq.clean
     @runCaseDaoPsql.clean
   end
+
+  def send_modules_list(uid = "")
+    list = ""
+    if (@framework)
+      list = @framework.modules.keys
+    end
+    msg = Hash.new
+    msg['type'] = "modules_list"
+    msg['uid'] = uid
+    msg['list'] = list
+    queue_client = Revok::ActiveMQClient.new
+    puts "Connecting to messages queue..."
+    queue_client.connect
+    puts "Publishing modules list"
+    queue_client.publish(JSON.generate(msg).to_s)
+  end
 	
   def run(runCase)
     begin
-#      Revok.run_case(runCase)
       executor = Revok::ModuleExecutor.new(runCase, @framework.modules)
       executor.gen_exec_list_all
       executor.execute

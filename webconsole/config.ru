@@ -116,6 +116,30 @@ map '/log' do
   run logs
 end
 
+map '/modules_list' do
+  list_modules = proc do |env|
+    begin
+      req = Rack::Request.new env
+      res = Rack::Response.new
+      res.header['Content-Type'] = 'application/json'
+      uid = req['uid']
+      uid = 'nil' if uid.nil?
+      uid = '' if uid.size != 36
+      http = $revok_http[]
+      request = Net::HTTP::Get.new("/moduleslist/#{uid}")
+      request.basic_auth($rest_username, $rest_password)
+      response = http.request(request)
+      res.status = response.code
+      res.write response.body
+    rescue =>exp
+      res.write $!
+      res.write "#{exp.backtrace.join("\n")}"
+    end
+    res.finish
+  end
+  run list_modules
+end
+
 map '/scan' do
   scan = proc do |env|
     req = Rack::Request.new env
