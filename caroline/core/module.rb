@@ -28,6 +28,9 @@ module Revok
 				info["group_priority"] = 10 if (!info.has_key?("group_priority"))
 				info["group_priority"] = 10 if ((info["group_name"] == "default") && (info["group_priority"] != 10))
 				info["priority"] = 10 if (!info.has_key?("priority"))
+				info["detail"] = "" if (!info.has_key?("detail"))
+				info["required"] = false if (!info.has_key?("required"))
+				info["required"] = false if (info["required"].class.name != "TrueClass" && info["required"].class.name != "FalseClass")
 
 				self.name = name
 				self.info = info

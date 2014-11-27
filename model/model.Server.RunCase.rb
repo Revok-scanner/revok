@@ -35,9 +35,13 @@ class RunCaseServer
   end
 
   def send_modules_list(uid = "")
-    list = ""
+    list = Hash.new
     if (@framework)
-      list = @framework.modules.keys
+      @framework.modules.each do |key, _module|
+        if (!_module.info['required'])
+          list[key] = _module.info['detail']
+        end
+      end
     end
     msg = Hash.new
     msg['type'] = "modules_list"
