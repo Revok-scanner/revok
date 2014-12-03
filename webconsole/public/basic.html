@@ -15,12 +15,16 @@
             <span class="user-info-error" ng-show="state.valid_user">Username can not be empty</span>
           </div>
           <div ng-class="password_input">
-            <input class="form-control login-field" size="25" type="password" ng-model="state.password" placeholder="Password"/>
+            <input ng-show="showpwd" class="form-control login-field" size="25" type="text" ng-model="state.password" placeholder="Password"/>
+            <input ng-hide="showpwd" class="form-control login-field" size="25" type="password" ng-model="state.password" placeholder="Password"/>
           </div>
           <div ng-class="password_input">
-            <input class="form-control login-field" size="25" type="password" ng-model="state.repeated"  placeholder="Confirm Password"/>
+            <input ng-show="showpwd" class="form-control login-field" size="25" type="text" ng-model="state.repeated"  placeholder="Confirm Password"/>
+            <input ng-hide="showpwd" class="form-control login-field" size="25" type="password" ng-model="state.repeated"  placeholder="Confirm Password"/>
             <span class="user-info-error" ng-show="state.valid_pass">Passwords do not match</span>
           </div>
+          <input id="showcheckbox" type="checkbox" ng-model="showpwd" ng-checked="false">
+          <label for="showcheckbox">Show passwords</label>
         </center>
       </div>
     </form>

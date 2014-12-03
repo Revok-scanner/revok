@@ -1,0 +1,18 @@
+<div class="ngdialog-message">
+	<h2>The modules will be run</h2>
+	<hr />
+	<div ng-hide="hide_ani">
+		<img id="spinner_img" src="../imgs/ajax-loader.gif" style="padding-left: 180px; padding-bottom: 10px;"/>
+	</div>
+	<div ng-repeat="module in modules">
+		<label>
+			<input type="checkbox" checklist-model="choose.modules" checklist-value="module">
+			<a ng-model="collapsed" ng-click="collapsed=!collapsed">{{module.name}}</a>
+		</label>
+		<p ng-show="collapsed">{{module.detail}}</p>
+	</div>
+</div>
+<div class="ngdialog-buttons">
+	<button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog()">Close</button>
+	<button ng-disabled="loaded" type="button" class="ngdialog-button" ng-click="moduleConfirm()">Ok</button>
+</div>

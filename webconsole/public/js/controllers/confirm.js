@@ -1,7 +1,10 @@
-revok.controller('confirmController', function($scope,$http) {
+revok.controller('confirmController', function($scope,$http,ngDialog) {
    $scope.state.confirm = false; 
    $scope.confirm_button_style = "btn-next btn-disable"; 
-   $scope.icon_style = "btn-icon icon2-paperplane"
+   $scope.icon_style = "btn-icon icon2-paperplane";
+   $scope.hide_ani = false;
+   $scope.loaded = true;
+   var dialog;
 
    function check() {
      if($scope.state.confirm == false){
@@ -34,5 +37,36 @@ revok.controller('confirmController', function($scope,$http) {
    };
  
    $scope.check = check;
-   
+
+   $scope.openModuleDialog = function () {
+     if (!$scope.modules) {
+       $http.get('/modules_list')
+       .success(function(data, status, headers, config) {
+         $scope.modules = data;
+         $scope.choose = {
+           modules: angular.copy($scope.modules)
+         };
+         $scope.hide_ani = true;
+         $scope.loaded = false;
+       });
+     } else {
+       $scope.loaded = false;
+     }
+     dialog = ngDialog.open({template: "module_dialog.html", scope: $scope});
+   };
+
+   $scope.moduleConfirm = function () {
+     var i;
+     var modules = new Array();
+     if ($scope.modules.length == $scope.choose.modules.length) {
+       $scope.state.modules = ['all'];
+       ngDialog.close(dialog.id);
+       return;
+     }
+     for (i in $scope.choose.modules) {
+       modules[i] = $scope.choose.modules[i].name;
+     }
+     $scope.state.modules = modules;
+     ngDialog.close(dialog.id);
+   };
 });

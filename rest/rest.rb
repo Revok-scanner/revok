@@ -12,11 +12,10 @@ module Rest
 
 class APIServlet < WEBrick::HTTPServlet::AbstractServlet
 
-  def initialize(server)
+  def initialize(server, queue_client)
     super server
     @runCaseServer = RunCaseServer.new
-    @queue_client = ActiveMQClient.new
-    @queue_client.connect
+    @queue_client = queue_client
   end
 
   def route(req, rsp)
@@ -142,8 +141,10 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
           msg_back = JSON.generate(msg_back)
         rescue
           msg_back = nil
-        end       
+        end
         break
+      else
+        msg_back = nil
       end
       sleep(2)
     end

@@ -35,11 +35,14 @@ class RunCaseServer
   end
 
   def send_modules_list(uid = "")
-    list = Hash.new
+    list = Array.new
     if (@framework)
       @framework.modules.each do |key, _module|
         if (!_module.info['required'])
-          list[key] = _module.info['detail']
+          info = Hash.new
+          info['name'] = key
+          info['detail'] = _module.info['detail']
+          list << info
         end
       end
     end
@@ -57,7 +60,11 @@ class RunCaseServer
   def run(runCase)
     begin
       executor = Revok::ModuleExecutor.new(runCase, @framework.modules)
-      executor.gen_exec_list_all
+      if (runCase.modules.include?('all'))
+        executor.gen_exec_list_all
+      else
+        executor.gen_exec_list(runCase.modules)
+      end
       executor.execute
     rescue => exp
       puts $!

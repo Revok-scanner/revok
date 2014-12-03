@@ -71,7 +71,7 @@ class ActiveMQClient
 			return false if (@connection == nil)
 			if (!msg.body.empty?)
 				@received_msg << msg
-				@connection.ack(msg['message-id'])				
+				@connection.ack(msg)
 			end
 		end
 end

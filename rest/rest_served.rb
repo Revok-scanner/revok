@@ -19,7 +19,9 @@ s = WEBrick::HTTPServer.new(
 #  :SSLPrivateKey => pkey,
 )
 
-s.mount('/',Revok::Rest::APIServlet)
+queue_client = Revok::Rest::ActiveMQClient.new
+queue_client.connect
+s.mount('/', Revok::Rest::APIServlet, queue_client)
 
 ['TERM','INT'].each do |signal|
   trap(signal) do

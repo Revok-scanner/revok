@@ -2,7 +2,7 @@ angular.element(document).ready(function() {
      angular.bootstrap(document,['Revok']);
    });
 
-var revok = angular.module('Revok',[]);
+var revok = angular.module('Revok',['ngDialog', 'checklist-model']);
 revok.config(['$routeProvider', function($routeProvider) {
     $routeProvider.otherwise({redirectTo:'/'});
     $routeProvider.when('/',{templateUrl:'welcome.html'});

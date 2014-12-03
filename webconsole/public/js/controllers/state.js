@@ -1,4 +1,4 @@
-revok.controller('stateController',function($scope,$location) {
+revok.controller('stateController',function($scope,$location,ngDialog) {
 
     $scope.root = "";
 
@@ -34,6 +34,7 @@ revok.controller('stateController',function($scope,$location) {
       },
       login_message:"",
       auto_detect:false,
+      modules:["all"]
     };
 
     $scope.action = {

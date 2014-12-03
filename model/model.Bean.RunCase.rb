@@ -11,6 +11,7 @@ class RunCase
       @endTime=idOrDict['endTime']
       @requestor=idOrDict['requestor']
       @type = idOrDict['type']
+      @modules = idOrDict['modules']
     end
   end
 
@@ -26,11 +27,16 @@ class RunCase
     runDict['requestor']=@requestor if @requestor
     runDict['type']=@type if @type
     runDict['uid']=@uid if @uid
+    runDict['modules'] = @modules if @modules
     return runDict
   end
 
   def id
     @id
+  end
+
+  def modules
+    @modules
   end
 
   def process

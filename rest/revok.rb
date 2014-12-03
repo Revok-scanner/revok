@@ -1,6 +1,7 @@
 require_relative 'rest'
 require_relative 'config'
 require_relative 'mono_logger'
+require_relative 'activemq'
 
 module Revok
 module Rest

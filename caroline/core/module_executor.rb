@@ -37,6 +37,39 @@ module Revok
 			}
 		end
 
+		def gen_exec_list(modules)
+			@exec_list.clear
+			if (self.modules.empty?)
+				raise RuntimeError, "No any instance of modules", caller
+			end
+			if (modules.include?("Photographer"))
+				instance = self.modules["Photographer"]
+				module_info = [instance.name,
+								instance.info["group_name"],
+								instance.info["group_priority"],
+								instance.info["priority"]]
+				@exec_list.push(module_info)
+				return
+			end
+
+			self.modules.each {|_module|
+				instance = _module[1]
+				module_info = [instance.name,
+								instance.info["group_name"],
+								instance.info["group_priority"],
+								instance.info["priority"]]
+				if (modules.include?(module_info[0]))
+					@exec_list.push(module_info)
+				end
+				if (module_info[1] == "system")
+					@exec_list.push(module_info)
+				end
+			}
+			@exec_list.sort_by! {|name, g_name, g_priority, priority|
+				[g_priority, priority]
+			}
+		end
+
 		def execute
 			if (self.exec_list.empty?)
 				Log.warn("Run ID #{@datastore['run_id']}: the execute list is empty, nothing to do")

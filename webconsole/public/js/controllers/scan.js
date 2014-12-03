@@ -25,6 +25,7 @@ revok.controller('scanController', function($scope,$http) {
         username:$scope.state.username,
         password:$scope.state.password,
         email:$scope.state.email,
+        modules:$scope.state.modules
       };
       if ($scope.state.has_whitelist) {
         config['whitelist'] = $scope.state.whitelist;

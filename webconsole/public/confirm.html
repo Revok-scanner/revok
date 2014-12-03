@@ -25,6 +25,13 @@
           <td>Login Username</td>
           <td><span ng-show="state.logtype != 'none' && state.username.length > 0"><b>{{state.username}}</b></span><span ng-show="state.logtype == 'none' || state.username.length == 0"><b>None</b></span></td>
         </tr>
+        <tr>
+          <td>Modules</td>
+          <td>
+            <span ng-show="state.modules.toString() == 'all'"><b>All</b><sub>not all moudles? <a href="" ng-click="openModuleDialog()">Custom here</a></sub></span>
+            <span ng-show="state.modules.toString() != 'all'"><b>Portion</b><sub><a href="" ng-click="openModuleDialog()">Custom here</a></sub></span>
+          </td>
+        </tr>
       </tbody>
     </table>
 

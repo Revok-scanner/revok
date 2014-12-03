@@ -122,9 +122,7 @@ map '/modules_list' do
       req = Rack::Request.new env
       res = Rack::Response.new
       res.header['Content-Type'] = 'application/json'
-      uid = req['uid']
-      uid = 'nil' if uid.nil?
-      uid = '' if uid.size != 36
+      uid = `uuidgen`.chomp
       http = $revok_http[]
       request = Net::HTTP::Get.new("/moduleslist/#{uid}")
       request.basic_auth($rest_username, $rest_password)
@@ -146,11 +144,13 @@ map '/scan' do
     res = Rack::Response.new
     res.header['Content-Type'] = 'application/json'
     begin
-      config = Base64.encode64(JSON.dump(JSON.parse(req.body.read, {:create_additions=>false}))).split("\n").join('')
+      config = JSON.parse(req.body.read, {:create_additions=>false})
+      modules = config['modules']
+      config = Base64.encode64(JSON.dump(config)).split("\n").join('')
       uid = `uuidgen`.chomp
 
       conf = <<-conf
-{"id":"#{uid}","scanConfig":-2,"targetInfo":"#{config}"}
+{"id":"#{uid}","scanConfig":-2,"modules":#{modules},"targetInfo":"#{config}"}
 conf
 
       http = $revok_http[]
