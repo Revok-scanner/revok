@@ -1,22 +1,27 @@
 require 'open3'
 require 'json'
+require 'core/module'
 
-class Photographer
+class Photographer < Revok::Module
   
-  def initialize(url=nil)
-    if url
-      @url=url 
-    else
-      @url=(JSON.parse($datastore['config'], {create_additions:false}))['target']
-    end
-    
+  def initialize
+    info_register("Photographer", {"group_name" => "screenshot",
+                                "group_priority" => 100,
+                                "priority" => 1,
+                                "required" => true})
   end
 
     
-  def shot
+  def run
+    begin
+      @url=(JSON.parse($datastore['config'], {create_additions:false}))['target']
+    rescue => exp
+       Log.error("#{exp}")
+       return
+    end
     result = "FAIL"
     filename = "/tmp/" + `uuidgen`.chomp + '.png'
-    log "Generating screenshot of the login page..."
+    Log.info("Generating screenshot of the login page...")
 
     shot_in, shot_out, shout_err = Open3.popen3("phantomjs --ignore-ssl-errors=true --ssl-protocol=any #{File.dirname(__FILE__)}/js/longshot.js #{filename} 25000")
     shot_in.puts "#{@url}"
@@ -29,10 +34,10 @@ class Photographer
       base_in, base_out, base_err = Open3.popen3("base64 #{filename}")
       payload = base_out.read.split("\n").join('')
       [base_in, base_out, base_err].each {|pipe| pipe.close}
-      log "----screenshot\n#{payload}\n----screenshot\n"
+      Log.info("----screenshot\n#{payload}\n----screenshot\n")
     end
     system("rm -rf #{filename}")
-    log "ERROR: #{filename} cannot be removed" if File.exists?("#{filename}")
+    Log.error("ERROR: #{filename} cannot be removed" if File.exists?("#{filename}"))
   end
 
 end
