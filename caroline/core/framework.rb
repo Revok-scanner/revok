@@ -38,8 +38,8 @@ module Revok
 
 				return true
 			rescue RuntimeError => exp
-				# Temporary function to output
 				Log.error(exp.to_s)
+				Log.debug(exp.backtrace.join("\n"))
 			end
 		end
 
@@ -69,8 +69,8 @@ module Revok
 					raise NameError, "#{instance.class.name} is a invalid module definition", caller
 				end
 			rescue NameError, NotImplementedError, ArgumentError => exp
-				# Temporary function to output
 				Log.error(exp.to_s)
+				Log.debug(exp.backtrace.join("\n"))
 			end
 		end
 

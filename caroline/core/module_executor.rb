@@ -82,14 +82,19 @@ module Revok
 				@datastore['start'] = `date`.slice(0..-2)
 			rescue => exp
 				Log.error("Run ID #{@datastore['run_id']}: invalid config")
-				Log.debug("#{exp.backtrace}")
+				Log.debug(exp.backtrace.join("\n"))
 				return false
 			end
 			Log.info("Try to execute modules")
 			self.exec_list.each {|name, g_name, g_priority, priority|
 				Log.info("Run #{name} (priority: #{priority}, group name: #{g_name}, group priority: #{g_priority})")
 				modules[name].datastore = @datastore
-				modules[name].run
+				begin
+					modules[name].run
+				rescue => exp
+					Log.error("Module #{name} executed error")
+					Log.debug(exp.backtrace.join("\n"))
+				end
 			}
 			return true
 		end
