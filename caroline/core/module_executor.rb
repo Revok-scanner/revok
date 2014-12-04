@@ -30,7 +30,7 @@ module Revok
 								instance.info["group_name"],
 								instance.info["group_priority"],
 								instance.info["priority"]]
-				@exec_list.push(module_info)
+				@exec_list.push(module_info) if (instance.name != "Photographer")
 			}
 			@exec_list.sort_by! {|name, g_name, g_priority, priority|
 				[g_priority, priority]
@@ -62,6 +62,9 @@ module Revok
 					@exec_list.push(module_info)
 				end
 				if (module_info[1] == "system")
+					@exec_list.push(module_info)
+				end
+				if (module_info[1] == "reportor")
 					@exec_list.push(module_info)
 				end
 			}

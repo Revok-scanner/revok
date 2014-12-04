@@ -46,6 +46,9 @@ module Revok
 		def load_module(path, filename)
 			file = File.read(path + filename)
 			Revok::Modules.module_eval file
+			class_name = Revok::Modules.constants.last
+			symbol = Revok::Modules.const_get(class_name)
+			symbol.const_set("FILE_NAME", File.basename(filename, ".rb"))
 			self.modules_loaded.push(File.basename(filename, ".rb"))
 		end
 
