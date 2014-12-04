@@ -43,16 +43,9 @@ class ActiveMQClient
 		@connection.publish(Config::RETURN_QUEUE, msg, {persistent:false,expires:(Time.now.to_i*1000)+(259200*1000),'amq-msg-type'=>'text'})
 	end
 
-	def get_return_msg
-		return false if (@connection == nil)
-		msg = @connection.reveive
-		@connection.ack(msg["message-id"]) if msg
-		return msg.body
-	end
-
 	def disconnect
 		if @connection
-			@connection.disconnect if !@connection.closed?
+			@connection.close if !@connection.closed?
 		end
 	end
 

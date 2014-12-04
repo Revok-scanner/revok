@@ -76,11 +76,12 @@ module Revok
 
 		def execute
 			@datastore['timestamp'] = Time.now.strftime('%Y%m%d%H%M%S')
-			add_user_logger()
 			if (self.exec_list.empty?)
 				Log.warn("Run ID #{@datastore['run_id']}: the execute list is empty, nothing to do")
 				return false
 			end
+			screenshot = self.exec_list.select {|name, g_name, g_priority, priority| name == "Photographer"}
+			add_user_logger() if (screenshot.empty?)
 			begin
 				config_json = Base64.decode64(@datastore['config'])
 				config = JSON.parse(config_json,{create_additions:false})
@@ -91,6 +92,7 @@ module Revok
 				Log.debug(exp.backtrace.join("\n"))
 				return false
 			end
+			Log.info("Running scan #{@datastore['run_id']}...")
 			Log.info("Try to execute modules")
 			self.exec_list.each {|name, g_name, g_priority, priority|
 				Log.info("Run #{name} (priority: #{priority}, group name: #{g_name}, group priority: #{g_priority})")

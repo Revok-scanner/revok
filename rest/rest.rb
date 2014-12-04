@@ -14,8 +14,17 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
 
   def initialize(server, queue_client)
     super server
-    @runCaseServer = RunCaseServer.new
+    silence_warnings { @runCaseServer = RunCaseServer.new }
     @queue_client = queue_client
+  end
+
+  # Ignore redefine warning temporarily, will be removed next version
+  def silence_warnings(&block)
+    warn_level = $VERBOSE
+    $VERBOSE = nil
+    result = block.call
+    $VERBOSE = warn_level
+    result
   end
 
   def route(req, rsp)
@@ -175,13 +184,32 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
     @path =~ /\/reports\/([a-z0-9\-_]*)/
     id = $1
 
-    runCase = @runCaseServer.loadRunCaseFromDBByID(id)
+    msg_back = @queue_client.received_msg.select do |msg|
+      body = JSON.parse(msg.body, {create_additions:false})
+      body['uid'] == id
+    end
+     f (!msg_back.empty?)
+      @queue_client.received_msg.reject! do |msg|
+        body = JSON.parse(msg.body, {create_additions:false})
+        body['uid'] == id && body['type'] == "screenshot"
+      end
+      Log.debug("Messages cache: #{@queue_client.received_msg}")
+      begin
+        msg_back = JSON.parse(msg_back.last.body, {create_additions:false})
+        msg_back = msg_back['img']
+      rescue
+        msg_back = nil
+      end
+    else
+      msg_back = nil
+    end
 
-    if runCase.nil? or runCase.log == ""
+    if (msg_back)
+      @body.puts msg_back
+      @code, @mime = 200, 'text/plain'
+    else
       @body.puts "404: Not found."
       @code, @mime = 404, 'text/plain'
-    else
-      @body.puts runCase.log
     end
 
   end
