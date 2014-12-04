@@ -8,10 +8,12 @@ require_relative 'core/framework'
 require_relative 'core/module_executor'
 require_relative 'core/activemq'
 require_relative 'core/utils'
+require_relative 'core/multilogger'
 
 module Revok
 
-	Log = Logger.new(STDOUT)
+	Log = MultiLogger.new
+	Log.add_logger(Logger.new(STDOUT))
 	case ENV['LOG']
 		when "info"
 			Log.level = Logger::INFO

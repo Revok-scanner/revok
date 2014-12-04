@@ -25,6 +25,8 @@ module Revok
 							load_module(path, filename)
 						rescue IOError, NameError, SyntaxError
 							self.load_error_modules.push(path + filename)
+							Log.debug(exp.to_s)
+							Log.debug(exp.backtrace.join("\n"))
 						end
 					}
 				else

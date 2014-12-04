@@ -17,6 +17,7 @@ module Revok
 			@datastore['log'] = run_case.log
 			@datastore['start'] = run_case.startTime
 			@datastore['end'] = run_case.endTime
+			@log_file = nil
 		end
 
 		def gen_exec_list_all
@@ -74,6 +75,8 @@ module Revok
 		end
 
 		def execute
+			@datastore['timestamp'] = Time.now.strftime('%Y%m%d%H%M%S')
+			add_user_logger()
 			if (self.exec_list.empty?)
 				Log.warn("Run ID #{@datastore['run_id']}: the execute list is empty, nothing to do")
 				return false
@@ -99,6 +102,7 @@ module Revok
 					Log.debug(exp.backtrace.join("\n"))
 				end
 			}
+			close_user_logger()
 			return true
 		end
 
@@ -106,6 +110,30 @@ module Revok
 		attr_accessor	:modules, :datastore
 
 		private
+
+			def add_user_logger
+				path = File.expand_path("report", Revok::ROOT_PATH)
+				begin
+					Dir.mkdir(path) if (!Dir.exist?(path))
+					filename = File.expand_path("#{@datastore['timestamp']}_log.txt", path)
+					@log_file = File.open(filename, File::WRONLY | File::APPEND | File::CREAT)
+					@datastore['log_path'] = path
+					logger = Logger.new(@log_file)
+					Log.add_logger(logger)
+				rescue => exp
+					Log.error(exp.to_s)
+					Log.debug(exp.backtrace.join("\n"))
+				end
+			end
+
+			def close_user_logger
+				begin
+					Log.close_user_logger
+					@log_file.close if (@log_file)
+				rescue IOError
+					#ignore any IO error
+				end
+			end
 
 			attr_writer		:exec_list
 	end
