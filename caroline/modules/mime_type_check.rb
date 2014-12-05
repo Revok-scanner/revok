@@ -2,31 +2,28 @@
 # MIME Type Checking Module
 # Check whether nosniff header is set. And find reponses whose actual contect type is mismatched with the defined one.
 #
-
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'base64'
 require 'nokogiri'
 require 'rkelly'
 require 'json'
 require 'net/http'
+require 'core/module'
 
-class MimeTypeChecker
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+class MimeTypeChecker < Revok::Module
+
+  def initialize(load_from_file = false, session_file = "")
+    info_register("MimeType_checker", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10,
+                              "detail" => "Check whether nosniff header is set. And find reponses whose actual contect type is mismatched with the defined one."})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
@@ -43,7 +40,7 @@ class MimeTypeChecker
   end
 
   def detect_xml(resp_body)
-    error=Nokogiri::XML.parse(resp_body).errors
+    error = Nokogiri::XML.parse(resp_body).errors
     if error == []
       return true
     else
@@ -80,15 +77,15 @@ class MimeTypeChecker
     content_type = /\r\n(Content-Type:.*?)\r\n/.match(resp).to_s.strip
 
     if content_type.include? "text/html" and detect_html(resp_body) == false
-      log "Actual content type mismatchs with html: #{req}"
-    elsif content_type.scan(/\/xml/)!=[] and detect_xml(resp_body)==false
-      log "Actual content type mismatchs with xml: #{req}"
-    elsif content_type.scan(/\/javascript|\/x-javascript/)!=[] and detect_js(resp_body)==false
-      log "Actual content type mismatchs with javascript: #{req}"
-    elsif content_type.scan(/\/json/)!=[] and detect_json(resp_body)==false
-      log "Actual content type mismatchs with json: #{req}"
-    elsif content_type.include? "text/plain" and detect_html(resp_body)|detect_js(resp_body)|detect_xml(resp_body)|detect_json(resp_body)==true
-      log "Actual content type mismatchs with plain: #{req}"
+      Log.warn("Actual content type mismatchs with html: #{req}")
+    elsif content_type.scan(/\/xml/) != [] and detect_xml(resp_body) == false
+      Log.warn("Actual content type mismatchs with xml: #{req}")
+    elsif content_type.scan(/\/javascript|\/x-javascript/)!=[] and detect_js(resp_body) == false
+      Log.warn("Actual content type mismatchs with javascript: #{req}")
+    elsif content_type.scan(/\/json/) != [] and detect_json(resp_body) == false
+      Log.warn("Actual content type mismatchs with json: #{req}")
+    elsif content_type.include? "text/plain" and detect_html(resp_body)|detect_js(resp_body)|detect_xml(resp_body)|detect_json(resp_body) == true
+      Log.warn("Actual content type mismatchs with plain: #{req}")
     else
       return
     end
@@ -96,15 +93,17 @@ class MimeTypeChecker
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    config = @datastore['config']
     sniff_urls = Array.new()
     report = Array.new()
     @mismatch_report = Array.new()
     aff_url = String.new
 
-    log "Checking for nosniff header and mismatched content type..."
+    Log.info("Checking for nosniff header and mismatched content type...")
     begin
       session = JSON.parse(@session_data, {create_additions:false})
-      config = JSON.parse(@config, {create_additions:false})
+      config = JSON.parse(config, {create_additions:false})
       requests = session['requests']
       responses = session['responses']
       domain = URI(config['target']).host
@@ -133,9 +132,10 @@ class MimeTypeChecker
       sniff_urls.unshift("URLs without nosniff response header. Number of pages: #{sniff_urls.size}") if sniff_urls != []
       @mismatch_report.unshift("Actual content type is mismatched with Content-Type header. Number of pages: #{@mismatch_report.size}") if @mismatch_report != []
       report = sniff_urls + @mismatch_report
-    rescue => excep
+    rescue => exp
       error
-      log excep.to_s 
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
     end
 
     if report == []
@@ -145,12 +145,11 @@ class MimeTypeChecker
         k = k.gsub(/POST/, "POST request for").gsub(/GET/, "GET request for")
         list("#{k}")
       end
-      num=@mismatch_report.size+sniff_urls.size
-      if @mismatch_report.size != 0 then num=num-1 end
-      if sniff_urls.size != 0 then num=num-1 end
+      num = @mismatch_report.size + sniff_urls.size
+      num = num - 1 if @mismatch_report.size != 0
+      num = num - 1 if sniff_urls.size != 0
       advise({ "num" => num })
     end
-    log "mime_type_check is done"
+    Log.info("mime_type_check is done")
   end
-
 end
