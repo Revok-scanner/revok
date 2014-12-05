@@ -14,7 +14,7 @@ class AdminAccessor < Revok::Module
   def initialize(load_from_file = false, session_file="", flag='s')
     info_register("Access_admin_pages", {"group_name" => "default",
                               "group_priority" => 10,
-                              "detail" => "Send HTTP requests with common administrative URIs to check whether these pages can be accessed by the provides user account."
+                              "detail" => "Send HTTP requests with common administrative URIs to check whether these pages can be accessed by the provides user account.",
                               "priority" => 10})
     if(load_from_file)
       @session_data = File.open(session_file).read
