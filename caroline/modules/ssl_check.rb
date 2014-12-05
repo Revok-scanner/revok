@@ -98,7 +98,7 @@ class SSLChecker < Revok::Module
       finalize
     end
 
-    if ssl_report! = nil && ssl_report.length > 0
+    if ssl_report != nil && ssl_report.length > 0
       advise({"ssl_report" => ssl_report})
     else
       abstain
