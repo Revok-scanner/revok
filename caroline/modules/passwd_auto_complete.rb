@@ -7,10 +7,8 @@ require 'open-uri'
 require 'json'
 require 'openssl'
 require 'core/module'
-require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
 
 class PasswordAutoCompleteChecker < Revok::Module
-  include ReportUtils
   def initialize
     info_register("Password_auto_complete_checker", {"group_name" => "default",
                                 "group_priority" => 10,
@@ -35,8 +33,8 @@ class PasswordAutoCompleteChecker < Revok::Module
     issues = []
     target = ""
     begin
-      @config = @datastore['config']
-      config = JSON.parse(@config, {create_additions:false})
+      config = @datastore['config']
+      config = JSON.parse(config, {create_additions:false})
       if config['logtype'] == "normal"
         target = config['login']
         Log.info("Access login page #{target}")
