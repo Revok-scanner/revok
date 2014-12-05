@@ -1,10 +1,8 @@
 #
 # Redirection Module
-# Check whether redirection of designed patterns exists in location of 30x response, refresh header, meta label or js..
+# Check whether redirection of designed patterns exists in location of 30x response, refresh header, meta label or js.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib/"
-require 'report.ut'
 require 'webrick'
 require 'stringio'
 require 'json'
@@ -17,27 +15,28 @@ require 'rex/proto/ntlm/constants'
 require 'rex/proto/ntlm/utils'
 require 'rex/proto/ntlm/exceptions'
 
+class RedirChecker < Revok::Module
 
-class RedirChecker
-  include ReportUtils
-  def initialize(config=$datastore['config'],session_data=$datastore['session'],flag='s')
-    @config=config
-    if flag=='f'
+  def initialize(load_from_file = false, session_file = "")
+    info_register("Redirection", {"group_name" => "default",
+                              "group_priority" => 10,
+                              "priority" => 10,
+                              "detail" => "Check whether redirection of designed patterns exists in location of 30x response, refresh header, meta label or js."})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log "ERROR: #{exp.to_s}" 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug(exp.backtrace.join("\n"))
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    @config = @datastore['config']
+    config = JSON.parse(@config, {create_additions:false})
     abstain
     @expected = "http://revok.example.com"
     payloads = [
@@ -51,13 +50,13 @@ class RedirChecker
     
     def EV(*arg)
       @ev = "[Evidence] #{arg[0]}"
-      log @ev 
+      Log.info @ev
     end
 
     def _30x_redir(resp)
       if resp.headers['location']!=nil
         if resp.headers['location'].downcase.start_with? @expected
-          log "Redir detected via location header" 
+          Log.info "Redir detected via location header"
           EV "Location: #{resp.headers['location']}"
           return true
         end
@@ -71,7 +70,7 @@ class RedirChecker
       if resp.headers['refresh']!=nil
         url = resp.headers['refresh'].split('=')[1]
         if url.start_with? @expected
-          log "Redir detected via refresh header" 
+          Log.info "Redir detected via refresh header"
           EV resp.headers['refresh']
           return true
         end
@@ -86,7 +85,7 @@ class RedirChecker
       resp.body.scan(/<meta.*url=([^"]*)/) do |matched|
         url = matched[0]
         if url.start_with? @expected
-          log "Redir detected via meta tag" 
+          Log.info "Redir detected via meta tag"
           #p resp.body[/<meta.*url.*>/]
           EV $~
           return true
@@ -106,7 +105,7 @@ class RedirChecker
           url = matched_loc[0]
 
           if url.start_with? @expected
-            log "Redir detected via javascript" 
+            Log.info "Redir detected via javascript"
             EV $~
             return true
           end
@@ -133,7 +132,7 @@ class RedirChecker
       #   [{ :id => snks/id, :req => requests, :resp => responses, :tag => tag }, ...]
       #
       
-      log "Fetching requests to test from session data..." 
+      Log.info "Fetching requests to test from session data..."
       array = []
       @data['snks'].each do |tck,details|
         details['params'].each do |prm_tck|
@@ -191,7 +190,7 @@ class RedirChecker
       @data = JSON.parse(@session_data, {create_additions:false})
       @config = JSON.parse(@config, {create_additions:false})
       if @data.nil?
-        log "datastore['SESSION'] is nil"
+        Log.error "datastore['SESSION'] is nil"
         return
       end
       uri=URI(@config['target'])
@@ -201,7 +200,7 @@ class RedirChecker
       ssl = (uri.scheme=='https'?true:false)
       ssl_version = nil
       proxies = nil
-      conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
+      conn = Rex::Proto::Http::Client.new(host, port, context, ssl, ssl_version, proxies)
 
       test_reqs = get_user_inf_reqs
 
@@ -209,7 +208,7 @@ class RedirChecker
       # p test_reqs.map{|x|x[]}
 
       test_reqs.each do |t|
-        log "Testing #{t[:id]}"
+        Log.info "Testing #{t[:id]}"
         id_report_done = false
 
         next if not is_to_be_tested(t)
@@ -231,8 +230,9 @@ class RedirChecker
 
           begin
             resp = conn.send_recv(req,30)
-          rescue
-            log "ERROR: #{$!}" 
+          rescue => exp
+            Log.error(exp.to_s)
+            Log.debug(exp.backtrace.join("\n"))
           end
 
           if not resp
@@ -240,7 +240,7 @@ class RedirChecker
             next
           end
 
-          if _30x_redir(resp) or _refresh_redir(resp) or  _meta_redir(resp) or _js_redir(resp)
+          if _30x_redir(resp) or _refresh_redir(resp) or _meta_redir(resp) or _js_redir(resp)
             if not id_report_done
               id_report_done = true
 
@@ -255,11 +255,13 @@ class RedirChecker
       end 
 
       if not @affected_urls.empty?
-        warn({'urls'=>@affected_urls})
+        warn({'urls' => @affected_urls})
       end
-    rescue =>exp
+    rescue => exp
       error
-      log "ERROR: #{exp}" 
+      Log.error(exp.to_s)
+      Log.debug(exp.backtrace.join("\n"))
     end
+    Log.info("Redirection check completed")
   end
 end
