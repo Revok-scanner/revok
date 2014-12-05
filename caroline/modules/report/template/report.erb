@@ -27,7 +27,7 @@
                 </div>
                 <div class="entry">
                     <table style="margin-left:0px;font-style: italic;font-size:100%;">
-                        <tr><td align="left">Version:</td><td align="left">0.7</td></tr>
+                        <tr><td align="left">Version:</td><td align="left">0.8</td></tr>
                         <tr><td align="left">Target URL:</td><td align="left"><a href="<%= "#{report.config['target']}" %> " target="_blank"><%= "#{report.config['target']}" %></a></td></tr>
                         <tr><td align="left">Start Time:</td><td align="left"><%= "#{report.datastore['start']}" %></td></tr>
                         <tr><td align="left">Finish Time:</td><td align="left"><%= "#{`date`.slice(0..-2)}" %></td></tr>
@@ -154,18 +154,6 @@
                 </section>
             <%  end %>
 
-            <section id="log_section" class="section" style="display:block">
-                <div class="title">
-                    <h3 class="purpleheader">Scan Log</h3>
-                </div>
-                <div class="desc">
-                    <p>You can see the full log for your scan here:
-                        <a target="_blank" href="http://<%= ENV["HOSTNAME"] %>:<%= ENV["WEB_PORT"] %>/log?uid=<%= "#{report.datastore['RUN_ID']}" %>">
-                            http://<%= ENV["HOSTNAME"] %>:<%= ENV["WEB_PORT"] %>/log?uid=<%= "#{report.datastore['RUN_ID']}" %>
-                        </a>
-                    </p>
-                </div>
-            </section>
         </div>
 
         <div id="shangxia" >
