@@ -122,7 +122,7 @@ module CORS
         url = URI.escape(url.to_s)
         uri = URI.parse("#{url}")
       rescue
-        log "Cannot parse URL: " + url.to_s 
+        Log.warn("Cannot parse URL: " + url.to_s)
         next
       end
 
@@ -189,7 +189,7 @@ module CORS
         begin
           res = http.request(request)
         rescue
-          log "ERROR: #{tck.to_s} #{$!}"  
+          Log.error("ERROR: #{tck.to_s} #{$!}")
           n = n + 1
           if n == len
             return "error", "error"
