@@ -6,12 +6,10 @@ require 'json'
 require 'rex'
 require 'typhoeus'
 require 'core/module'
-require "#{Revok::Config::MODULES_DIR}/lib/report.ut.rb"
 require "#{Revok::Config::MODULES_DIR}/lib/admin_url.rb"
 
 class AdminAccessor < Revok::Module
   include AdminURLs
-  include ReportUtils
 
   def initialize(load_from_file = false, session_file="", flag='s')
     info_register("Access_admin_pages", {"group_name" => "default",
@@ -19,9 +17,9 @@ class AdminAccessor < Revok::Module
                               "detail" => "Send HTTP requests with common administrative URIs to check whether these pages can be accessed by the provides user account."
                               "priority" => 10})
     if(load_from_file)
-        @session_data = File.open(session_file).read
+      @session_data = File.open(session_file).read
     else
-        @session_data = ""
+      @session_data = ""
     end
   end
 
