@@ -8,10 +8,10 @@ module Sess
 
   def env_prepare
     if @config['logtype'] == 'basic'
-      resp=Typhoeus::Request.new(@config['target'],ssl_verifypeer: false,ssl_verifyhost: 1,).run
+      resp = Typhoeus::Request.new(@config['target'], ssl_verifypeer: false, ssl_verifyhost: 1).run
       if resp.code >= 300 and resp.code < 308
         resp.response_headers.match(/^\s*Location\:\s*(.*?)$/)
-        @target=$1
+        @target = $1
       else
         @target = @config['target']
       end
@@ -24,14 +24,14 @@ module Sess
     else
       dir = @target
     end
-    log "Running pre_login before the first login..." 
-    pre_resp=Typhoeus::Request.new(dir,ssl_verifypeer: false,ssl_verifyhost: 1,connecttimeout:5,).run
-    #log "***pre_resp***#{pre_resp.code}#{pre_resp.headers}" 
+    Log.info "Running pre_login before the first login..."
+    pre_resp = Typhoeus::Request.new(dir, ssl_verifypeer: false, ssl_verifyhost: 1, connecttimeout:5).run
+    #log "***pre_resp***#{pre_resp.code}#{pre_resp.headers}"
 
     if pre_resp.nil?
-      log "No response received" 
+      Log.warn "No response received"
     elsif pre_resp.code == 404
-      log "404 received, page wasn't found" 
+      Log.warn "404 received, page wasn't found"
     end
     grab_set_cookie(pre_resp)
 
@@ -57,18 +57,18 @@ module Sess
       tokens = data_format.split("&")
       params = _grab_token(pre_resp, tokens) #Grab csrf and other tokens
       post_me = sess_set_post_param(params) #Prepare POST login params
-      resp= Typhoeus::Request.new(
+      resp = Typhoeus::Request.new(
           dir,
           ssl_verifypeer: false,
           ssl_verifyhost: 1,
           method: :post,
           headers: { Cookie: sess_gen_cookie(cookie) },
           body: post_me,
-          followlocation: true,
-        ).run
+          followlocation: true
+      ).run
     else
       @auth = Rex::Text.encode_base64("#{@config['username']}:#{@config['password']}")
-      resp= Typhoeus::Request.new(
+      resp = Typhoeus::Request.new(
           dir,
           ssl_verifypeer: false,
           ssl_verifyhost: 1,
@@ -95,14 +95,14 @@ module Sess
       end
 
       if @config['logtype'] == 'basic'
-        resp=Typhoeus::Request.new(
+        resp = Typhoeus::Request.new(
           dir,
           method: :get,
           headers: { Cookie: sess_gen_cookie(cookie),Authorization: "Basic " + @auth },
           connecttimeout:5,
         ).run
       else
-        resp=Typhoeus::Request.new(
+        resp = Typhoeus::Request.new(
           dir,
           method: :get,
           headers: { Cookie: sess_gen_cookie(cookie)},
@@ -111,32 +111,32 @@ module Sess
       end
 
       grab_set_cookie(resp)
-      log "Redirection request uri: #{dir}" 
+      Log.info "Redirection request uri: #{dir}"
 
       redir_cnt += 1
       if(redir_cnt == 5) #Too many redirection"
-        log "More than 5 redirections occurred" 
+        Log.info "More than 5 redirections occurred"
         break
       end
-    end  
+    end
   end
 
   def grab_set_cookie(resp) #Grab cookies to be used
     temp = Array.new()
     setcookie=resp.headers['Set-Cookie']
     if setcookie == nil
-      #log "No set cookie in response header" 
+      #log "No set cookie in response header"
       return @cookies
     end
-    if setcookie.class==Array
+    if setcookie.class == Array
       setcookie.each do |val|
-        if val.match(/(.*?)=(.*?)(;|$)/)!=nil
-          @cookies[$1]=$2
+        if val.match(/(.*?)=(.*?)(;|$)/) != nil
+          @cookies[$1] = $2
         end
       end
     else
-        if setcookie.match(/(.*?)=(.*?)(;|$)/)!=nil
-          @cookies[$1]=$2
+        if setcookie.match(/(.*?)=(.*?)(;|$)/) != nil
+          @cookies[$1] = $2
         end
     end
     return @cookies
@@ -184,7 +184,7 @@ module Sess
         end
       end
     rescue
-      log "Login parameters can not be grabbed" 
+      Log.warn "Login parameters can not be grabbed"
     end
     return params
   end
@@ -211,27 +211,27 @@ module Sess
       pre_resp = pre_login
       pre_cookie = @cookies.clone
 
-      log "Checking session ID is set or not before login..." 
+      Log.info "Checking session ID is set or not before login..."
       if(pre_cookie.has_key? @session_id)
-        log "Session ID is set before login. Login and check if it changes..." 
+        Log.info "Session ID is set before login. Login and check if it changes..."
 
         login(pre_resp)
         aft_cookie = @cookies.clone
 
-        log "pre_session is: #{pre_cookie}" 
-        log "aft_session is: #{aft_cookie}" 
+        Log.info "pre_session is: #{pre_cookie}"
+        Log.info "aft_session is: #{aft_cookie}"
         is_same = compare_cookie(pre_cookie, aft_cookie)
         if is_same
-          log "Login with an old session ID, and it was not reset" 
+          Log.info "Login with an old session ID, and it was not reset"
           return false
         else
-          log "Login with an old session ID, and it was reset" 
+          Log.info "Login with an old session ID, and it was reset"
         end
       else
-        log "Session ID isn't set before login" 
+        Log.info "Session ID isn't set before login"
       end
     else
-      log "No authentication in this application"
+      Log.info "No authentication in this application"
     end
     return true
   end #sess_fix
