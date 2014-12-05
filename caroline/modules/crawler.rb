@@ -2,9 +2,9 @@ require 'io/wait'
 require 'open3'
 require 'json'
 require 'socket'
+require 'core/module'
 
-
-class Crawler
+class Crawler < Revok::Module
 
   def cleanProcs
     mitmdump = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
@@ -13,18 +13,24 @@ class Crawler
     Process.kill 'KILL', phantom if phantom > 0
   end
 
-  def initialize(config,width=1280,height=800,attempts=25,delay=2000,depth=8,time=180)
-    @config=config
-    @width=width
-    @height=height
-    @attempts=attempts
-    @delay=delay
-    @depth=depth
-    @time=time
+  def initialize
+    info_register("Crawler", {"group_name" => "system",
+                                "group_priority" => 0,
+                                "priority" => 1,
+                                "detail" => "",
+                                "required" => true})
+
+    @width = 1280
+    @height = 800
+    @attempts = 25
+    @delay = 2000
+    @depth = 8
+    @time = 180
   end
 
   def run
-    config = JSON.parse(@config, {create_additions:false})
+    config = @datastore['config']
+    config = JSON.parse(config, {create_additions:false})
     begin
       ip = config['target'].split('/')[2]
       target = config['target']
@@ -35,33 +41,35 @@ class Crawler
     config['height'] = @height
     config['attempts'] = @attempts
     config['delay'] = @delay
-    config['duration'] = @time*1000 + 60*1000
+    config['duration'] = @time * 1000 + 60 * 1000
     config['depth'] = @depth
     config = JSON.dump(config)
 
     cleanProcs
     sleep 5
 
-    mitm_in, mitm_out, mitm_err, mitm_thd = Open3.popen3("mitmdump -s #{File.dirname(__FILE__)}/creep/creep.py #{ip} -q")
+    mitm_in, mitm_out, mitm_err, mitm_thd = Open3.popen3("mitmdump -s #{Revok::Config::MODULES_DIR}/creep/creep.py #{ip} -q")
     mitmid = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
-    if mitmid>0
-      log "mitmdump is started"
+    Log.debug("Mitmdump PID: #{mitmid}")
+    if mitmid > 0
+      Log.info("mitmdump is started")
     else
       return
     end
     mitm_in.close
     sleep 5
 
-    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{File.dirname(__FILE__)};phantomjs --proxy=localhost:8080 --ssl-protocol=any --ignore-ssl-errors=true #{File.dirname(__FILE__)}/creep/webcrawler.js")
+    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{Revok::Config::MODULES_DIR};phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{Revok::Config::MODULES_DIR}/creep/webcrawler.js")
     phantomjsid = `ps -ef | grep phantomjs | grep -v grep | grep -v sh |awk '{print $2}'`.to_i
-    if phantomjsid>0
-      log "phantomjs is started"
+    Log.debug("Phantomjs PID: #{phantomjsid}")
+    if phantomjsid > 0
+      Log.info("phantomjs is started")
     else
       return
     end
     crawl_in.puts config
     crawl_in.close
-    log "Crawling the application #{target}..."
+    Log.info("Crawling the application #{target}...")
 
     buffer = Array.new
     start = Time.now.to_i
@@ -100,11 +108,10 @@ class Crawler
 
     begin
       mitmdump = `ps -ef | grep mitmdump | grep -v grep | awk '{print $2}'`.to_i
-      log "Asking mitmdump to stop..." if mitmdump > 0
-      #log "#{mitmdump}" if mitmdump > 0
+      Log.info("Asking mitmdump to stop...") if mitmdump > 0
       Process.kill 'INT', mitmdump if mitmdump > 0
     rescue
-      log "mitmdump is probably still running"
+      Log.warn("mitmdump is probably still running")
     end
 
     while report_idle < 30
@@ -123,27 +130,23 @@ class Crawler
     crawl_err.close
     mitm_out.close
     mitm_err.close
-    #log "pipes closed"
 
     injections = injections.join('')
     walk = walk.join('')
     if walk != "" and injections == ""
      injections = "{\"tags\":{}, \"ticks\":[{\"url\":\"#{target}\"}]}"
     end
-    $datastore['injections']=injections
-    $datastore['walk']=walk
+    @datastore['injections'] = injections
+    @datastore['walk'] = walk
 
     sleep 10
     cleanProcs
 
-    #log walk.size
-    #log injections.size
-
     if injections.nil? or injections.size < 1 or walk.nil? or walk.size < 1
-      # No crawling result
+      Log.warn("No crawling result")
     end
 
-    log "crawler is done"
+    Log.info("crawler is done")
 
   end
 
