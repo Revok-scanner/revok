@@ -9,45 +9,43 @@
 #    The var "path_list" is a array.
 #
 
-$: << "#{File.dirname(__FILE__)}/lib"
-require 'report.ut'
 require 'json'
 require 'net/http'
-require 'path_tree'
+require 'core/module'
+require "#{Revok::Config::MODULES_DIR}/lib/path_tree.rb"
 
-class Sitemaper
-  include ReportUtils
-  def initialize(target=$datastore['target'],session_data=$datastore['session'],flag='s')
-    @target=target
-    if flag=='f'
+class Sitemap < Revok::Module
+  def initialize(load_from_file = false, session_file = "")
+    info_register("Sitemap", {"group_name" => "system",
+                              "group_priority" => 0,
+                              "priority" => 4,
+                              "required" => true})
+    if(load_from_file)
       begin
-        @session_data=File.open(session_data,'r').read 
-      rescue =>exp
-        log exp.to_s 
-        @session_data=""
+        @session_data = File.open(session_file, 'r').read
+      rescue => exp
+        @session_data = ""
+        Log.warn(exp.to_s)
+        Log.debug("#{exp.backtrace}")
       end
-    elsif flag=="s"
-      @session_data=session_data
-    else
-      log 'unknow flag' 
-      return nil
     end
   end
 
   def run
+    @session_data = @datastore['session'] if @session_data == nil
+    target = @datastore['target']
     urls = Array.new()
     path_list = Array.new()
     issues = Array.new()
     result = true
     begin
       session = JSON.parse(@session_data, {create_additions:false})
-      target=@target
       domain = URI(target).host
       requests = session['requests']
-      log "Generating the directory structure of this site..." 
+      Log.info("Generating the directory structure of this site...")
 
       #extracting url from each request
-      requests.each_pair {|key,value|
+      requests.each_pair {|key, value|
         url = /\b(https?|ftp|file):\/\/\S+/.match(value)
         begin
           uri = URI(url.to_s)
@@ -65,16 +63,12 @@ class Sitemaper
       urls.each {|url|
         path_tree.add_path(url)
       }
-      log "Directory structure:" 
+      Log.info("Directory structure:")
       path_tree.each {|path|
         url = URI(target).scheme + "://" + domain + path
         path_list << url
-        log url 
+        Log.info(url)
       }
-    # rescue => exp 
-      # issues.push(exp.to_s)
-      # p exp.to_s
-      # result = false
     end
 
     if result
@@ -83,17 +77,17 @@ class Sitemaper
           list(path)
         }
         session['sitemap'] = path_list
-        $datastore['session'] = JSON.dump(session).to_s
+        @datastore['session'] = JSON.dump(session).to_s
       end
     else
       if issues.size > 0
         issues.each do |issue|
-          log "ERROR: #{issue}" 
+          Log.error("#{issue}")
         end
       end
       error
     end
-   
+
   end
 end
 
