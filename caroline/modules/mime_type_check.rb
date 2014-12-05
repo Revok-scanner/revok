@@ -12,7 +12,7 @@ require 'core/module'
 class MimeTypeChecker < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("MimeType_checker", {"group_name" => "default",
+    info_register("MIME_Type_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Check whether nosniff header is set. And find reponses whose actual contect type is mismatched with the defined one."})
@@ -150,6 +150,6 @@ class MimeTypeChecker < Revok::Module
       num = num - 1 if sniff_urls.size != 0
       advise({ "num" => num })
     end
-    Log.info("mime_type_check is done")
+    Log.info("MIME type check completed")
   end
 end

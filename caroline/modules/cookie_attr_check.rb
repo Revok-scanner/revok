@@ -11,7 +11,7 @@ require 'core/module'
 class CookieAttrChecker < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("Cookie_attribute_checker", {"group_name" => "default",
+    info_register("Cookie_Attribute_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "detail" => "Search for cookies without Secure flag or HttpOnly flag, and session cookies without expires attribute.",
                               "priority" => 10})
@@ -27,7 +27,6 @@ class CookieAttrChecker < Revok::Module
   end
 
   def run
-
     @session_data = @datastore['session'] if @session_data == nil
     @session_id = @datastore['session_id'] if @session_id == nil
     @config = @datastore['config']
@@ -40,7 +39,7 @@ class CookieAttrChecker < Revok::Module
       return
     end
     cookie_attr_check
-    Log.info("cookie_attr_check is done")
+    Log.info("Cookie attribute check completed")
   end
   
   def cookie_attr_check
@@ -62,14 +61,14 @@ class CookieAttrChecker < Revok::Module
       end 
 
       set_cookies.each_pair do |k, v|
-        if v.scan(/secure/i)==[]
-          not_secure["#{k}"]=v
+        if v.scan(/secure/i) == []
+          not_secure["#{k}"] = v
         end
-        if v.scan(/httponly/i)==[]
-          not_httponly["#{k}"]=v
+        if v.scan(/httponly/i) == []
+          not_httponly["#{k}"] = v
         end
-        if session_id != nil and v.include? session_id and v.scan(/expires/i)==[]
-            expired["#{k}"]=v
+        if session_id != nil and v.include? session_id and v.scan(/expires/i) == []
+            expired["#{k}"] = v
         end
       end
     rescue => exp

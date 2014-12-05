@@ -102,7 +102,7 @@ class Autologin < Revok::Module
     mitm_err.close
     mitm_out.close
 
-    Log.info("autologin is done")
+    Log.info("autologin completed")
 
   end
 

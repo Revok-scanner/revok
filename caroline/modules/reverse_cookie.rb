@@ -11,7 +11,7 @@ require 'core/module'
 class CookieReverser < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("CookieReverser", {"group_name" => "default",
+    info_register("Reverse_Cookie", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Check whether critical user information are kept in simply encoded cookies."})
@@ -98,7 +98,7 @@ class CookieReverser < Revok::Module
 
     if result == true
       abstain
-      Log.info("No critical info is found")
+      Log.info("No critical info was found")
     else
       advise({"cookies" => @report})
     end

@@ -6,10 +6,10 @@ require 'json'
 require 'core/module'
 require "#{Revok::Config::MODULES_DIR}/lib/path_traversal.rb.ut.rb"
 
-class PathTravelor < Revok::Module
+class PathTraveler < Revok::Module
   include PATH_TRAV
   def initialize(load_from_file = false, session_file = "")
-    info_register("Path_travelor", {"group_name" => "default",
+    info_register("Path_Traversal_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "detail" => "Check whether content of a file can be read by injecting its file path to requests.",
                               "priority" => 10})
@@ -48,6 +48,6 @@ class PathTravelor < Revok::Module
     else
       abstain
     end
-    Log.info("path_traversal is done")
+    Log.info("Path traversal check completed")
   end
 end

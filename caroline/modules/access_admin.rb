@@ -106,6 +106,6 @@ class AdminAccessor < Revok::Module
     else
       abstain
     end
-    Log.info("Access admin pages is done")
+    Log.info("Access admin pages completed")
   end
 end

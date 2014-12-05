@@ -19,7 +19,7 @@ class XSSChecker < Revok::Module
   include Patterns
 
   def initialize
-     info_register("XSS_checker", {"group_name" => "default",
+     info_register("Cross-site_Scripting_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Inject dangerous characters \' \"  < > and their encoded forms through parameters in HTTP request, then check whether these dangerous characters are filtered in the response."})
@@ -169,6 +169,6 @@ class XSSChecker < Revok::Module
     else
       abstain
     end
-    Log.info("Cross-site scripting check is done")
+    Log.info("Cross-site scripting check completed")
   end
 end

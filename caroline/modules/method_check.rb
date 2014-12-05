@@ -6,10 +6,10 @@ require 'net/http'
 require 'json'
 require 'core/module'
 
-class MethodCheckor < Revok::Module
+class MethodChecker < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("MethodCheckor", {"group_name" => "default",
+    info_register("HTTP_Method_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Check whether some HTTP methods such as 'TRACE' and 'OPTIONS' for URLS are available."})
@@ -103,7 +103,7 @@ class MethodCheckor < Revok::Module
       end
       advise({"vul_paths" => vul_paths})
     end
-    Log.info("method_check is done")
+    Log.info("HTTP method check completed")
 
   end
 

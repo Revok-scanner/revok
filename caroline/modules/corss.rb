@@ -11,7 +11,7 @@ require "#{Revok::Config::MODULES_DIR}/lib/corss.rb.ut.rb"
 class CorssChecker < Revok::Module
   include CORS
   def initialize(load_from_file = false, session_file = "")
-    info_register("Corss_checker", {"group_name" => "default",
+    info_register("Cross-Origin_Resource_Sharing_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "detail" => "Check whether URLs allow access from other or all origins by sending crafted HTTP requests.",
                               "priority" => 10})
@@ -76,6 +76,6 @@ class CorssChecker < Revok::Module
         abstain
       end
     end
-    Log.info("corss is done")
+    Log.info("Cross-Origin resource sharing check completed")
   end
 end

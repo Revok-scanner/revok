@@ -10,11 +10,11 @@ require 'rex'
 require 'core/module'
 require "#{Revok::Config::MODULES_DIR}/lib/session_check.rb.ut.rb"
 
-class SessionFixationCheckor < Revok::Module
+class SessionFixationChecker < Revok::Module
   include Sess
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("Session_fixation_checker", {"group_name" => "default",
+    info_register("Session_Fixation_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Check whether session id is refreshed after login to prevent session fixation."})
@@ -55,6 +55,6 @@ class SessionFixationCheckor < Revok::Module
       end
       warn({"url" => url,"name"=>"session_fixation"})
     end
-    Log.info("Session fixation check is done")
+    Log.info("Session fixation check completed")
   end
 end

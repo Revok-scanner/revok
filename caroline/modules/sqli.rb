@@ -21,7 +21,7 @@ class SQLiChecker < Revok::Module
   include Approach1
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("SQL_Injection_checker", {"group_name" => "default",
+    info_register("SQL_Injection_Checker", {"group_name" => "default",
                               "group_priority" => 10,
                               "priority" => 10,
                               "detail" => "Inject malicious SQLs to HTTP requests, then check keywords from responses or the response time to find out potential SQL injection vulnerability."})
@@ -111,7 +111,7 @@ class SQLiChecker < Revok::Module
       end
       warn({'vul_urls' => hUrls})
     end
-    Log.info("sqli is done")
+    Log.info("SQL injection check completed")
   end
 
 

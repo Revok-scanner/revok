@@ -146,7 +146,7 @@ class Crawler < Revok::Module
       Log.warn("No crawling result")
     end
 
-    Log.info("crawler is done")
+    Log.info("Crawler completed")
 
   end
 

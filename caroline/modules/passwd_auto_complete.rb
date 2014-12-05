@@ -10,7 +10,7 @@ require 'core/module'
 
 class PasswordAutoCompleteChecker < Revok::Module
   def initialize
-    info_register("Password_auto_complete_checker", {"group_name" => "default",
+    info_register("Auto_Complete_Password_Checker", {"group_name" => "default",
                                 "group_priority" => 10,
                                 "priority" => 10,
                                 "detail" => "Check whether password field turns off the autocomplete option."})
@@ -66,7 +66,8 @@ class PasswordAutoCompleteChecker < Revok::Module
         return
       end
       advise({'login_page'=>target})
-      Log.info("auto-complete is enabled")
+      Log.warn("auto-complete is enabled")
     end
+    Log.info("Auto complete password check completed")
   end
 end

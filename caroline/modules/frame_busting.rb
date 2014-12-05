@@ -9,7 +9,7 @@ require 'core/module'
 class FrameBustingTester < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("Frame_Busting_test", {"group_name" => "default",
+    info_register("Frame_Busting_Test", {"group_name" => "default",
                               "group_priority" => 10,
                               "detail" => "Check whether x-frame-options header is set.",
                               "priority" => 10})

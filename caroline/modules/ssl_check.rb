@@ -13,7 +13,7 @@ class SSLChecker < Revok::Module
   include SSLCheck
 
   def initialize
-    info_register("SSL_checker", {"group_name" => "default",
+    info_register("SSL_Mis-configuration_Checker", {"group_name" => "default",
                                 "group_priority" => 10,
                                 "priority" => 10,
                                 "detail" => "Check SSL/TLS mis-configuration which makes the communication between browser and server not secure, such as weak cipher, invalid certificate etc."})
@@ -103,6 +103,6 @@ class SSLChecker < Revok::Module
     else
       abstain
     end
-    Log.info("ssl_check is done")
+    Log.info("SSL mis-configuration check completed")
   end
 end

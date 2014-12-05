@@ -50,5 +50,6 @@ class AntiReflectionChecker < Revok::Module
       error
       Log.error("AntiReflectionChecker error: #{excep}")
     end#begin
+    Log.info("Reflected XSS attack check completed")
   end#run
 end

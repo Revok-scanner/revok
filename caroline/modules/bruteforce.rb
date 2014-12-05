@@ -13,10 +13,10 @@ require 'rex/proto/ntlm/exceptions'
 require 'json'
 require 'core/module'
 
-class BruteForceCheckor < Revok::Module
+class BruteForceChecker < Revok::Module
 
   def initialize(load_from_file = false, session_file = "")
-    info_register("BruteForceCheckor", {"group_name" => "default",
+    info_register("Login_Brute_Force", {"group_name" => "default",
                               "group_priority" => 10,
                               "detail" => "Check whether prevention for login brute force exists by logging in after several times' failed authentication.",
                               "priority" => 10})
@@ -157,14 +157,14 @@ class BruteForceCheckor < Revok::Module
         return
       end
 
-      uri=URI(@config['target'])
-      host=uri.host
+      uri = URI(@config['target'])
+      host = uri.host
       port = uri.port
       context = {}
-      ssl = (uri.scheme=='https'?true:false)
+      ssl = (uri.scheme == 'https' ? true : false)
       ssl_version = nil
       proxies = nil
-      conn=Rex::Proto::Http::Client.new(host,port, context, ssl, ssl_version, proxies)
+      conn = Rex::Proto::Http::Client.new(host, port, context, ssl, ssl_version, proxies)
 
       # send one to get successful login response in response object
       if @logtype == 'basic'
