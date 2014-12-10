@@ -95,6 +95,7 @@ class SQLiChecker < Revok::Module
           Log.error("#{issue}")
         end
         error
+        @session_data = nil
         return
       end
       hUrls = Hash.new
@@ -111,6 +112,7 @@ class SQLiChecker < Revok::Module
       end
       warn({'vul_urls' => hUrls})
     end
+    @session_data = nil
     Log.info("SQL injection check completed")
   end
 

@@ -262,6 +262,7 @@ class RedirChecker < Revok::Module
       Log.error(exp.to_s)
       Log.debug(exp.backtrace.join("\n"))
     end
+    @session_data = nil
     Log.info("Redirection check completed")
   end
 end

@@ -130,6 +130,6 @@ class FrameBustingTester < Revok::Module
         Log.info("X-Frame-Options is set for all URLs")
       end
     end
-
+    @session_data = nil
   end
 end

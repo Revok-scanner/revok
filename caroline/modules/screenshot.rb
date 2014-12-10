@@ -23,7 +23,7 @@ class Photographer < Revok::Module
     
   def run
     begin
-      url=(JSON.parse(@datastore['config'], {create_additions:false}))['target']
+      url = (JSON.parse(@datastore['config'], {create_additions:false}))['target']
       queue_client = Revok::ActiveMQClient.new
       Log.info("Connecting to messages queue...")
       queue_client.connect

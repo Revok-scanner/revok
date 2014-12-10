@@ -154,6 +154,7 @@ class BruteForceChecker < Revok::Module
       @login_req = _get_login_req
       if not @login_req
         Log.info("No login request found")
+        @session_data = nil
         return
       end
 
@@ -197,7 +198,7 @@ class BruteForceChecker < Revok::Module
         # - compare new response with it
         if _are_same_resp(resp, success_resp)
           # this means the login with invalid password has been successful. AUTH issue
-          log "Authentication failed" 
+          Log.warn "Authentication failed" 
           break
         end
  
@@ -221,5 +222,6 @@ class BruteForceChecker < Revok::Module
       Log.error(exp.to_s)
       Log.debug(exp.backtrace.join("\n"))
     end
+    @session_data = nil
   end #run
 end

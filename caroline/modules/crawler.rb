@@ -59,7 +59,7 @@ class Crawler < Revok::Module
     mitm_in.close
     sleep 5
 
-    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{Revok::Config::MODULES_DIR};phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{Revok::Config::MODULES_DIR}/creep/webcrawler.js")
+    crawl_in, crawl_out, crawl_err = Open3.popen3("cd #{Revok::Config::MODULES_DIR};phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true --ssl-protocol=any #{Revok::Config::MODULES_DIR}/creep/webcrawler.js")
     phantomjsid = `ps -ef | grep phantomjs | grep -v grep | grep -v sh |awk '{print $2}'`.to_i
     Log.debug("Phantomjs PID: #{phantomjsid}")
     if phantomjsid > 0

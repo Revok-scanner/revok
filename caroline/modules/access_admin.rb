@@ -19,7 +19,7 @@ class AdminAccessor < Revok::Module
     if(load_from_file)
       @session_data = File.open(session_file).read
     else
-      @session_data = ""
+      @session_data = nil
     end
   end
 
@@ -35,6 +35,7 @@ class AdminAccessor < Revok::Module
     rescue => exp
       Log.debug(exp.to_s)
       Log.debug(exp.backtrace.join("\n"))
+      @session_data = nil
       return
     end
     cookie=data['cookie']
@@ -106,6 +107,7 @@ class AdminAccessor < Revok::Module
     else
       abstain
     end
+    @session_data = nil
     Log.info("Access admin pages completed")
   end
 end

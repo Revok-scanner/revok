@@ -103,6 +103,7 @@ class MethodChecker < Revok::Module
       end
       advise({"vul_paths" => vul_paths})
     end
+    @session_data = nil
     Log.info("HTTP method check completed")
 
   end

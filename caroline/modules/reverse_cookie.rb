@@ -37,9 +37,13 @@ class CookieReverser < Revok::Module
       Log.warn(exp.to_s)
       Log.debug(exp.backtrace.join("\n"))
       error
+      @session_data = nil
+      @session_id = nil
       return
     end
     reverse_cookie_test
+    @session_data = nil
+    @session_id = nil
   end
   
   def str_to_hex(s)

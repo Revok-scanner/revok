@@ -23,7 +23,7 @@ module Revok
 						next if (File.extname(filename) != ".rb")
 						begin
 							load_module(path, filename)
-						rescue IOError, NameError, SyntaxError
+						rescue IOError, NameError, SyntaxError => exp
 							self.load_error_modules.push(path + filename)
 							Log.debug(exp.to_s)
 							Log.debug(exp.backtrace.join("\n"))

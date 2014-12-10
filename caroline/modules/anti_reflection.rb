@@ -49,6 +49,8 @@ class AntiReflectionChecker < Revok::Module
     rescue => excep
       error
       Log.error("AntiReflectionChecker error: #{excep}")
+    ensure
+      @session_data = nil
     end#begin
     Log.info("Reflected XSS attack check completed")
   end#run

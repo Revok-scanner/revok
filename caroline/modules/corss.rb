@@ -76,6 +76,7 @@ class CorssChecker < Revok::Module
         abstain
       end
     end
+    @session_data = nil
     Log.info("Cross-Origin resource sharing check completed")
   end
 end

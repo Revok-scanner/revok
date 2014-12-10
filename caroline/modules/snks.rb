@@ -14,7 +14,7 @@ class Snks < Revok::Module
       rescue => exp
         @session_data = ""
         Log.warn("Load session from file failed")
-        Log.debug("#{exp.backtrace}")
+        Log.debug(exp.backtrace.join("\n"))
         return nil
       end
     end
@@ -31,15 +31,36 @@ class Snks < Revok::Module
     url
   end
 
+  def merge(source_a, source_b)
+
+    composite = {}
+    hash = JSON.parse(source_a.sub(/[^{]*/,''), {create_additions:false})
+    hash.keys.each do |key|
+      composite[key] = hash[key]
+    end
+    hash = JSON.parse(source_b.sub(/[^{]*/,''), {create_additions:false})
+    hash.keys.each do |key|
+      composite[key] = hash[key]
+    end
+    return JSON.dump(composite).to_s
+  end
+
   def run
-    @session_data = Revok::Utils.merge(@datastore['injections'], @datastore['walk']) if @session_data == nil
-    comp = @session_data.clone
+    Log.warn("@datastore['injections'] is empty") if @datastore['injections'] == ""
+    Log.warn("@datastore['walk']") if @datastore['walk'] == ""
 
     begin
-      @session_data = JSON.parse(@session_data, {create_additions:false})
+      comp = merge(@datastore['injections'], @datastore['walk'])
     rescue => exp
-      Log.error("Invalid session data")
-      Log.debug("#{exp.backtrace}")
+      Log.error("merge error: #{exp.to_s}")
+      Log.debug(exp.backtrace.join("\n"))
+    end
+
+    begin
+      @session_data = JSON.parse(comp.to_s, {create_additions:false})
+    rescue => exp
+      Log.error("Invalid session data: #{exp.to_s}")
+      Log.debug(exp.backtrace.join("\n"))
     end
 
     markers = Array.new
@@ -97,7 +118,8 @@ class Snks < Revok::Module
       }
 
     end
-    @datastore['session'] = Revok::Utils.merge(comp, JSON.dump({'snks'=>snks}).to_s)
+    @datastore['session'] = merge(comp, JSON.dump({'snks'=>snks}).to_s)
+    @session_data = nil
     Log.info("Datas got from the crawler are merged")
   end
 end

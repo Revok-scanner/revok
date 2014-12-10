@@ -45,7 +45,7 @@ class Autologin < Revok::Module
 
     Log.info("mitmdump is started")
 
-    phantom_in, phantom_out, phantom_err = Open3.popen3("phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true #{Revok::Config::MODULES_DIR}/js/autologin.js")
+    phantom_in, phantom_out, phantom_err = Open3.popen3("phantomjs --proxy=localhost:8080 --ignore-ssl-errors=true --ssl-protocol=any #{Revok::Config::MODULES_DIR}/js/autologin.js")
     phantom_in.puts @config
     phantom_in.close
 

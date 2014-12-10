@@ -8,10 +8,8 @@ require 'typhoeus'
 require 'net/http'
 require 'rex'
 require 'core/module'
-require "#{Revok::Config::MODULES_DIR}/lib/session_check.rb.ut.rb"
 
 class SessionExposureChecker < Revok::Module
-  include Sess
 
   def initialize(load_from_file = false, session_file = "")
     info_register("Session_ID_Exposure_Checker", {"group_name" => "default",
@@ -161,6 +159,7 @@ class SessionExposureChecker < Revok::Module
       end
       warn({"name" => "session_exposed_in_url"})
     end
+    @session_data = nil
     Log.info("Session id exposure check completed")
   end
   

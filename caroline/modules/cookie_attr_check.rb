@@ -36,6 +36,8 @@ class CookieAttrChecker < Revok::Module
     rescue => exp
       Log.warn(exp.to_s)
       Log.debug(exp.backtrace.join("\n"))
+      @session_data = nil
+      @session_id = nil
       return
     end
     cookie_attr_check
@@ -110,6 +112,8 @@ class CookieAttrChecker < Revok::Module
     if not_secure.empty? and not_httponly.empty? and expired.empty?
       abstain
     end
+    @session_data = nil
+    @session_id = nil
   end
    
   def str_to_hex(s)

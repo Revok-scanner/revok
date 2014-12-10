@@ -150,6 +150,7 @@ class MimeTypeChecker < Revok::Module
       num = num - 1 if sniff_urls.size != 0
       advise({ "num" => num })
     end
+    @session_data = nil
     Log.info("MIME type check completed")
   end
 end

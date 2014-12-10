@@ -26,7 +26,7 @@ class Sitemap < Revok::Module
       rescue => exp
         @session_data = ""
         Log.warn(exp.to_s)
-        Log.debug(exp.backtrace.join("\n"))
+        Log.debug("#{exp.backtrace}")
       end
     end
   end
@@ -87,6 +87,7 @@ class Sitemap < Revok::Module
       end
       error
     end
+    @session_data = nil
     Log.info("Site map generated")
   end
 end
