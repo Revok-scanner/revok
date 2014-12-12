@@ -188,7 +188,7 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
       body = JSON.parse(msg.body, {create_additions:false})
       body['uid'] == id
     end
-     f (!msg_back.empty?)
+    if (!msg_back.empty?)
       @queue_client.received_msg.reject! do |msg|
         body = JSON.parse(msg.body, {create_additions:false})
         body['uid'] == id && body['type'] == "screenshot"
