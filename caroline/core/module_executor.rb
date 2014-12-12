@@ -6,6 +6,9 @@ require_relative 'modules'
 module Revok
 
 	class ModuleExecutor
+		RUNNING = 1
+		FINISHED = 2
+
 		def initialize(run_case, modules = {})
 			@modules = modules
 			@exec_list = Array.new
@@ -81,7 +84,10 @@ module Revok
 				return false
 			end
 			screenshot = self.exec_list.select {|name, g_name, g_priority, priority| name == "Photographer"}
-			add_user_logger() if (screenshot.empty?)
+			if (screenshot.empty?)
+				add_user_logger()
+				send_notify("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan is finished in about an hour.")
+			end
 			begin
 				config_json = Base64.decode64(@datastore['config'])
 				config = JSON.parse(config_json,{create_additions:false})
@@ -106,6 +112,7 @@ module Revok
 				end
 			}
 			close_user_logger()
+			send_notify("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
 			return true
 		end
 
@@ -135,6 +142,30 @@ module Revok
 					@log_file.close if (@log_file)
 				rescue IOError
 					#ignore any IO error
+				end
+			end
+
+			def send_notify(title = "", body = "")
+				begin
+					system("notify-send '#{title}' '#{body}' -t 0")
+				rescue => exp
+					Log.error(exp.to_s)
+					Log.debug(exp.backtrace.join("\n"))
+				end
+			end
+
+			def set_status(status)
+				begin
+					f = File.open("#{Revok::ROOT_PATH}/report/STATUS", 'w')
+					if (status == RUNNING)
+						f.write("Scan #{@datastore['run_id']}(#{@datastore['timestamp']}) is running...")
+					elsif (status == FINISHED)
+						f.write("Scan #{@datastore['run_id']}(#{@datastore['timestamp']}) is FINISHED.")
+					end
+					f.close
+				rescue => exp
+					Log.warn("Update status file error: #{exp.to_s}")
+					Log.debug(exp.backtrace.join("\n"))
 				end
 			end
 
