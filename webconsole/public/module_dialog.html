@@ -1,15 +1,22 @@
 <div class="ngdialog-message">
 	<h2>The modules will be run</h2>
+    <div ng-hide="!hide_ani">
+      <input type="checkbox" id="select_all" checked ng-click="batchSelect(this)">
+      <label for="select_all">Select/unselect all</label>
+    </div>
 	<hr />
 	<div ng-hide="hide_ani">
-		<img id="spinner_img" src="../imgs/ajax-loader.gif" style="padding-left: 180px; padding-bottom: 10px;"/>
+		<img id="spinner_img" src="../imgs/ajax-loader.gif" style="padding-left: 255px; padding-bottom: 10px;"/>
 	</div>
 	<div ng-repeat="module in modules">
 		<label>
 			<input type="checkbox" checklist-model="choose.modules" checklist-value="module">
-			<a ng-model="collapsed" ng-click="collapsed=!collapsed">{{module.name}}</a>
+			<a ng-model="collapsed" ng-click="collapsed=!collapsed" style="
+    color: rgb(84, 82, 82);">{{module.name}}</a>
 		</label>
-		<p ng-show="collapsed">{{module.detail}}</p>
+		<div>
+			<p ng-show="collapsed" style="padding-left: 25px;color: rgb(84, 82, 82);margin-top: 0px;">{{module.detail}}</p>
+		</div>
 	</div>
 </div>
 <div class="ngdialog-buttons">

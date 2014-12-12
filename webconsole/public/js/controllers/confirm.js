@@ -55,6 +55,19 @@ revok.controller('confirmController', function($scope,$http,ngDialog) {
      dialog = ngDialog.open({template: "module_dialog.html", scope: $scope});
    };
 
+   $scope.batchSelect = function (element) {
+     element.checked = !element.checked;
+     if (!element.checked) {
+       $scope.choose = {
+         modules: angular.copy($scope.modules)
+       };
+     } else {
+       $scope.choose = {
+         modules: []
+       };
+     }
+   };
+
    $scope.moduleConfirm = function () {
      var i;
      var modules = new Array();
