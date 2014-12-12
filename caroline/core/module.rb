@@ -1,5 +1,3 @@
-require_relative 'utils'
-
 module Revok
 
 	class Module
