@@ -2,6 +2,7 @@ require 'base64'
 require 'json'
 require_relative 'module'
 require_relative 'modules'
+require_relative 'postman'
 
 module Revok
 
@@ -78,19 +79,17 @@ module Revok
 		end
 
 		def execute
+			config = ""
 			@datastore['timestamp'] = Time.now.strftime('%Y%m%d%H%M%S')
 			if (self.exec_list.empty?)
 				Log.warn("Run ID #{@datastore['run_id']}: the execute list is empty, nothing to do")
 				return false
 			end
 			screenshot = self.exec_list.select {|name, g_name, g_priority, priority| name == "Photographer"}
-			if (screenshot.empty?)
-				add_user_logger()
-				send_notify("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan is finished in about an hour.")
-			end
+			
 			begin
 				config_json = Base64.decode64(@datastore['config'])
-				config = JSON.parse(config_json,{create_additions:false})
+				config = JSON.parse(config_json, {create_additions:false})
 				@datastore['config']=JSON.dump(config)
 				@datastore['start'] = `date`.slice(0..-2)
 			rescue => exp
@@ -98,6 +97,22 @@ module Revok
 				Log.debug(exp.backtrace.join("\n"))
 				return false
 			end
+
+			if (screenshot.empty?)
+				add_user_logger()
+				if (Config::USE_SMTP == "off")
+					send_notify("Revok", "Your scan has begun. Depending on server load, you should receive a second notification when the scan is finished in about an hour.")
+					set_status(RUNNING)
+				else
+					begin
+						Postman::send_intro(config['email'], config['target'])
+					rescue => exp
+						Log.warn("Send intro mail failed: #{exp.to_s}")
+						Log.debug(exp.backtrace.join("\n"))
+					end
+				end
+			end
+
 			Log.info("Running scan #{@datastore['run_id']}...")
 			Log.info("Try to execute modules")
 			self.exec_list.each {|name, g_name, g_priority, priority|
@@ -111,8 +126,24 @@ module Revok
 					Log.debug(exp.backtrace.join("\n"))
 				end
 			}
+
 			close_user_logger()
-			send_notify("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
+			if (Config::USE_SMTP == "off")
+				send_notify("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
+				set_status(FINISHED)
+			else
+				if @datastore["advice_report"] != nil
+					failed = false
+				else
+					failed = true
+				end
+				begin
+					Postman::send_report(config['email'], config['target'], @datastore["advice_email_body"], @datastore["timestamp"], failed)
+				rescue => exp
+					Log.warn("Send intro mail failed: #{exp.to_s}")
+					Log.debug(exp.backtrace.join("\n"))
+				end
+			end			
 			return true
 		end
 
@@ -156,7 +187,7 @@ module Revok
 
 			def set_status(status)
 				begin
-					f = File.open("#{Revok::ROOT_PATH}/report/STATUS", 'w')
+					f = File.open("#{Revok::ROOT_PATH}/report/00-STATUS", 'w')
 					if (status == RUNNING)
 						f.write("Scan #{@datastore['run_id']}(#{@datastore['timestamp']}) is running...")
 					elsif (status == FINISHED)

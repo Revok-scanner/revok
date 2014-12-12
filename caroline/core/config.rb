@@ -9,6 +9,12 @@ module Revok
 		MSG_QUEUE_CERT_PATH = ENV["MSG_QUEUE_CERT_PATH"] != nil ? ENV["MSG_QUEUE_CERT_PATH"] : ""
 		WORK_QUEUE = "/queue/work"
 		RETURN_QUEUE = "/queue/return"
+		USE_SMTP = ENV["USE_SMTP"] != nil ? ENV["USE_SMTP"] : "off"
+		SMTP_ADDRESS = ENV["SMTP_ADDRESS"] != nil ? ENV["SMTP_ADDRESS"] : "smtp.example.com"
+		SMTP_PORT = ENV["SMTP_PORT"] != nil ? ENV["SMTP_PORT"] : "587"
+		SMTP_USER = ENV["SMTP_USER"] != nil ? ENV["SMTP_USER"] : "username"
+		SMTP_PASSWORD = ENV["SMTP_PASSWORD"] != nil ? ENV["SMTP_PASSWORD"] : "password"
+		EMAIL_ADDRESS = ENV["EMAIL_ADDRESS"] != nil ? ENV["EMAIL_ADDRESS"] : "revok@example.com"
 	end
 
 end
