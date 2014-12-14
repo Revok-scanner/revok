@@ -120,7 +120,7 @@ module Revok
 				modules[name].datastore = @datastore
 				begin
 					modules[name].run
-					modules[name].datastore = nil
+					modules[name].clean
 				rescue => exp
 					Log.error("Module #{name} executed error")
 					Log.debug(exp.backtrace.join("\n"))

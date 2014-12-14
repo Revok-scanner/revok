@@ -9,6 +9,11 @@ module Revok
 			raise NotImplementedError
 		end
 
+		def clean
+			@seen_before = false
+			@datastore = nil
+		end
+
 		attr_reader		:name
 		attr_reader		:info
 		attr_accessor		:datastore
