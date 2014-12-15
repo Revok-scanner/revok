@@ -127,23 +127,25 @@ module Revok
 				end
 			}
 
-			close_user_logger()
-			if (Config::USE_SMTP == "off")
-				send_notify("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
-				set_status(FINISHED)
-			else
-				if @datastore["advice_report"] != nil
-					failed = false
+			if (screenshot.empty?)
+				close_user_logger()
+				if (Config::USE_SMTP == "off")
+					send_notify("Revok", "Your scan has finished, please access {revok_directory}/report to view the report.")
+					set_status(FINISHED)
 				else
-					failed = true
+					if @datastore["advice_report"] != nil
+						failed = false
+					else
+						failed = true
+					end
+					begin
+						Postman::send_report(config['email'], config['target'], @datastore["advice_email_body"], @datastore["timestamp"], failed)
+					rescue => exp
+						Log.warn("Send intro mail failed: #{exp.to_s}")
+						Log.debug(exp.backtrace.join("\n"))
+					end
 				end
-				begin
-					Postman::send_report(config['email'], config['target'], @datastore["advice_email_body"], @datastore["timestamp"], failed)
-				rescue => exp
-					Log.warn("Send intro mail failed: #{exp.to_s}")
-					Log.debug(exp.backtrace.join("\n"))
-				end
-			end			
+			end
 			return true
 		end
 
