@@ -1,11 +1,19 @@
 # Changelog
 
+### 0.8.0 (2014-12-16)
+* Custom scan support
+* New flexible framework
+* New log and report generator
+* Code refactoring
+* Remove useless modules
+* Remove report and log from database
+
 ### 0.7.6 (2014-08-12)
 * Distribute self-contained version
 * Add installation guide
 * Define default configuration for activemq
 * Create DB initializing script
-* Remove DNS server from backen
+* Remove DNS server from backend
 
 ### 0.7.5 (2014-07-09)
 * Start backend services as daemons

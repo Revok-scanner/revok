@@ -2,14 +2,13 @@
 
 ## 1 Deployment
 ### 1.1 Start Revok with binary package
-Step 1: download and decompress the binary package
+Step 1: download and decompress the binary package (http://revok-scanner.github.io/revok/)
 ```
-$ wget http://example.com
-$ tar xJvf revok-0.7.6_x86_64.tar.xz
+$ tar xJvf revok-0.8.0_x86_64.tar.xz
 ```
 Step 2: initialize Revok
 ```
-$ cd revok-0.7.6_x86_64
+$ cd revok-0.8.0_x86_64
 $ ./revokd init
 ```
 Step 3: run Revok
