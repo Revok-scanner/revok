@@ -20,9 +20,10 @@ revok.controller('confirmController', function($scope,$http,ngDialog) {
    function valid_email(email) { 
      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
      return re.test(email);
-   } 
- 
+   }
+
    $scope.next= function(){
+     $scope.state.email = "test@example.com";
      if (valid_email($scope.state.email)==false){
        $scope.state.valid_email = true;
        $scope.email_input = "form-group has-error";
