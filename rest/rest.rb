@@ -120,11 +120,11 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
   def get_modules_list
     Log.debug("invoke route moudles list")
     @path =~ /\/moduleslist\/([a-z0-9\-_]*)/
-    uid = $1
-    raise RuntimeError if (uid == "")
+    id = $1
+    raise RuntimeError if (id == "")
     msg = Hash.new
     msg['type'] = "list_modules"
-    msg['uid'] = uid
+    msg['id'] = id
     msg_back = nil
     begin
       msg = JSON.generate(msg).to_s
@@ -136,12 +136,12 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
     for i in 0..5
       msg_back = @queue_client.received_msg.select do |msg|
         body = JSON.parse(msg.body, {create_additions:false})
-        body['uid'] == uid
+        body['id'] == id
       end
       if (!msg_back.empty?)
         @queue_client.received_msg.reject! do |msg|
           body = JSON.parse(msg.body, {create_additions:false})
-          body['uid'] == uid && body['type'] == "modules_list"
+          body['id'] == id && body['type'] == "modules_list"
         end
         Log.debug("Messages cache: #{@queue_client.received_msg}")
         begin
@@ -186,12 +186,12 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
 
     msg_back = @queue_client.received_msg.select do |msg|
       body = JSON.parse(msg.body, {create_additions:false})
-      body['uid'] == id
+      body['id'] == id
     end
     if (!msg_back.empty?)
       @queue_client.received_msg.reject! do |msg|
         body = JSON.parse(msg.body, {create_additions:false})
-        body['uid'] == id && body['type'] == "screenshot"
+        body['id'] == id && body['type'] == "screenshot"
       end
       Log.debug("Messages cache: #{@queue_client.received_msg}")
       begin
