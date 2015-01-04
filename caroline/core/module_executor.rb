@@ -10,17 +10,16 @@ module Revok
 		RUNNING = 1
 		FINISHED = 2
 
-		def initialize(run_case, modules = {})
+		def initialize(run, modules = {})
 			@modules = modules
 			@exec_list = Array.new
 			@datastore = Hash.new
-			@datastore['run_id'] = run_case.id
-			@datastore['process'] = run_case.process
-			@datastore['config'] = run_case.targetInfo
-			@datastore['scan_config'] = run_case.scanConfig
-			@datastore['log'] = run_case.log
-			@datastore['start'] = run_case.startTime
-			@datastore['end'] = run_case.endTime
+			@datastore['run_id'] = run['id']
+			@datastore['process'] = run['process']
+			@datastore['config'] = run['target_info']
+			@datastore['scan_config'] = run['scan_config']
+			@datastore['start'] = run['start_time']
+			@datastore['end'] = run['end_time']
 			@log_file = nil
 		end
 
@@ -86,7 +85,7 @@ module Revok
 				return false
 			end
 			screenshot = self.exec_list.select {|name, g_name, g_priority, priority| name == "Photographer"}
-			
+
 			begin
 				config_json = Base64.decode64(@datastore['config'])
 				config = JSON.parse(config_json, {create_additions:false})
@@ -126,6 +125,7 @@ module Revok
 					Log.debug(exp.backtrace.join("\n"))
 				end
 			}
+			Log.info("Scan #{@datastore['run_id']} is finished")
 
 			if (screenshot.empty?)
 				close_user_logger()
