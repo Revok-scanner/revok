@@ -6,6 +6,7 @@ require 'json'
 require 'webrick'
 require 'stringio'
 require_relative 'activemq'
+require_relative 'run'
 
 module Revok
 module Rest
@@ -83,11 +84,12 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
     success = false
     hash = JSON.parse(@data, {create_additions:false})
 
-    if hash && hash['id'] && !@runCaseServer.exists?(hash['id'])
-      runCase = @runCaseServer.createRunCase(hash)
-    end
+    run = Revok::Rest::Run.new(hash)
+    msg = JSON.generate(run).to_s
 
-    if runCase && @runCaseServer.saveRunCaseToDB(runCase) && @runCaseServer.putRunCaseToQueue(runCase)
+    #if runCase && @runCaseServer.saveRunCaseToDB(runCase) && @runCaseServer.putRunCaseToQueue(runCase)
+
+    if run && @queue_client.publish(msg)
       success = true
     end
 
