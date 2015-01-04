@@ -150,7 +150,7 @@ map '/scan' do
       uid = `uuidgen`.chomp
 
       conf = <<-conf
-{"id":"#{uid}","scanConfig":-2,"modules":#{modules},"targetInfo":"#{config}"}
+{"id":"#{uid}","scan_config":-2,"modules":#{modules},"target_info":"#{config}"}
 conf
 
       http = $revok_http[]
@@ -180,7 +180,7 @@ map '/screenshot' do
           uid = `uuidgen`.chomp
           config = Base64.encode64(req.body.read).split("\n").join('')
           conf = <<-conf
-{"id":"#{uid}","scanConfig":1,"targetInfo":"#{config}", "modules":["Photographer"]}
+{"id":"#{uid}","scan_config":1,"target_info":"#{config}", "modules":["Photographer"]}
 conf
 
           http = $revok_http[]
