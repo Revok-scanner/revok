@@ -45,7 +45,14 @@ class ActiveMQClient
 	def publish(msg)
 		return false if (@connection == nil)
 		Log.debug("Pushing message \"#{msg.to_s}\" to queue #{Config::WORK_QUEUE}")
-		@connection.publish(Config::WORK_QUEUE, msg, {persistent:false,expires:(Time.now.to_i*1000)+(259200*1000),'amq-msg-type'=>'text'})
+		begin
+			@connection.publish(Config::WORK_QUEUE, msg, {persistent:false,expires:(Time.now.to_i*1000)+(259200*1000),'amq-msg-type'=>'text'})
+		rescue => exp
+			Log.error(exp.to_s)
+			Log.debug(exp.backtrace.join("\n"))
+			return false
+		end
+		return true
 	end
 
 	def disconnect
