@@ -85,37 +85,6 @@ map '/env' do
   run env_
 end
 
-map '/log' do
-  logs = proc do |env|
-    begin
-
-      req = Rack::Request.new env
-      res = Rack::Response.new
-      res.header['Content-Type'] = 'text/plain'
-      uid = req['uid']
-      uid = 'nil' if uid.nil?
-      uid = '' if uid.size != 36
-      http = $revok_http[]
-      request = Net::HTTP::Get.new("/reports/#{uid}/")
-      request.basic_auth($rest_username, $rest_password)
-      response = http.request(request)
-      if response.class == Net::HTTPNotFound then
-        res.status = 404
-        res.write "404: Not Found"
-      else
-        res.write response.body
-      end
-    rescue =>exp
-      res.write $!
-      res.write "#{exp.backtrace.join("\n")}"
-    end
-
-    res.finish
-
-  end
-  run logs
-end
-
 map '/modules_list' do
   list_modules = proc do |env|
     begin
@@ -150,7 +119,7 @@ map '/scan' do
       uid = `uuidgen`.chomp
 
       conf = <<-conf
-{"id":"#{uid}","scan_config":-2,"modules":#{modules},"target_info":"#{config}"}
+{"id":"#{uid}","modules":#{modules},"target_info":"#{config}"}
 conf
 
       http = $revok_http[]
@@ -180,7 +149,7 @@ map '/screenshot' do
           uid = `uuidgen`.chomp
           config = Base64.encode64(req.body.read).split("\n").join('')
           conf = <<-conf
-{"id":"#{uid}","scan_config":1,"target_info":"#{config}", "modules":["Photographer"]}
+{"id":"#{uid}","target_info":"#{config}", "modules":["Photographer"]}
 conf
 
           http = $revok_http[]
@@ -194,7 +163,7 @@ conf
           uid = 'nil' if uid.nil?
           uid = '' if uid.size != 36
           http = $revok_http[]
-          request = Net::HTTP::Get.new("/reports/#{uid}")
+          request = Net::HTTP::Get.new("/screenshot/#{uid}")
           request.basic_auth($rest_username, $rest_password)
           response = http.request(request)
           if response.class == Net::HTTPNotFound then
