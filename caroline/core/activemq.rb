@@ -26,7 +26,8 @@ class ActiveMQClient
 			}
 			Log.debug("Connecting ActiveMQ: #{config}")
 			begin
-				@connection = Stomp::Client.new(config)
+				@connection = Stomp::Connection.new(config)
+				@connection.subscribe(Config::WORK_QUEUE, {ack:'client'})
 			rescue => exp
 				Log.error(exp.to_s)
 				Log.debug(exp.backtrace.join("\n"))
@@ -45,7 +46,7 @@ class ActiveMQClient
 
 	def disconnect
 		if @connection
-			@connection.close if !@connection.closed?
+			@connection.disconnect if !@connection.closed?
 		end
 	end
 
