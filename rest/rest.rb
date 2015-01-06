@@ -1,6 +1,3 @@
-$: << "#{File.dirname(__FILE__)}/../model/"
-
-require 'model.Server.RunCase'
 require 'io/console'
 require 'json'
 require 'webrick'
@@ -15,17 +12,7 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
 
   def initialize(server, queue_client)
     super server
-    silence_warnings { @runCaseServer = RunCaseServer.new }
     @queue_client = queue_client
-  end
-
-  # Ignore redefine warning temporarily, will be removed next version
-  def silence_warnings(&block)
-    warn_level = $VERBOSE
-    $VERBOSE = nil
-    result = block.call
-    $VERBOSE = warn_level
-    result
   end
 
   def route(req, rsp)
@@ -47,9 +34,9 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
     Log.debug(destination.to_s)
     destination = {
       "PUT/scans" => :put_scan,
-      "GET/scans" => :get_scan,
-      "GET/reports" => :get_report,
-      "GET/status" => :get_status,
+      #"GET/scans" => :get_scan,   #temporary disable
+      "GET/screenshot" => :get_screenshot,
+      #"GET/status" => :get_status,    #temporary disable
       "GET/moduleslist" => :get_modules_list
     }[destination]
 
@@ -85,6 +72,7 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
     hash = JSON.parse(@data, {create_additions:false})
 
     run = Revok::Rest::Run.new(hash)
+    run['type'] = "scan"
     msg = JSON.generate(run).to_s
 
     #if runCase && @runCaseServer.saveRunCaseToDB(runCase) && @runCaseServer.putRunCaseToQueue(runCase)
@@ -182,7 +170,7 @@ class APIServlet < WEBrick::HTTPServlet::AbstractServlet
 
   end
 
-  def get_report
+  def get_screenshot
     @path =~ /\/reports\/([a-z0-9\-_]*)/
     id = $1
 
