@@ -121,7 +121,7 @@ module Revok
 					modules[name].run
 					modules[name].clean
 				rescue => exp
-					Log.error("Module #{name} executed error")
+					Log.error("Module #{name} executed error: #{exp.to_s}")
 					Log.debug(exp.backtrace.join("\n"))
 				end
 			}
