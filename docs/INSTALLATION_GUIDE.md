@@ -4,11 +4,11 @@
 ### 1.1 Start Revok with binary package
 Step 1: download and decompress the binary package (http://revok-scanner.github.io/revok/)
 ```
-$ tar xJvf revok-0.8.0_x86_64.tar.xz
+$ tar xJvf revok-0.8.1_x86_64.tar.xz
 ```
 Step 2: initialize Revok
 ```
-$ cd revok-0.8.0_x86_64
+$ cd revok-0.8.1_x86_64
 $ ./revokd init
 ```
 Step 3: run Revok
@@ -70,16 +70,7 @@ $ vi /var/lib/pgsql/data/pg_hba.conf
 host revok_db revok 0.0.0.0/0 md5
 $ systemctl restart postgresql.service
 ```
-Step 4: update DB settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
-```
-# DB config
-DB_USER=revok
-DB_PASSWORD=password
-DB_HOST=db.example.com
-DB_NAME=revok_db
-DB_PORT=5432
-```
-Step 5: add iptables rule
+Step 4: add iptables rule
 ```
 # iptables -I INPUT 1 -p tcp -m tcp --dport 5432 -j ACCEPT
 ```
@@ -123,25 +114,30 @@ b. Get the certificate and move it to activemq/ on Caroline and REST nodes.
 ```
 $ echo -n | openssl s_client -connect activemq.example.com:61613 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > queue.pem
 ```
-Step 3: update activemq settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
-```
-# ActiveMQ config
-AMPQ_USER=caroline
-AMPQ_PASSWORD=password
-AMPQ_HOST=activemq.example.com
-AMPQ_PORT=61613
-AMPQ_QUEUE=/revok/queue
-```
-Step 4: add iptables rule
+Step 3: add iptables rule
 ```
 # iptables -I INPUT 1 -p tcp -m tcp --dport 61613 -j ACCEPT
 ```
 
 ### 1.2.4 REST API server
 
-Step 1: prepare dependent packages  
+Step 1: copy files to server  
+a. Making a basic directory on server.
+```
+$ mkdir -p revok/var/log
+$ mkdir -p revok/var/pid
+$ mkdir -p revok/var/lock
+$ mkdir -p revok/var/run
+```
+b. Copying the files of directories below from source code package to "revok" folder on server
+- bin/
+- conf/
+- rest/
+- Gemfile
+
+Step 2: prepare dependent packages  
 The list of basic packages required by REST API server.
-- ruby (>=1.9.3)
+- ruby (>=2.1.0)
 - ruby-devel
 - rubygems
 
@@ -154,12 +150,21 @@ $ gem install bundle
 $ cd revok
 $ bundle install
 ```
-Step 2: update REST settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
+Step 3: update settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
 ```
+# ActiveMQ config
+MSG_QUEUE_USER=caroline
+MSG_QUEUE_PASSWORD=password
+MSG_QUEUE_HOST=queue.example.com
+MSG_QUEUE_PORT=61613
+
 # REST config
 REST_USER=revok
 REST_PASSWORD=password
 REST_PORT=8443
+
+# Log level
+LOG=info
 ```
 SSL configuration [Optional]  
 a. Create self-signed certificate and private key for the server, then edit file [rest/rest_served.rb](https://github.com/Revok-scanner/revok/blob/master/rest/rest_served.rb).
@@ -189,14 +194,10 @@ $revok_http = lambda {
   http
 }
 ```
-Step 3: set environment variables that defined in the global configuration file
+Step 4: set environment variables that defined in the global configuration file
 ```
 $ cd revok
-$ sh bin/setenv.sh
-```
-Step 4: initialize database by importing data schema to database
-```
-$ ruby db/initdb.rb
+$ source bin/setenv.sh
 ```
 Step 5: start rest-served
 ```
@@ -209,7 +210,23 @@ Step 6: add iptables rule
 
 ### 1.2.5 Caroline nodes
 
-Step 1: prepare dependent packages  
+Step 1: copy files to server  
+a. Making a basic directory on server.
+```
+$ mkdir -p revok/var/log
+$ mkdir -p revok/var/pid
+$ mkdir -p revok/var/lock
+$ mkdir -p revok/var/run
+$ mkdir -p revok/report
+```
+b. Copying the files of directories below from source code package to "revok" folder on server
+- bin/
+- conf/
+- caroline/
+- db/
+- Gemfile
+
+Step 2: prepare dependent packages  
 All dependent packages of REST API Server are required. Other dependency is as below.
 - python (>=2.6)
 - [pip](https://pip.pypa.io/en/latest/installing.html)
@@ -220,7 +237,15 @@ All dependent packages of REST API Server are required. Other dependency is as b
 - sslscan
 - expect
 - zip
+- ruby (>=2.1.0)
+- ruby-devel
+- rubygems
+- bundle
 ```
+$ yum install -y ruby rubygems
+$ gem install bundle
+$ cd revok
+$ bundle install
 $ yum install -y python ImageMagick openssl sslscan expect
 $ wget https://bootstrap.pypa.io/get-pip.py
 $ python get-pip.py
@@ -229,7 +254,8 @@ $ wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86
 $ tar xjvf phantomjs-1.9.7-linux-x86_64.tar.bz2
 $ cp phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/bin/
 ```
-Step 2: update SMTP settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)  
+
+Step 3: update settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)  
 A SMTP server is needed to send scan reports to users.
 ```
 # Report config
@@ -239,13 +265,35 @@ SMTP_PORT=587
 SMTP_USER=username
 SMTP_PASSWORD=password
 EMAIL_ADDRESS=revok@example.com
+
+# DB config
+DB_TYPE=postgresql
+DB_USER=revok
+DB_PASSWORD=password
+DB_HOST=db.example.com
+DB_NAME=revok_db
+DB_PORT=5435
+DB_SSL=enable
+
+# ActiveMQ config
+MSG_QUEUE_USER=caroline
+MSG_QUEUE_PASSWORD=password
+MSG_QUEUE_HOST=queue.example.com
+MSG_QUEUE_PORT=61613
+
+# Log level
+LOG=info
 ```
-Step 3: set environment variables that defined in the global configuration file
+Step 4: set environment variables that defined in the global configuration file
 ```
 $ cd revok
-$ sh bin/setenv.sh
+$ source bin/setenv.sh
 ```
-Step 4: start carolined
+Step 5: initialize the database
+```
+$ ruby db/db_init.rb
+```
+Step 6: start carolined
 ```
 $ caroline/carolined start
 ```
@@ -253,25 +301,51 @@ $ caroline/carolined start
 
 * Start by WEBrick
 
-Step 1: prepare dependent packages  
-All dependent packages of REST API Server are required.
+Step 1: copy files to server  
+a. Making a basic directory on server.
+```
+$ mkdir -p revok/var/log
+$ mkdir -p revok/var/pid
+$ mkdir -p revok/var/lock
+$ mkdir -p revok/var/run
+```
+b. Copying the files of directories below from source code package to "revok" folder on server
+- bin/
+- conf/
+- webconsole/
+- Gemfile
 
-Step 2: update web settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
+Step 2: prepare dependent packages  
+The list of basic packages required by REST API server.
+- ruby (>=2.1.0)
+- ruby-devel
+- rubygems
+
+The list of required gems.
+- bundle
+- see 'Gemfile' for others
+```
+$ yum install -y ruby rubygems
+$ gem install bundle
+$ cd revok
+$ bundle install
+```
+Step 3: update web settings in the [global configuration file](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf)
 ```
 # Web UI config
 WEB_PORT=3030
 ```
-Step 3: set environment variables that defined in the global configuration file
+Step 4: set environment variables that defined in the global configuration file
 ```
 $ cd revok
-$ sh bin/setenv.sh
+$ source bin/setenv.sh
 ```
-Step 4: start rackd
+Step 5: start rackd
 ```
 $ cd revok
 $ webconsole/rackd start
 ```
-Step 5: add iptables rule
+Step 6: add iptables rule
 ```
 # iptables -I INPUT 1 -p tcp -m tcp --dport 3030 -j ACCEPT
 ```
