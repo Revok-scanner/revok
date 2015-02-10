@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.8.1 (2015-02-10)
+* Remove useless codes & modules
+* New distributed deployment support
+* SQLite support for storage
+* Remove useless columns in database
+
 ### 0.8.0 (2014-12-16)
 * Custom scan support
 * New flexible framework

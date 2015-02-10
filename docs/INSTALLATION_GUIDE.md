@@ -23,8 +23,6 @@ Web console, REST API server, messaging server, Caroline nodes (working nodes) a
 ### 1.2.1 Preparation
 * Get source code  
 The source code can be got from  [Revok git repo](https://github.com/Revok-scanner/revok). Clone it for each node in distributed environment.
-* Global configuration file  
-File [conf/revok.conf](https://github.com/Revok-scanner/revok/blob/master/conf/revok.conf) defines the settings for starting Revok service. Please make sure changes of this file are synchronized on all nodes in the distributed environment.
 * DNS settings [Optional]  
 Add mapping of hostnames and IP addresses to the /etc/hosts file in distributed environment when hostnames are used to communicate.
 

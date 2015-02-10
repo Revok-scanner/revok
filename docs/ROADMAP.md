@@ -5,7 +5,7 @@ The exact roadmap may change according to feedback and resources, but roughly it
 * Revok 0.8.0, estimated Dec. 2014
     * Enhance scalability for adding modules
 
-* Revok 0.8.1, estimated Jan. 2015
+* Revok 0.8.1, estimated Feb. 2015
     * Remove useless codes & modules
     * New distributed deployment support
     * SQLite support for storage
