@@ -8,6 +8,7 @@ require_relative 'core/framework'
 require_relative 'core/module_executor'
 require_relative 'core/activemq'
 require_relative 'core/multilogger'
+require_relative 'core/runserver'
 
 module Revok
 

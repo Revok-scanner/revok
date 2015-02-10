@@ -100,6 +100,38 @@ status() {
   fi
 }
 
+check_dependencies() {
+  which tclsh > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install Tcl at first"
+    exit 1
+  fi
+
+  which unbuffer > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install expect at first"
+    exit 1
+  fi
+
+  which phantomjs > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install PhantomJs at first"
+    exit 1
+  fi
+
+  which mitmproxy > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install Mitmproxy at first"
+    exit 1
+  fi
+
+  which mitmdump > /dev/null
+  if [ $? == 1 ]; then
+    echo "Please install Mitmdump at first"
+    exit 1
+  fi
+}
+
 case "$1" in
   start)
     start
