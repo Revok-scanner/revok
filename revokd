@@ -34,6 +34,16 @@ init() {
   fi
   echo "Done"
 
+  # Sqlite check
+  if [ $DB_TYPE == "sqlite" ]; then
+    echo "Checking sqlite installation..."
+    which sqlite3 > /dev/null
+    if [ $? == 1 ]; then
+      echo "Please install sqlite at first"
+      exit 1
+    fi
+  fi
+
   # Make dirs
   echo -en "Creating directories..."
   eval mkdir -p var/lock $NULL
@@ -45,8 +55,6 @@ init() {
   # Softlink bin files
   echo -en "Creating softlinks..."
   eval ln -s $PHANTOM_JS_DIR/bin/phantomjs $ROOT_PATH/bin/phantomjs $NULL
-  eval ln -s $MITMPROXY_DIR/mitmproxy $ROOT_PATH/bin/mitmproxy $NULL
-  eval ln -s $MITMPROXY_DIR/mitmdump $ROOT_PATH/bin/mitmdump $NULL
   eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so $NULL
   eval ln -s $ROOT_PATH/lib/libffi.so.5.0.6 $ROOT_PATH/lib/libffi.so.5 $NULL
   eval ln -s $ROOT_PATH/lib/libyaml-0.so.2.0.4 $ROOT_PATH/lib/libyaml.so $NULL
@@ -58,20 +66,20 @@ init() {
   eval ln -s $ROOT_PATH/README.md $ROOT_PATH/webconsole/public/docs/About $NULL
   eval ln -s $ROOT_PATH/COPYING $ROOT_PATH/webconsole/public/docs/COPYING $NULL
 
+  ruby $ROOT_PATH/db/db_init.rb
+
   # Config iptables
   echo "To make revok work, we need to execute the below commands to add rules in iptables:"
   echo "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT (required by ActiveMQ)"
-  echo "iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT (required by PostgreSQL)"
   echo "iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT (required by Rest-server)"
   echo "iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT (required by Rack web server)"
   echo "We need the password of root, it'll never be saved"
-  
+
   # to set $? as non-zero, execute an invalid command
   eval qwertyasdfg $NULL
 
   until [ $? -eq 0 ]; do
     su - -c "iptables -I INPUT 1 -p tcp -m tcp --dport $AMPQ_PORT -j ACCEPT;
-    iptables -I INPUT 1 -p tcp -m tcp --dport $DB_PORT -j ACCEPT;
     iptables -I INPUT 1 -p tcp -m tcp --dport $REST_PORT -j ACCEPT;
     iptables -I INPUT 1 -p tcp -m tcp --dport $WEB_PORT -j ACCEPT"
   done
@@ -80,7 +88,6 @@ init() {
 
 start() {
   $ROOT_PATH/activemq/activemqd start
-  $ROOT_PATH/db/postgresql start
   $ROOT_PATH/caroline/carolined start
   $ROOT_PATH/rest/rest-served start
   $ROOT_PATH/webconsole/rackd start
@@ -91,7 +98,6 @@ stop() {
   $ROOT_PATH/webconsole/rackd stop
   $ROOT_PATH/rest/rest-served stop
   $ROOT_PATH/caroline/carolined stop
-  $ROOT_PATH/db/postgresql stop
   $ROOT_PATH/activemq/activemqd stop
 }
 
@@ -100,7 +106,6 @@ status() {
   $ROOT_PATH/rest/rest-served status
   $ROOT_PATH/caroline/carolined status
   $ROOT_PATH/webconsole/rackd status
-  $ROOT_PATH/db/postgresql status
 }
 
 case "$1" in
