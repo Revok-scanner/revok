@@ -48,7 +48,7 @@ def javascribe(str):
       c = bytearray(c.encode('utf16').decode('utf16'),'utf16')
       js.append(hex(c[3])[2:])
       js.append(hex(c[2])[2:])
-  
+
   return ''.join(js)
 
 def foo(ctx,flw):
@@ -71,7 +71,7 @@ def foo(ctx,flw):
 
 def request(ctx,flw):
   req = flw.request
-  url = req.get_url()
+  url = req.url
   url = url.replace("logout","nopenopenope")
   url = url.replace("log-out","nopenopenope")
   url = url.replace("&crawlerforminject=true","")
@@ -85,7 +85,7 @@ def request(ctx,flw):
   except Exception as e:
     print >> sys.stderr, "Problem: %s" % (e,)
     print >> sys.stderr, "Problem url: %s" % (url,)
-  req.set_url(url)
+  req.url = url
 
   if label:
     #double encoded JSON
