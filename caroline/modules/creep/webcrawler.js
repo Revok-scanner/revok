@@ -392,6 +392,19 @@ function Crawler(httpURL,type){
 			$('a').each(function(){
 				var href = $(this).attr('href');
 				if(href != '#' && $.trim(href) != '' && href.indexOf('mailto') < 0 && href.indexOf('logout') < 0 && href.indexOf('javascript') < 0){
+
+					var absoluteLinkReg = new RegExp("^(https?|ftps?|file|javascript|mailto|data:image)","i");
+					var baseHref = "";
+
+					//Only relative links
+					if(!absoluteLinkReg.test(href)){
+						//There is base tag defined
+						if($("base").length > 0 && (baseHref = $("base").attr("href")) != "")
+							href = baseHref + (baseHref.match(/\/$/)? href : "/"+href);
+						else
+							href = locations.path+"/"+href;
+					}
+
 					var httpReg = new RegExp('^http','i');
 					if( ! httpReg.test(href) ){
 						var reg=new RegExp("^/");    
