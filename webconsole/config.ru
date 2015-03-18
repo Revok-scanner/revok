@@ -9,15 +9,14 @@ require 'mechanize'
 
 $root = File.join(File.dirname(__FILE__), "/", "public")
 
-$rest_username = "revok"
-$rest_password = "password"
+$rest_username = ENV['REST_USER']
+$rest_password = ENV['REST_PASSWORD']
 
 # Called by auto fill form module. It saves the login body. To avoid unexpected modify the global var, you should never modify it directly.
 $login_msg = ""
 
 $revok_http = lambda {
-  uri = URI.parse("http://127.0.0.1:8443")
-  http = Net::HTTP.new(uri.host, uri.port)
+  http = Net::HTTP.new(ENV['REST_HOST'], ENV['REST_PORT'])
 # If you want to enable SSL, make the below lines functional
 #  http.use_ssl = true
 #  http.ca_file = "revok.crt"
