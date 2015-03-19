@@ -265,7 +265,7 @@ SMTP_PASSWORD=password
 EMAIL_ADDRESS=revok@example.com
 
 # DB config
-DB_TYPE=postgresql
+DB_TYPE=pgsql
 DB_USER=revok
 DB_PASSWORD=password
 DB_HOST=db.example.com
