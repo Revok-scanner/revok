@@ -8,10 +8,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: runcases; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: run; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
-CREATE TABLE runcases(
+CREATE TABLE run(
     id character varying(64) NOT NULL,
     process character varying(10),
     scanConfig integer DEFAULT 0,
@@ -23,10 +23,10 @@ CREATE TABLE runcases(
 );
 
 --
--- Name: runcases; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: run; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
-ALTER TABLE ONLY runcases
-    ADD CONSTRAINT runcases_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY run
+    ADD CONSTRAINT run_pkey PRIMARY KEY (id);
 
 
