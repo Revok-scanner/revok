@@ -384,7 +384,7 @@ function Crawler(httpURL,type){
 		this.scanButton();
 		this.scanForm();
 		this.scanImage();
-		this.scanOthers();
+		this.scanEvents();
 	};
 	this.scanLink = function(type) {
 		this.links = this.page.evaluate(function(host,locations){
@@ -547,15 +547,6 @@ function Crawler(httpURL,type){
 			return fields;
 		});
 	};
-	this.scanOthers = function() {
-		this.page.evaluate(function(){
-			$(' li , span ').each(function(i){
-				var o = $(this);
-				var t = i*50 + 100;
-				setTimeout(function(){o.click();},t);
-			});
-		});
-	};
 	this.crawlResources = function(){
 		for(var i = 0 ; i < this.webResources.length ; i++){
 			var url = new HttpURL(this.webResources[i]);
@@ -563,6 +554,59 @@ function Crawler(httpURL,type){
 				new Crawler(url);//Start a new crawler on the navigation URL.
 			}
 		}
+	};
+	this.scanEvents = function(){
+		this.page.onConsoleMessage = function(msg){};
+		this.page.injectJs(JQUERY);
+		//console.log("[OID] URL: "+this.page.url);
+
+		var objectSelectors = Array("div", "li", "span");//, "p", "tr", "td", "radio");
+
+		for(k = 0; k < objectSelectors.length; k++){
+			var objectSelector = objectSelectors[k];
+
+			//Get all oids
+			var objects = this.page.evaluate(function(objectSelector){
+				var objects = Array();
+
+				$(objectSelector).each(function(i){
+					var oid = $(this).attr('id');
+
+					if(oid == undefined){
+						oid = "revok-internal-id"+i;
+					}
+					objects.push(oid);
+				});
+				return objects;
+			},objectSelector);
+
+			//There are objects
+			if(objects.length > 0){
+				var events = Array("click", "mouseout", "mouseover", "mousedown"); //"mouseup");
+				for(i = 0; i < events.length; i++){
+					for(j = 0; j < objects.length; j++){
+						this.page.evaluate(function(objectSelector, id, ev){
+
+							//Get oids once again
+							$(objectSelector).each(function(i){
+								var oid = $(this).attr('id');
+
+								if(oid == undefined){
+									oid = "revok-internal-id"+i;
+								}
+
+								if(id == oid){
+									var o = $(this);
+									console.log("[OID] "+id+"."+ev+" ("+objectSelector+")");
+									setTimeout(function(){ o[ev](); }, 250);
+								}
+							});
+						}, objectSelector, objects[j], events[i]);
+					}
+				}
+			}
+		}
+
 	};
 	this.close = function(){
 		try{
