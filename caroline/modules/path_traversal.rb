@@ -65,7 +65,7 @@ class PathTraveler < Revok::Module
       @no_p_url = Array.new()
 
       @f_exts = FILEEXTS
-      @f_name = ['doc','file','f','page','p','dir','filename','fname']
+      @f_name = ['doc','file','f','page','p','dir','filename','fname','target','msg']
 
       @data = JSON.parse(@session_data, {create_additions:false})
       @cookie=@data['cookie']
